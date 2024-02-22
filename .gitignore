@@ -1,0 +1,6 @@
+*.elf
+*.o
+Debug/
+.setting/
+*.launch
+*.mxproject
