@@ -23,7 +23,6 @@
 #include "dcmi.h"
 #include "dma2d.h"
 #include "eth.h"
-#include "fatfs.h"
 #include "i2c.h"
 #include "ltdc.h"
 #include "quadspi.h"
@@ -120,7 +119,6 @@ int main(void)
   MX_QUADSPI_Init();
   MX_RTC_Init();
   MX_SAI2_Init();
-  MX_SDMMC1_SD_Init();
   MX_SPDIFRX_Init();
   MX_TIM1_Init();
   MX_TIM2_Init();
@@ -130,8 +128,8 @@ int main(void)
   MX_TIM12_Init();
   MX_USART1_UART_Init();
   MX_USART6_UART_Init();
-  MX_FATFS_Init();
   MX_USB_HOST_Init();
+  MX_SDMMC1_MMC_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
@@ -144,10 +142,8 @@ int main(void)
     MX_USB_HOST_Process();
 
     /* USER CODE BEGIN 3 */
-    HAL_GPIO_WritePin(ARDUINO_SCK_D13_GPIO_Port, ARDUINO_SCK_D13_Pin, GPIO_PIN_RESET);
-    HAL_Delay(500);
-    HAL_GPIO_WritePin(ARDUINO_SCK_D13_GPIO_Port, ARDUINO_SCK_D13_Pin, GPIO_PIN_SET);
-	HAL_Delay(500);
+	if (HAL_GetTick() % 1000 < 500) {HAL_GPIO_WritePin(ARDUINO_SCK_D13_GPIO_Port, ARDUINO_SCK_D13_Pin, GPIO_PIN_RESET);}
+	else {HAL_GPIO_WritePin(ARDUINO_SCK_D13_GPIO_Port, ARDUINO_SCK_D13_Pin, GPIO_PIN_SET);}
   }
   /* USER CODE END 3 */
 }
