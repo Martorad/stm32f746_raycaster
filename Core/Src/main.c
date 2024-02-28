@@ -40,6 +40,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "image.h"
+#include "../../Drivers/BSP/STM32746G-Discovery/stm32746g_discovery_lcd.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -133,7 +134,19 @@ int main(void)
   MX_FATFS_Init();
   MX_USB_HOST_Init();
   /* USER CODE BEGIN 2 */
+  BSP_LCD_Init();
+  BSP_LCD_LayerDefaultInit(LTDC_ACTIVE_LAYER, LCD_FB_START_ADDRESS);
+  BSP_LCD_SelectLayer(LTDC_ACTIVE_LAYER);
+  BSP_LCD_DisplayOn();
+  BSP_LCD_Clear(LCD_COLOR_BLACK);
+//  BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
+  HAL_Delay(1000);
+//  BSP_LCD_FillRect(50, 50, 100, 100);
 
+  for (uint8_t i = 0; i < 40; i++) {
+	  BSP_LCD_SetTextColor(0xFF000000 | (uint32_t)((0.025 * i) * 0xFF) << 16 | (uint32_t)((0.025 * i) * 0xFF) << 8 | (uint32_t)((0.025 * i) * 0xFF));
+	  BSP_LCD_FillRect(0 + i * 12, 0 + i * 2, 12, 272 - i * 4);
+  }
   /* USER CODE END 2 */
 
   /* Infinite loop */
