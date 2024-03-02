@@ -48,7 +48,8 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
+#define M_3PI_2 4.71238898038468985769
+#define INCR    0.0174533
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -68,7 +69,8 @@ void PeriphCommonClock_Config(void);
 void MX_USB_HOST_Process(void);
 
 /* USER CODE BEGIN PFP */
-
+void cast(float px, float py, float pa, uint8_t mapX, uint8_t mapY, uint8_t mapS, uint8_t* map);
+float raylength(float ax, float ay, float bx, float by);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -132,19 +134,35 @@ int main(void)
   /* USER CODE BEGIN 2 */
   BSP_LCD_Init();
   BSP_LCD_LayerDefaultInit(LTDC_ACTIVE_LAYER, LCD_FB_START_ADDRESS);
+  BSP_LCD_LayerDefaultInit(LTDC_INACTIVE_LAYER, 0xD0000000);
   BSP_LCD_SelectLayer(LTDC_ACTIVE_LAYER);
   BSP_LCD_DisplayOn();
   BSP_LCD_Clear(LCD_COLOR_BLACK);
-
   for (uint8_t i = 0; i < 40; i++) {
-	  BSP_LCD_SetTextColor(0xFF000000 | (uint32_t)((0.025 * i) * 0xFF) << 16 | (uint32_t)((0.025 * i) * 0xFF) << 8 | (uint32_t)((0.025 * i) * 0xFF));
-	  BSP_LCD_FillRect(0 + i * 12, 0 + i * 2, 12, 272 - i * 4);
+    BSP_LCD_SetTextColor(0xFF000000 | (uint32_t)((0.025 * i) * 0xFF) << 16 | (uint32_t)((0.025 * i) * 0xFF) << 8 | (uint32_t)((0.025 * i) * 0xFF));
+    BSP_LCD_FillRect(0 + i * 12, 0 + i * 2, 12, 272 - i * 4);
   }
+  HAL_Delay(2000);
+  BSP_LCD_Clear(LCD_COLOR_BLACK);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  float px, py;
+  // map
+  uint8_t mapX = 8, mapY = 8, mapS = 64;
+  uint8_t map[] = {
+      1, 1, 1, 1, 1, 1, 1, 1,
+      1, 0, 0, 1, 0, 0, 1, 1,
+      1, 0, 0, 1, 0, 0, 0, 1,
+      1, 0, 0, 0, 0, 0, 0, 1,
+      1, 0, 0, 0, 1, 1, 0, 1,
+      1, 0, 0, 0, 1, 1, 0, 1,
+      1, 0, 0, 0, 0, 0, 0, 1,
+      1, 1, 1, 1, 1, 1, 1, 1
+  };
+  float px = 160, py = 352, pdx = 0, pdy = 0, pa = 0; // player X and Y, player delta X and Y and player Angle
+  uint8_t i = 0;
 
   while (1)
   {
@@ -152,10 +170,22 @@ int main(void)
     MX_USB_HOST_Process();
 
     /* USER CODE BEGIN 3 */
-//    if (HAL_GetTick() % 1000 < 500) { HAL_GPIO_WritePin(ARDUINO_SCK_D13_GPIO_Port, ARDUINO_SCK_D13_Pin, GPIO_PIN_RESET); }
-//    else { HAL_GPIO_WritePin(ARDUINO_SCK_D13_GPIO_Port, ARDUINO_SCK_D13_Pin, GPIO_PIN_SET); }
+//    cast(px, py, pa, mapX, mapY, mapS, map);
 
-    HAL_GPIO_WritePin(ARDUINO_SCK_D13_GPIO_Port, ARDUINO_SCK_D13_Pin, HAL_GPIO_ReadPin(BUTTON_GPIO_Port, BUTTON_Pin));
+    BSP_LCD_Clear(LCD_COLOR_BLACK);
+    BSP_LCD_FillRect(240, 0, 20, i);
+    HAL_Delay(10);
+    if (++i > 272) { i = 0; }
+
+    if (HAL_GetTick() % 1000 < 500) { HAL_GPIO_WritePin(ARDUINO_SCK_D13_GPIO_Port, ARDUINO_SCK_D13_Pin, GPIO_PIN_RESET); }
+    else { HAL_GPIO_WritePin(ARDUINO_SCK_D13_GPIO_Port, ARDUINO_SCK_D13_Pin, GPIO_PIN_SET); }
+
+//    if (HAL_GPIO_ReadPin(BUTTON_GPIO_Port, BUTTON_Pin)) {
+//      pa -= 0.1;
+//      if (pa < 0) { pa = M_TWOPI; }
+//      pdx = cos(pa) * 5;
+//      pdy = sin(pa) * 5;
+//    }
   }
   /* USER CODE END 3 */
 }
@@ -244,7 +274,127 @@ void PeriphCommonClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+void cast(float px, float py, float pa, uint8_t mapX, uint8_t mapY, uint8_t mapS, uint8_t* map) {
+  uint16_t r, mx, my, mp, dof; // r is amount of rays, mx and my are map x and y positions, mp is map position in array, dof is how many steps to attempt to cast a ray, before giving up
+  float    rx, ry, ra, xo, yo; // rx and ry are the first intersect points, ra is ray angle, xo and yo are x and y offset or step
 
+  ra = pa;
+
+  for (r = 0; r < 1; r++) {
+    // HORIZONTAL LINE CHECK
+    dof = 0;
+    float dH = 100000, hx = px, hy = py;
+    float aTan = -1 / tan(ra);
+
+    // looking up
+    if (ra < M_PI) {
+      ry = (((uint16_t)py >> 6) << 6) + 64; // essentially acts as floor(py) + 64 to find next horizontal intersection of y
+      rx = (py - ry) * aTan + px;           // some weird signage stuff, but essentially find the y distance between ry and py, divide by the tangent to get xn and add px to get rx
+      yo = 64;                              // yo is equal to cellsize
+      xo = yo * aTan;                       // xo is equal to the ratio of the tangent
+    }
+
+    // looking down
+    if (ra > M_PI) {
+      ry = (((uint16_t)py >> 6) << 6);
+      rx = (py - ry) * aTan + px;
+      yo = -64;
+      xo = yo * aTan;
+    }
+
+    // looking perfectly horizontal
+    if (ra == 0 || ra == M_PI) {
+      ry = py;
+      rx = px;
+      dof = 8;
+    }
+
+    while (dof < 8) {
+      mx = (uint16_t)rx >> 6; // divide ray's position to figure out the map square to check
+      my = (uint16_t)ry >> 6;
+      mp = my * mapX + mx;    // find that map square's position in the array
+
+      if (mp > 0 && mp < mapX * mapY && map[mp] == 1) {
+        hx = rx;
+        hy = ry;
+        dH = raylength(px, py, hx, hy); // calculate delta between hit x,y and player x,y, use pythagoras to get hypotenuse length
+        dof = 8;
+      }
+      else {
+        rx += xo;
+        ry += yo;
+        dof++;
+      }
+    }
+
+    // VERTICAL LINE CHECK
+    dof = 0;
+    float dV = 100000, vx = px, vy = py;
+    float nTan = -tan(ra);
+
+    // looking left
+    if (ra > M_PI_2 && ra < M_3PI_2) {
+      rx = (((uint16_t)px >> 6) << 6);
+      ry = (px - rx) * nTan + py;
+      xo = -64;
+      yo = xo * nTan;
+    }
+
+    // looking right
+    if (ra < M_PI_2 || ra > M_3PI_2) {
+      rx = (((uint16_t)px >> 6) << 6) + 64;
+      ry = (px - rx) * nTan + py;
+      xo = 64;
+      yo = xo * nTan;
+    }
+
+    // looking perfectly horizontal
+    if (ra == 0 || ra == M_PI) {
+      ry = py;
+      rx = px;
+      dof = 8;
+    }
+
+    while (dof < 8) {
+      mx = (uint16_t)rx >> 6;
+      my = (uint16_t)ry >> 6;
+      mp = my * mapX + mx;
+
+      if (mp > 0 && mp < mapX * mapY && map[mp] == 1) {
+        vx = rx;
+        vy = ry;
+        dV = raylength(px, py, vx, vy);
+        dof = 8;
+      }
+      else {
+        rx += xo;
+        ry += yo;
+        dof++;
+      }
+    }
+
+    float shortest;
+
+    if (dV < dH) {
+      shortest = dV;
+      rx = vx;
+      ry = vy;
+    }
+    if (dH < dV) {
+      shortest = dH;
+      rx = hx;
+      ry = hy;
+    }
+
+    BSP_LCD_Clear(LCD_COLOR_BLACK);
+    BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
+    BSP_LCD_FillRect(240, 0, 20, shortest * 3);
+  }
+}
+
+float raylength(float ax, float ay, float bx, float by) {
+  return sqrt((bx - ax) * (bx - ax) + (by - ay) * (by - ay));
+}
 /* USER CODE END 4 */
 
 /**

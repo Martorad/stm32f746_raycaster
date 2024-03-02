@@ -86,6 +86,7 @@ typedef enum
 #define LCD_LayerCfgTypeDef    LTDC_LayerCfgTypeDef
 
 #define LTDC_ACTIVE_LAYER	     ((uint32_t)1) /* Layer 1 */
+#define LTDC_INACTIVE_LAYER    ((uint32_t)2) /* Layer 2 */
 /** 
   * @brief  LCD status structure definition  
   */     
