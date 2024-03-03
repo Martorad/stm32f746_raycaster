@@ -48,8 +48,8 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define M_3PI_2 4.71238898038468985769
-#define INCR    0.0174533
+#define M_3PI_2  4.71238898038468985769
+#define FOV_INCR 0.0174533
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -134,7 +134,6 @@ int main(void)
   /* USER CODE BEGIN 2 */
   BSP_LCD_Init();
   BSP_LCD_LayerDefaultInit(LTDC_ACTIVE_LAYER, LCD_FB_START_ADDRESS);
-//  BSP_LCD_LayerDefaultInit(LTDC_INACTIVE_LAYER, 0xD0000000);
   BSP_LCD_SelectLayer(LTDC_ACTIVE_LAYER);
   BSP_LCD_DisplayOn();
   BSP_LCD_Clear(LCD_COLOR_BLACK);
@@ -142,7 +141,7 @@ int main(void)
     BSP_LCD_SetTextColor(0xFF000000 | (uint32_t)((0.025 * i) * 0xFF) << 16 | (uint32_t)((0.025 * i) * 0xFF) << 8 | (uint32_t)((0.025 * i) * 0xFF));
     BSP_LCD_FillRect(0 + i * 12, 0 + i * 2, 12, 272 - i * 4);
   }
-  HAL_Delay(2000);
+  HAL_Delay(1000);
   BSP_LCD_Clear(LCD_COLOR_BLACK);
 
   /* USER CODE END 2 */
@@ -161,7 +160,7 @@ int main(void)
       1, 0, 0, 0, 0, 0, 0, 1,
       1, 1, 1, 1, 1, 1, 1, 1
   };
-  float px = 160, py = 352, pdx = 0, pdy = 0, pa = 70; // player X and Y, player delta X and Y and player Angle
+  float px = 160, py = 352, pdx = 0, pdy = 0, pa = 45 * FOV_INCR; // player X and Y, player delta X and Y and player Angle
   uint8_t i = 0;
 
   while (1)
@@ -277,11 +276,13 @@ void PeriphCommonClock_Config(void)
 /* USER CODE BEGIN 4 */
 void cast(float px, float py, float pa, uint8_t mapX, uint8_t mapY, uint8_t mapS, uint8_t* map) {
   uint16_t r, mx, my, mp, dof; // r is amount of rays, mx and my are map x and y positions, mp is map position in array, dof is how many steps to attempt to cast a ray, before giving up
-  float    rx, ry, ra, xo, yo; // rx and ry are the first intersect points, ra is ray angle, xo and yo are x and y offset or step
+  float    rx, ry, ra, xo, yo, shrt; // rx and ry are the first intersect points, ra is ray angle, xo and yo are x and y offset or step, shrt is the shortest ray length
 
-  ra = pa;
+  ra = pa - 30 * FOV_INCR;
+  if (ra < 0)       { ra += M_TWOPI; }
+  if (ra > M_TWOPI) { ra -= M_TWOPI; }
 
-  for (r = 0; r < 1; r++) {
+  for (r = 0; r < 60; r++) {
     // HORIZONTAL LINE CHECK
     dof = 0;
     float dH = 100000, hx = px, hy = py;
@@ -374,22 +375,34 @@ void cast(float px, float py, float pa, uint8_t mapX, uint8_t mapY, uint8_t mapS
       }
     }
 
-    float shortest;
-
     if (dV < dH) {
-      shortest = dV;
+      shrt = dV;
       rx = vx;
       ry = vy;
     }
     if (dH < dV) {
-      shortest = dH;
+      shrt = dH;
       rx = hx;
       ry = hy;
     }
 
-//    BSP_LCD_Clear(LCD_COLOR_BLACK);
-    BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
-    BSP_LCD_FillRect(240, 0, 20, (uint16_t)shortest);
+    // Rendering
+    float lineH = (mapS * 272) / shrt;
+    if (lineH > 272) { lineH = 272; }
+
+    float lineO = (272 - lineH) / 2;
+
+    if (HAL_GetTick() % 1000 > 998) {
+      BSP_LCD_Clear(LCD_COLOR_BLACK);
+      BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
+    }
+    else {
+      BSP_LCD_FillRect((r * 8) + 1, lineO, 6, lineH);
+    }
+
+    ra += FOV_INCR;
+    if (ra < 0)       { ra += M_TWOPI; }
+    if (ra > M_TWOPI) { ra -= M_TWOPI; }
   }
 }
 
