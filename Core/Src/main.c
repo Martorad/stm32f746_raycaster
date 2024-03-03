@@ -134,7 +134,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
   BSP_LCD_Init();
   BSP_LCD_LayerDefaultInit(LTDC_ACTIVE_LAYER, LCD_FB_START_ADDRESS);
-  BSP_LCD_LayerDefaultInit(LTDC_INACTIVE_LAYER, 0xD0000000);
+//  BSP_LCD_LayerDefaultInit(LTDC_INACTIVE_LAYER, 0xD0000000);
   BSP_LCD_SelectLayer(LTDC_ACTIVE_LAYER);
   BSP_LCD_DisplayOn();
   BSP_LCD_Clear(LCD_COLOR_BLACK);
@@ -161,7 +161,7 @@ int main(void)
       1, 0, 0, 0, 0, 0, 0, 1,
       1, 1, 1, 1, 1, 1, 1, 1
   };
-  float px = 160, py = 352, pdx = 0, pdy = 0, pa = 0; // player X and Y, player delta X and Y and player Angle
+  float px = 160, py = 352, pdx = 0, pdy = 0, pa = 70; // player X and Y, player delta X and Y and player Angle
   uint8_t i = 0;
 
   while (1)
@@ -170,22 +170,23 @@ int main(void)
     MX_USB_HOST_Process();
 
     /* USER CODE BEGIN 3 */
-//    cast(px, py, pa, mapX, mapY, mapS, map);
+    cast(px, py, pa, mapX, mapY, mapS, map);
 
-    BSP_LCD_Clear(LCD_COLOR_BLACK);
-    BSP_LCD_FillRect(240, 0, 20, i);
-    HAL_Delay(10);
-    if (++i > 272) { i = 0; }
+//    BSP_LCD_Clear(LCD_COLOR_BLACK);
+//    BSP_LCD_FillRect(240, 0, 20, i);
+//    HAL_Delay(10);
+//    if (++i > 272) { i = 0; }
 
     if (HAL_GetTick() % 1000 < 500) { HAL_GPIO_WritePin(ARDUINO_SCK_D13_GPIO_Port, ARDUINO_SCK_D13_Pin, GPIO_PIN_RESET); }
     else { HAL_GPIO_WritePin(ARDUINO_SCK_D13_GPIO_Port, ARDUINO_SCK_D13_Pin, GPIO_PIN_SET); }
 
-//    if (HAL_GPIO_ReadPin(BUTTON_GPIO_Port, BUTTON_Pin)) {
-//      pa -= 0.1;
-//      if (pa < 0) { pa = M_TWOPI; }
-//      pdx = cos(pa) * 5;
-//      pdy = sin(pa) * 5;
-//    }
+    if (HAL_GPIO_ReadPin(BUTTON_GPIO_Port, BUTTON_Pin)) {
+      HAL_Delay(10);
+      pa -= 0.1;
+      if (pa < 0) { pa = M_TWOPI; }
+      pdx = cos(pa) * 5;
+      pdy = sin(pa) * 5;
+    }
   }
   /* USER CODE END 3 */
 }
@@ -386,9 +387,9 @@ void cast(float px, float py, float pa, uint8_t mapX, uint8_t mapY, uint8_t mapS
       ry = hy;
     }
 
-    BSP_LCD_Clear(LCD_COLOR_BLACK);
+//    BSP_LCD_Clear(LCD_COLOR_BLACK);
     BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
-    BSP_LCD_FillRect(240, 0, 20, shortest * 3);
+    BSP_LCD_FillRect(240, 0, 20, (uint16_t)shortest);
   }
 }
 
