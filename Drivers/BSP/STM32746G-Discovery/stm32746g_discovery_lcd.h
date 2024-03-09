@@ -86,7 +86,9 @@ typedef enum
 #define LCD_LayerCfgTypeDef    LTDC_LayerCfgTypeDef
 
 #define LTDC_ACTIVE_LAYER	     ((uint32_t)1) /* Layer 1 */
-#define LTDC_INACTIVE_LAYER    ((uint32_t)2) /* Layer 2 */
+
+#define LTDC_FOREGROUND        ((uint32_t)1) /* Layer 1 */
+#define LTDC_BACKGROUND        ((uint32_t)0) /* Layer 0 */
 /** 
   * @brief  LCD status structure definition  
   */     
@@ -97,8 +99,9 @@ typedef enum
 /** 
   * @brief  LCD FB_StartAddress  
   */
-#define LCD_FB_START_ADDRESS       ((uint32_t)0xC0000000)
+#define LCD_FB_START_ADDRESS   ((uint32_t)0xC0000000)
 
+#define LCD_BB_START_ADDRESS   ((uint32_t)0xC0080000)
 /** 
   * @brief  LCD color  
   */ 
@@ -226,6 +229,7 @@ void     BSP_LCD_MspInit(LTDC_HandleTypeDef *hltdc, void *Params);
 void     BSP_LCD_MspDeInit(LTDC_HandleTypeDef *hltdc, void *Params);
 void     BSP_LCD_ClockConfig(LTDC_HandleTypeDef *hltdc, void *Params);
 
+void     BSP_LTDC_SWAP(uint32_t Address, uint32_t LayerIdx);
 /**
   * @}
   */ 

@@ -117,7 +117,7 @@ int main(void)
   MX_FMC_Init();
   MX_I2C1_Init();
   MX_I2C3_Init();
-  MX_LTDC_Init();
+//  MX_LTDC_Init();
   MX_QUADSPI_Init();
   MX_RTC_Init();
   MX_SAI2_Init();
@@ -133,16 +133,27 @@ int main(void)
   MX_USB_HOST_Init();
   /* USER CODE BEGIN 2 */
   BSP_LCD_Init();
-  BSP_LCD_LayerDefaultInit(LTDC_ACTIVE_LAYER, LCD_FB_START_ADDRESS);
-  BSP_LCD_SelectLayer(LTDC_ACTIVE_LAYER);
+  BSP_LCD_LayerDefaultInit(LTDC_FOREGROUND, LCD_FB_START_ADDRESS);
+  BSP_LCD_LayerDefaultInit(LTDC_BACKGROUND, LCD_BB_START_ADDRESS);
   BSP_LCD_DisplayOn();
+
+  BSP_LCD_SelectLayer(LTDC_FOREGROUND);
   BSP_LCD_Clear(LCD_COLOR_BLACK);
   for (uint8_t i = 0; i < 40; i++) {
     BSP_LCD_SetTextColor(0xFF000000 | (uint32_t)((0.025 * i) * 0xFF) << 16 | (uint32_t)((0.025 * i) * 0xFF) << 8 | (uint32_t)((0.025 * i) * 0xFF));
     BSP_LCD_FillRect(0 + i * 12, 0 + i * 2, 12, 272 - i * 4);
   }
-  HAL_Delay(1000);
+
+  BSP_LCD_SelectLayer(LTDC_BACKGROUND);
   BSP_LCD_Clear(LCD_COLOR_BLACK);
+  for (uint8_t i = 0; i < 40; i++) {
+    BSP_LCD_SetTextColor(0xFF000000 | (uint32_t)((0.025 * i) * 0xFF) << 16 | (uint32_t)((0.025 * i) * 0x00) << 8 | (uint32_t)((0.025 * i) * 0xFF));
+    BSP_LCD_FillRect(0 + i * 12, 0 + i * 2, 12, 272 - i * 4);
+  }
+  HAL_Delay(3000);
+  BSP_LTDC_SWAP(LCD_BB_START_ADDRESS, 1);
+//  BSP_LCD_SelectLayer(LTDC_FOREGROUND);
+//  BSP_LCD_Clear(LCD_COLOR_BLACK);
 
   /* USER CODE END 2 */
 
@@ -169,7 +180,7 @@ int main(void)
     MX_USB_HOST_Process();
 
     /* USER CODE BEGIN 3 */
-    cast(px, py, pa, mapX, mapY, mapS, map);
+//    cast(px, py, pa, mapX, mapY, mapS, map);
 
 //    BSP_LCD_Clear(LCD_COLOR_BLACK);
 //    BSP_LCD_FillRect(240, 0, 20, i);

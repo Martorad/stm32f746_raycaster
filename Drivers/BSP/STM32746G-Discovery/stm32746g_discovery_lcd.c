@@ -1629,6 +1629,10 @@ static void LL_ConvertLineToARGB8888(void *pSrc, void *pDst, uint32_t xSize, uin
   } 
 }
 
+void BSP_LTDC_SWAP(uint32_t Address, uint32_t LayerIdx) {
+  HAL_LTDC_SetAddress(&hLtdcHandler, Address, LayerIdx);
+}
+
 /**
   * @}
   */
