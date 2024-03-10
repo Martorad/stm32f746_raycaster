@@ -69,7 +69,7 @@ void PeriphCommonClock_Config(void);
 void MX_USB_HOST_Process(void);
 
 /* USER CODE BEGIN PFP */
-void cast(float px, float py, float pa, uint8_t mapX, uint8_t mapY, uint8_t mapS, uint8_t* map);
+void cast(float px, float py, float pa, uint8_t mapX, uint8_t mapY, uint8_t mapS, uint8_t* map, uint8_t activeBuffer);
 float raylength(float ax, float ay, float bx, float by);
 /* USER CODE END PFP */
 
@@ -150,8 +150,8 @@ int main(void)
     BSP_LCD_SetTextColor(0xFF000000 | (uint32_t)((0.025 * i) * 0xFF) << 16 | (uint32_t)((0.025 * i) * 0x00) << 8 | (uint32_t)((0.025 * i) * 0xFF));
     BSP_LCD_FillRect(0 + i * 12, 0 + i * 2, 12, 272 - i * 4);
   }
-  HAL_Delay(3000);
-  BSP_LTDC_SWAP(LCD_BB_START_ADDRESS, 1);
+//  HAL_Delay(3000);
+
 //  BSP_LCD_SelectLayer(LTDC_FOREGROUND);
 //  BSP_LCD_Clear(LCD_COLOR_BLACK);
 
@@ -172,7 +172,7 @@ int main(void)
       1, 1, 1, 1, 1, 1, 1, 1
   };
   float px = 160, py = 352, pdx = 0, pdy = 0, pa = 45 * FOV_INCR; // player X and Y, player delta X and Y and player Angle
-  uint8_t i = 0;
+  uint8_t activeBuffer = 0;
 
   while (1)
   {
@@ -180,7 +180,7 @@ int main(void)
     MX_USB_HOST_Process();
 
     /* USER CODE BEGIN 3 */
-//    cast(px, py, pa, mapX, mapY, mapS, map);
+    cast(px, py, pa, mapX, mapY, mapS, map, activeBuffer);
 
 //    BSP_LCD_Clear(LCD_COLOR_BLACK);
 //    BSP_LCD_FillRect(240, 0, 20, i);
@@ -191,8 +191,8 @@ int main(void)
     else { HAL_GPIO_WritePin(ARDUINO_SCK_D13_GPIO_Port, ARDUINO_SCK_D13_Pin, GPIO_PIN_SET); }
 
     if (HAL_GPIO_ReadPin(BUTTON_GPIO_Port, BUTTON_Pin)) {
-      HAL_Delay(10);
-      pa -= 0.1;
+//      HAL_Delay(10);
+      pa -= 0.001;
       if (pa < 0) { pa = M_TWOPI; }
       pdx = cos(pa) * 5;
       pdy = sin(pa) * 5;
@@ -285,13 +285,17 @@ void PeriphCommonClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-void cast(float px, float py, float pa, uint8_t mapX, uint8_t mapY, uint8_t mapS, uint8_t* map) {
+void cast(float px, float py, float pa, uint8_t mapX, uint8_t mapY, uint8_t mapS, uint8_t* map, uint8_t activeBuffer) {
   uint16_t r, mx, my, mp, dof; // r is amount of rays, mx and my are map x and y positions, mp is map position in array, dof is how many steps to attempt to cast a ray, before giving up
   float    rx, ry, ra, xo, yo, shrt; // rx and ry are the first intersect points, ra is ray angle, xo and yo are x and y offset or step, shrt is the shortest ray length
 
   ra = pa - 30 * FOV_INCR;
   if (ra < 0)       { ra += M_TWOPI; }
   if (ra > M_TWOPI) { ra -= M_TWOPI; }
+
+  BSP_LCD_SelectLayer(!activeBuffer);
+  BSP_LCD_Clear(LCD_COLOR_BLACK);
+  BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
 
   for (r = 0; r < 60; r++) {
     // HORIZONTAL LINE CHECK
@@ -403,18 +407,15 @@ void cast(float px, float py, float pa, uint8_t mapX, uint8_t mapY, uint8_t mapS
 
     float lineO = (272 - lineH) / 2;
 
-    if (HAL_GetTick() % 1000 > 998) {
-      BSP_LCD_Clear(LCD_COLOR_BLACK);
-      BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
-    }
-    else {
-      BSP_LCD_FillRect((r * 8) + 1, lineO, 6, lineH);
-    }
+    BSP_LCD_FillRect((r * 8) + 1, lineO, 6, lineH);
 
     ra += FOV_INCR;
     if (ra < 0)       { ra += M_TWOPI; }
     if (ra > M_TWOPI) { ra -= M_TWOPI; }
   }
+
+  activeBuffer ^= 1;
+  BSP_LTDC_SWAP(activeBuffer);
 }
 
 float raylength(float ax, float ay, float bx, float by) {
