@@ -37,8 +37,11 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include <stdio.h>
+#include <stdlib.h>
 #include "math.h"
 #include "../../Drivers/BSP/STM32746G-Discovery/stm32746g_discovery_lcd.h"
+#include "rc_config.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -69,13 +72,14 @@ void PeriphCommonClock_Config(void);
 void MX_USB_HOST_Process(void);
 
 /* USER CODE BEGIN PFP */
-void cast(float px, float py, float pa, uint8_t mapX, uint8_t mapY, uint8_t mapS, uint8_t* map, uint8_t activeBuffer);
+uint32_t cast(float px, float py, float pa, uint8_t mapX, uint8_t mapY, uint8_t mapS, uint8_t* map);
 float raylength(float ax, float ay, float bx, float by);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+volatile uint8_t displayFlag  = 0;
+volatile uint8_t activeBuffer = 1;
 /* USER CODE END 0 */
 
 /**
@@ -131,6 +135,7 @@ int main(void)
   MX_USART1_UART_Init();
   MX_USART6_UART_Init();
   MX_USB_HOST_Init();
+  MX_TIM4_Init();
   /* USER CODE BEGIN 2 */
   BSP_LCD_Init();
   BSP_LCD_LayerDefaultInit(LTDC_FOREGROUND, LCD_FB_START_ADDRESS);
@@ -150,6 +155,8 @@ int main(void)
     BSP_LCD_SetTextColor(0xFF000000 | (uint32_t)((0.025 * i) * 0xFF) << 16 | (uint32_t)((0.025 * i) * 0x00) << 8 | (uint32_t)((0.025 * i) * 0xFF));
     BSP_LCD_FillRect(0 + i * 12, 0 + i * 2, 12, 272 - i * 4);
   }
+
+  HAL_TIM_Base_Start_IT(&htim4);
 //  HAL_Delay(3000);
 
 //  BSP_LCD_SelectLayer(LTDC_FOREGROUND);
@@ -172,7 +179,6 @@ int main(void)
       1, 1, 1, 1, 1, 1, 1, 1
   };
   float px = 160, py = 352, pdx = 0, pdy = 0, pa = 45 * FOV_INCR; // player X and Y, player delta X and Y and player Angle
-  uint8_t activeBuffer = 0;
 
   while (1)
   {
@@ -180,19 +186,23 @@ int main(void)
     MX_USB_HOST_Process();
 
     /* USER CODE BEGIN 3 */
-    cast(px, py, pa, mapX, mapY, mapS, map, activeBuffer);
+    if (displayFlag) {
+      uint8_t frameTime[32];
+      itoa(cast(px, py, pa, mapX, mapY, mapS, map), frameTime, 10);
+      BSP_LCD_DisplayStringAt(0, 0, frameTime, LEFT_MODE);
 
-//    BSP_LCD_Clear(LCD_COLOR_BLACK);
-//    BSP_LCD_FillRect(240, 0, 20, i);
-//    HAL_Delay(10);
-//    if (++i > 272) { i = 0; }
+      displayFlag = 0;
+      activeBuffer ^= 1;
+      BSP_LCD_SWAP(activeBuffer);
+//      BSP_LCD_SelectLayer(!activeBuffer);
+//      BSP_LCD_Clear(LCD_COLOR_BLACK);
+    }
 
     if (HAL_GetTick() % 1000 < 500) { HAL_GPIO_WritePin(ARDUINO_SCK_D13_GPIO_Port, ARDUINO_SCK_D13_Pin, GPIO_PIN_RESET); }
     else { HAL_GPIO_WritePin(ARDUINO_SCK_D13_GPIO_Port, ARDUINO_SCK_D13_Pin, GPIO_PIN_SET); }
 
     if (HAL_GPIO_ReadPin(BUTTON_GPIO_Port, BUTTON_Pin)) {
-//      HAL_Delay(10);
-      pa -= 0.001;
+      pa -= 0.0001;
       if (pa < 0) { pa = M_TWOPI; }
       pdx = cos(pa) * 5;
       pdy = sin(pa) * 5;
@@ -285,17 +295,17 @@ void PeriphCommonClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-void cast(float px, float py, float pa, uint8_t mapX, uint8_t mapY, uint8_t mapS, uint8_t* map, uint8_t activeBuffer) {
+uint32_t cast(float px, float py, float pa, uint8_t mapX, uint8_t mapY, uint8_t mapS, uint8_t* map) {
   uint16_t r, mx, my, mp, dof; // r is amount of rays, mx and my are map x and y positions, mp is map position in array, dof is how many steps to attempt to cast a ray, before giving up
   float    rx, ry, ra, xo, yo, shrt; // rx and ry are the first intersect points, ra is ray angle, xo and yo are x and y offset or step, shrt is the shortest ray length
+  uint32_t startTime = HAL_GetTick();
 
   ra = pa - 30 * FOV_INCR;
   if (ra < 0)       { ra += M_TWOPI; }
   if (ra > M_TWOPI) { ra -= M_TWOPI; }
 
-  BSP_LCD_SelectLayer(!activeBuffer);
+  BSP_LCD_SelectLayer(0);
   BSP_LCD_Clear(LCD_COLOR_BLACK);
-  BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
 
   for (r = 0; r < 60; r++) {
     // HORIZONTAL LINE CHECK
@@ -323,10 +333,10 @@ void cast(float px, float py, float pa, uint8_t mapX, uint8_t mapY, uint8_t mapS
     if (ra == 0 || ra == M_PI) {
       ry = py;
       rx = px;
-      dof = 8;
+      dof = DOF;
     }
 
-    while (dof < 8) {
+    while (dof < DOF) {
       mx = (uint16_t)rx >> 6; // divide ray's position to figure out the map square to check
       my = (uint16_t)ry >> 6;
       mp = my * mapX + mx;    // find that map square's position in the array
@@ -335,7 +345,7 @@ void cast(float px, float py, float pa, uint8_t mapX, uint8_t mapY, uint8_t mapS
         hx = rx;
         hy = ry;
         dH = raylength(px, py, hx, hy); // calculate delta between hit x,y and player x,y, use pythagoras to get hypotenuse length
-        dof = 8;
+        dof = DOF;
       }
       else {
         rx += xo;
@@ -369,10 +379,10 @@ void cast(float px, float py, float pa, uint8_t mapX, uint8_t mapY, uint8_t mapS
     if (ra == 0 || ra == M_PI) {
       ry = py;
       rx = px;
-      dof = 8;
+      dof = DOF;
     }
 
-    while (dof < 8) {
+    while (dof < DOF) {
       mx = (uint16_t)rx >> 6;
       my = (uint16_t)ry >> 6;
       mp = my * mapX + mx;
@@ -381,7 +391,7 @@ void cast(float px, float py, float pa, uint8_t mapX, uint8_t mapY, uint8_t mapS
         vx = rx;
         vy = ry;
         dV = raylength(px, py, vx, vy);
-        dof = 8;
+        dof = DOF;
       }
       else {
         rx += xo;
@@ -407,15 +417,15 @@ void cast(float px, float py, float pa, uint8_t mapX, uint8_t mapY, uint8_t mapS
 
     float lineO = (272 - lineH) / 2;
 
-    BSP_LCD_FillRect((r * 8) + 1, lineO, 6, lineH);
+    BSP_LCD_SetTextColor(0xFF000000 | (uint32_t)((0.0036 * lineH) * 0xFF) << 16 | (uint32_t)((0.0036 * lineH) * 0xFF) << 8 | (uint32_t)((0.0036 * lineH) * 0xFF));
+    BSP_LCD_FillRect((r * 8), lineO, 8, lineH);
 
     ra += FOV_INCR;
     if (ra < 0)       { ra += M_TWOPI; }
     if (ra > M_TWOPI) { ra -= M_TWOPI; }
   }
 
-  activeBuffer ^= 1;
-  BSP_LTDC_SWAP(activeBuffer);
+  return (HAL_GetTick() - startTime);
 }
 
 float raylength(float ax, float ay, float bx, float by) {
@@ -440,7 +450,9 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     HAL_IncTick();
   }
   /* USER CODE BEGIN Callback 1 */
-
+  if (htim->Instance == TIM4) {
+    displayFlag = 1;
+  }
   /* USER CODE END Callback 1 */
 }
 

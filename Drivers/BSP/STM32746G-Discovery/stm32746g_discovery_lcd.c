@@ -1629,8 +1629,9 @@ static void LL_ConvertLineToARGB8888(void *pSrc, void *pDst, uint32_t xSize, uin
   } 
 }
 
-void BSP_LTDC_SWAP(uint32_t LayerIdx) {
+void BSP_LCD_SWAP(uint32_t LayerIdx) {
   HAL_LTDC_SetAddress(&hLtdcHandler, (LayerIdx) ? (LCD_FB_START_ADDRESS) : (LCD_BB_START_ADDRESS), (uint32_t)1);
+  HAL_LTDC_SetAddress(&hLtdcHandler, (LayerIdx) ? (LCD_BB_START_ADDRESS) : (LCD_FB_START_ADDRESS), (uint32_t)0);
 }
 
 /**
