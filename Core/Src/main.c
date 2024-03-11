@@ -72,12 +72,29 @@ void PeriphCommonClock_Config(void);
 void MX_USB_HOST_Process(void);
 
 /* USER CODE BEGIN PFP */
-uint32_t cast(float px, float py, float pa, uint8_t mapX, uint8_t mapY, uint8_t mapS, uint8_t* map);
+uint32_t cast();
 float raylength(float ax, float ay, float bx, float by);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+// MAP
+uint8_t mapX = 8, mapY = 8, mapS = 64;
+uint8_t map[] = {
+    1, 1, 1, 1, 1, 1, 1, 1,
+    1, 0, 0, 1, 0, 0, 1, 1,
+    1, 0, 0, 1, 0, 0, 0, 1,
+    1, 0, 0, 0, 0, 0, 0, 1,
+    1, 0, 0, 0, 1, 1, 0, 1,
+    1, 0, 0, 0, 1, 1, 0, 1,
+    1, 0, 0, 0, 0, 0, 0, 1,
+    1, 1, 1, 1, 1, 1, 1, 1
+};
+
+// PLAYER
+float px = 160, py = 352, pdx = 0, pdy = 0, pa = 45 * FOV_INCR; // player X and Y, player delta X and Y and player Angle
+
+// RENDERING
 volatile uint8_t displayFlag  = 0;
 volatile uint8_t activeBuffer = 1;
 /* USER CODE END 0 */
@@ -167,18 +184,6 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   // map
-  uint8_t mapX = 8, mapY = 8, mapS = 64;
-  uint8_t map[] = {
-      1, 1, 1, 1, 1, 1, 1, 1,
-      1, 0, 0, 1, 0, 0, 1, 1,
-      1, 0, 0, 1, 0, 0, 0, 1,
-      1, 0, 0, 0, 0, 0, 0, 1,
-      1, 0, 0, 0, 1, 1, 0, 1,
-      1, 0, 0, 0, 1, 1, 0, 1,
-      1, 0, 0, 0, 0, 0, 0, 1,
-      1, 1, 1, 1, 1, 1, 1, 1
-  };
-  float px = 160, py = 352, pdx = 0, pdy = 0, pa = 45 * FOV_INCR; // player X and Y, player delta X and Y and player Angle
 
   while (1)
   {
@@ -188,14 +193,12 @@ int main(void)
     /* USER CODE BEGIN 3 */
     if (displayFlag) {
       uint8_t frameTime[32];
-      itoa(cast(px, py, pa, mapX, mapY, mapS, map), frameTime, 10);
+      itoa(cast(), frameTime, 10);
       BSP_LCD_DisplayStringAt(0, 0, frameTime, LEFT_MODE);
 
       displayFlag = 0;
       activeBuffer ^= 1;
       BSP_LCD_SWAP(activeBuffer);
-//      BSP_LCD_SelectLayer(!activeBuffer);
-//      BSP_LCD_Clear(LCD_COLOR_BLACK);
     }
 
     if (HAL_GetTick() % 1000 < 500) { HAL_GPIO_WritePin(ARDUINO_SCK_D13_GPIO_Port, ARDUINO_SCK_D13_Pin, GPIO_PIN_RESET); }
@@ -295,7 +298,7 @@ void PeriphCommonClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-uint32_t cast(float px, float py, float pa, uint8_t mapX, uint8_t mapY, uint8_t mapS, uint8_t* map) {
+uint32_t cast() {
   uint16_t r, mx, my, mp, dof; // r is amount of rays, mx and my are map x and y positions, mp is map position in array, dof is how many steps to attempt to cast a ray, before giving up
   float    rx, ry, ra, xo, yo, shrt; // rx and ry are the first intersect points, ra is ray angle, xo and yo are x and y offset or step, shrt is the shortest ray length
   uint32_t startTime = HAL_GetTick();
