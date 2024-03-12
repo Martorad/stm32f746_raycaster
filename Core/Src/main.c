@@ -92,7 +92,7 @@ uint8_t map[] = {
 };
 
 // PLAYER
-float px = 160, py = 352, pdx = 0, pdy = 0, pa = 315 * FOV_INCR; // player X and Y, player delta X and Y and player Angle
+float px = 160, py = 352, pdx = 0, pdy = 0, pa = 320 * FOV_INCR; // player X and Y, player delta X and Y and player Angle
 
 // RENDERING
 volatile uint8_t displayFlag  = 0;
@@ -193,7 +193,7 @@ int main(void)
     /* USER CODE BEGIN 3 */
     if (displayFlag) {
       uint8_t frameTime[32];
-      itoa(cast(), frameTime, 10);
+      itoa(1000 / cast(), frameTime, 10);
       BSP_LCD_SetTextColor(0xFF000000);
       BSP_LCD_SetBackColor(0xFFFF2244);
       BSP_LCD_DisplayStringAt(0, 0, frameTime, LEFT_MODE);
@@ -210,23 +210,23 @@ int main(void)
     if (HAL_GetTick() % 1000 < 500) { HAL_GPIO_WritePin(ARDUINO_SCK_D13_GPIO_Port, ARDUINO_SCK_D13_Pin, GPIO_PIN_RESET); }
     else { HAL_GPIO_WritePin(ARDUINO_SCK_D13_GPIO_Port, ARDUINO_SCK_D13_Pin, GPIO_PIN_SET); }
 
-    if (HAL_GPIO_ReadPin(ARDUINO_D5_GPIO_Port, ARDUINO_D5_Pin)) {
+    if (HAL_GPIO_ReadPin(ARDUINO_D4_GPIO_Port, ARDUINO_D4_Pin)) { // RIGHT
       pa -= 0.0002;
       if (pa < 0) { pa = M_TWOPI; }
       pdx = cos(pa) / 500;
       pdy = sin(pa) / 500;
     }
-    if (HAL_GPIO_ReadPin(ARDUINO_D4_GPIO_Port, ARDUINO_D4_Pin)) {
+    if (HAL_GPIO_ReadPin(ARDUINO_D5_GPIO_Port, ARDUINO_D5_Pin)) { // LEFT
       pa += 0.0002;
       if (pa > M_TWOPI) { pa = 0; }
       pdx = cos(pa) / 500;
       pdy = sin(pa) / 500;
     }
-    if (HAL_GPIO_ReadPin(ARDUINO_D2_GPIO_Port, ARDUINO_D2_Pin)) {
+    if (HAL_GPIO_ReadPin(ARDUINO_D2_GPIO_Port, ARDUINO_D2_Pin)) { // FORWARD
       px += pdx;
       py += pdy;
     }
-    if (HAL_GPIO_ReadPin(ARDUINO_D3_GPIO_Port, ARDUINO_D3_Pin)) {
+    if (HAL_GPIO_ReadPin(ARDUINO_D3_GPIO_Port, ARDUINO_D3_Pin)) { // BACKWARD
       px -= pdx;
       py -= pdy;
     }
