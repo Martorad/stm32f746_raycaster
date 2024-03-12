@@ -204,11 +204,25 @@ int main(void)
     if (HAL_GetTick() % 1000 < 500) { HAL_GPIO_WritePin(ARDUINO_SCK_D13_GPIO_Port, ARDUINO_SCK_D13_Pin, GPIO_PIN_RESET); }
     else { HAL_GPIO_WritePin(ARDUINO_SCK_D13_GPIO_Port, ARDUINO_SCK_D13_Pin, GPIO_PIN_SET); }
 
-    if (HAL_GPIO_ReadPin(BUTTON_GPIO_Port, BUTTON_Pin)) {
+    if (HAL_GPIO_ReadPin(ARDUINO_D5_GPIO_Port, ARDUINO_D5_Pin)) {
       pa -= 0.0001;
       if (pa < 0) { pa = M_TWOPI; }
-      pdx = cos(pa) * 5;
-      pdy = sin(pa) * 5;
+      pdx = cos(pa) / 1000;
+      pdy = sin(pa) / 1000;
+    }
+    if (HAL_GPIO_ReadPin(ARDUINO_D4_GPIO_Port, ARDUINO_D4_Pin)) {
+      pa += 0.0001;
+      if (pa > M_TWOPI) { pa = 0; }
+      pdx = cos(pa) / 1000;
+      pdy = sin(pa) / 1000;
+    }
+    if (HAL_GPIO_ReadPin(ARDUINO_D2_GPIO_Port, ARDUINO_D2_Pin)) {
+      px += pdx;
+      py += pdy;
+    }
+    if (HAL_GPIO_ReadPin(ARDUINO_D3_GPIO_Port, ARDUINO_D3_Pin)) {
+      px -= pdx;
+      py -= pdy;
     }
   }
   /* USER CODE END 3 */
