@@ -92,7 +92,7 @@ uint8_t map[] = {
 };
 
 // PLAYER
-float px = 160, py = 352, pdx = 0, pdy = 0, pa = 45 * FOV_INCR; // player X and Y, player delta X and Y and player Angle
+float px = 160, py = 352, pdx = 0, pdy = 0, pa = 315 * FOV_INCR; // player X and Y, player delta X and Y and player Angle
 
 // RENDERING
 volatile uint8_t displayFlag  = 0;
@@ -194,7 +194,13 @@ int main(void)
     if (displayFlag) {
       uint8_t frameTime[32];
       itoa(cast(), frameTime, 10);
+      BSP_LCD_SetTextColor(0xFF000000);
+      BSP_LCD_SetBackColor(0xFFFF2244);
       BSP_LCD_DisplayStringAt(0, 0, frameTime, LEFT_MODE);
+
+      uint8_t playerAngle[32];
+      itoa(pa, playerAngle, 10);
+      BSP_LCD_DisplayStringAt(0, 20, playerAngle, LEFT_MODE);
 
       displayFlag = 0;
       activeBuffer ^= 1;
@@ -419,13 +425,9 @@ uint32_t cast() {
 
     if (dV < dH) {
       shrt = dV;
-      rx = vx;
-      ry = vy;
     }
     if (dH < dV) {
       shrt = dH;
-      rx = hx;
-      ry = hy;
     }
 
     // Rendering
