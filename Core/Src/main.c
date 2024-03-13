@@ -222,13 +222,13 @@ int main(void)
     if (HAL_GPIO_ReadPin(ARDUINO_D4_GPIO_Port, ARDUINO_D4_Pin)) { // RIGHT
       pa -= 0.0002;
       if (pa < 0) { pa = M_TWOPI; }
-      pdx = cos(pa) / 500;
+      pdx =  cos(pa) / 500;
       pdy = -sin(pa) / 500;
     }
     if (HAL_GPIO_ReadPin(ARDUINO_D5_GPIO_Port, ARDUINO_D5_Pin)) { // LEFT
       pa += 0.0002;
       if (pa > M_TWOPI) { pa = 0; }
-      pdx = cos(pa) / 500;
+      pdx =  cos(pa) / 500;
       pdy = -sin(pa) / 500;
     }
     if (HAL_GPIO_ReadPin(ARDUINO_D2_GPIO_Port, ARDUINO_D2_Pin)) { // FORWARD
@@ -444,7 +444,7 @@ uint32_t cast() {
 
     float lineO = (272 - lineH) / 2;
 
-    BSP_LCD_SetTextColor(0xFF000000 | (uint32_t)((0.0036 * lineH) * 0xDE) << 16 | (uint32_t)((0.0036 * lineH) * 0xDE) << 8 | (uint32_t)((0.0036 * lineH) * 0xDE));
+    BSP_LCD_SetTextColor(0xFF000000 | (uint32_t)((0.0036 * lineH) * 0x11) << 16 | (uint32_t)((0.0036 * lineH) * 0xFF) << 8 | (uint32_t)((0.0036 * lineH) * 0x40));
     BSP_LCD_FillRect((r * FOV_RECT), lineO, FOV_RECT, lineH);
 
     ra -= FOV_INCR;
