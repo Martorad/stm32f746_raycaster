@@ -339,10 +339,11 @@ uint32_t cast() {
   BSP_LCD_SelectLayer(0);
   BSP_LCD_Clear(LCD_COLOR_BLACK);
 
-  BSP_LCD_SetTextColor(0xFF1174ED);
-  BSP_LCD_FillRect(0, 0, 480, 136);
-  BSP_LCD_SetTextColor(0xFF04B80A);
-  BSP_LCD_FillRect(0, 137, 480, 136);
+// Sky and Grass
+//  BSP_LCD_SetTextColor(0xFF1174ED);
+//  BSP_LCD_FillRect(0, 0, 480, 136);
+//  BSP_LCD_SetTextColor(0xFF04B80A);
+//  BSP_LCD_FillRect(0, 137, 480, 136);
 
   for (r = 0; r < FOV; r++) {
     // VERTICAL LINE CHECK
@@ -431,6 +432,13 @@ uint32_t cast() {
     }
 
     // Rendering
+#ifdef REMOVE_FISHEYE
+    float ff = pa - ra;
+    if (ff < 0)       { ff += M_TWOPI; }
+    if (ff > M_TWOPI) { ff -= M_TWOPI; }
+    shrt *= cos(ff);
+#endif
+
     float lineH = (mapS * 272) / shrt;
     if (lineH > 272) { lineH = 272; }
 

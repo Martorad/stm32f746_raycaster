@@ -1,8 +1,9 @@
 #ifndef __RC__CONFIG__H__
 #define __RC__CONFIG__H__
 
-#define DOF 8
+#define DOF 6
 #define FOV_1
+#define REMOVE_FISHEYE
 
 #ifdef FOV_1
 #define FOV      60
