@@ -331,14 +331,14 @@ uint32_t cast() {
   float    rx, ry, ra, xo, yo, shrt; // rx and ry are the first intersect points, ra is ray angle, xo and yo are x and y offset or step, shrt is the shortest ray length
   uint32_t startTime = HAL_GetTick();
 
-  ra = pa - 30 * FOV_INCR;
+  ra = pa + FOV_HALF * FOV_INCR;
   if (ra < 0)       { ra += M_TWOPI; }
   if (ra > M_TWOPI) { ra -= M_TWOPI; }
 
   BSP_LCD_SelectLayer(0);
   BSP_LCD_Clear(LCD_COLOR_BLACK);
 
-  for (r = 0; r < 60; r++) {
+  for (r = 0; r < FOV; r++) {
     // HORIZONTAL LINE CHECK
     dof = 0;
     float dH = 100000, hx = px, hy = py;
@@ -435,9 +435,9 @@ uint32_t cast() {
     float lineO = (272 - lineH) / 2;
 
     BSP_LCD_SetTextColor(0xFF000000 | (uint32_t)((0.0036 * lineH) * 0xFF) << 16 | (uint32_t)((0.0036 * lineH) * 0xFF) << 8 | (uint32_t)((0.0036 * lineH) * 0xFF));
-    BSP_LCD_FillRect((r * 8), lineO, 8, lineH);
+    BSP_LCD_FillRect((r * 8), lineO, FOV_RECT, lineH);
 
-    ra += FOV_INCR;
+    ra -= FOV_INCR;
     if (ra < 0)       { ra += M_TWOPI; }
     if (ra > M_TWOPI) { ra -= M_TWOPI; }
   }
