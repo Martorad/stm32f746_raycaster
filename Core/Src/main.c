@@ -200,7 +200,15 @@ int main(void)
 
       uint8_t playerAngle[32];
       itoa(pa, playerAngle, 10);
-      BSP_LCD_DisplayStringAt(0, 20, playerAngle, LEFT_MODE);
+      BSP_LCD_DisplayStringAt(0, 72, playerAngle, LEFT_MODE);
+
+      uint8_t playerX[32];
+      itoa(px, playerX, 10);
+      BSP_LCD_DisplayStringAt(0, 24, playerX, LEFT_MODE);
+
+      uint8_t playerY[32];
+      itoa(py, playerY, 10);
+      BSP_LCD_DisplayStringAt(0, 48, playerY, LEFT_MODE);
 
       displayFlag = 0;
       activeBuffer ^= 1;
@@ -334,26 +342,21 @@ uint32_t cast() {
     // HORIZONTAL LINE CHECK
     dof = 0;
     float dH = 100000, hx = px, hy = py;
-    float aTan = -1 / tan(ra);
+    float rTan = 1 / tan(ra);
 
-    // looking up
-    if (ra < M_PI) {
-      ry = (((uint16_t)py >> 6) << 6) + 64; // essentially acts as floor(py) + 64 to find next horizontal intersection of y
-      rx = (py - ry) * aTan + px;           // some weird signage stuff, but essentially find the y distance between ry and py, divide by the tangent to get xn and add px to get rx
-      yo = 64;                              // yo is equal to cellsize
-      xo = yo * aTan;                       // xo is equal to the ratio of the tangent
+    if (ra < M_PI) { // looking up
+      ry = (((uint16_t)py >> 6) << 6);       // essentially acts as floor(py) to find next horizontal intersection of y
+      rx = (py - ry) * rTan + px;            // some weird signage stuff, but essentially find the y distance between ry and py, divide by the tangent to get xn and add px to get rx
+      yo = -64;                              // yo is equal to cellsize
+      xo = -yo * rTan;                       // xo is equal to the ratio of the tangent
     }
-
-    // looking down
-    if (ra > M_PI) {
-      ry = (((uint16_t)py >> 6) << 6);
-      rx = (py - ry) * aTan + px;
-      yo = -64;
-      xo = yo * aTan;
+    else if (ra > M_PI) { // looking down
+      ry = (((uint16_t)py >> 6) << 6) + mapS;
+      rx = (py - ry) * rTan + px;
+      yo = 64;
+      xo = -yo * rTan;
     }
-
-    // looking perfectly horizontal
-    if (ra == 0 || ra == M_PI) {
+    else { // looking perfectly horizontal
       ry = py;
       rx = px;
       dof = DOF;
@@ -380,26 +383,21 @@ uint32_t cast() {
     // VERTICAL LINE CHECK
     dof = 0;
     float dV = 100000, vx = px, vy = py;
-    float nTan = -tan(ra);
+    float tTan = tan(ra);
 
-    // looking left
-    if (ra > M_PI_2 && ra < M_3PI_2) {
+    if (ra > M_PI_2 && ra < M_3PI_2) { // looking left
       rx = (((uint16_t)px >> 6) << 6);
-      ry = (px - rx) * nTan + py;
+      ry = (px - rx) * tTan + py;
       xo = -64;
-      yo = xo * nTan;
+      yo = -xo * tTan;
     }
-
-    // looking right
-    if (ra < M_PI_2 || ra > M_3PI_2) {
-      rx = (((uint16_t)px >> 6) << 6) + 64;
-      ry = (px - rx) * nTan + py;
+    else if (ra < M_PI_2 || ra > M_3PI_2) { // looking right
+      rx = (((uint16_t)px >> 6) << 6) + mapS;
+      ry = (px - rx) * tTan + py;
       xo = 64;
-      yo = xo * nTan;
+      yo = -xo * tTan;
     }
-
-    // looking perfectly horizontal
-    if (ra == 0 || ra == M_PI) {
+    else { // looking perfectly vertical
       ry = py;
       rx = px;
       dof = DOF;
