@@ -222,13 +222,13 @@ int main(void)
       pa -= 0.0002;
       if (pa < 0) { pa = M_TWOPI; }
       pdx = cos(pa) / 500;
-      pdy = sin(pa) / 500;
+      pdy = -sin(pa) / 500;
     }
     if (HAL_GPIO_ReadPin(ARDUINO_D5_GPIO_Port, ARDUINO_D5_Pin)) { // LEFT
       pa += 0.0002;
       if (pa > M_TWOPI) { pa = 0; }
       pdx = cos(pa) / 500;
-      pdy = sin(pa) / 500;
+      pdy = -sin(pa) / 500;
     }
     if (HAL_GPIO_ReadPin(ARDUINO_D2_GPIO_Port, ARDUINO_D2_Pin)) { // FORWARD
       px += pdx;
