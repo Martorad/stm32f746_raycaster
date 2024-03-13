@@ -432,7 +432,7 @@ uint32_t cast() {
     float lineO = (272 - lineH) / 2;
 
     BSP_LCD_SetTextColor(0xFF000000 | (uint32_t)((0.0036 * lineH) * 0xFF) << 16 | (uint32_t)((0.0036 * lineH) * 0xFF) << 8 | (uint32_t)((0.0036 * lineH) * 0xFF));
-    BSP_LCD_FillRect((r * 8), lineO, FOV_RECT, lineH);
+    BSP_LCD_FillRect((r * FOV_RECT), lineO, FOV_RECT, lineH);
 
     ra -= FOV_INCR;
     if (ra < 0)       { ra += M_TWOPI; }
