@@ -39,6 +39,7 @@
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
 #include <stdlib.h>
+#include <float.h>
 #include "math.h"
 #include "../../Drivers/BSP/STM32746G-Discovery/stm32746g_discovery_lcd.h"
 #include "rc_config.h"
@@ -92,7 +93,7 @@ uint8_t map[] = {
 };
 
 // PLAYER
-float px = 160, py = 352, pdx = 0, pdy = 0, pa = 320 * FOV_INCR; // player X and Y, player delta X and Y and player Angle
+float px = 416, py = 416, pdx = 0, pdy = 0, pa = 135 * FOV_INCR; // player X and Y, player delta X and Y and player Angle
 
 // RENDERING
 volatile uint8_t displayFlag  = 0;
@@ -341,11 +342,11 @@ uint32_t cast() {
   for (r = 0; r < FOV; r++) {
     // VERTICAL LINE CHECK
     dof = 0;
-    float dV = 100000, vx = px, vy = py;
+    float dV = FLT_MAX;
     float tTan = tan(ra);
 
     if (ra > M_PI_2 && ra < M_3PI_2) { // looking left
-      rx = (((uint16_t)px >> 6) << 6);
+      rx = (((uint16_t)px >> 6) << 6) - 0.0001;
       ry = (px - rx) * tTan + py;
       xo = -64;
       yo = -xo * tTan;
@@ -368,9 +369,7 @@ uint32_t cast() {
       mp = my * mapX + mx;
 
       if (mp > 0 && mp < mapX * mapY && map[mp] == 1) {
-        vx = rx;
-        vy = ry;
-        dV = raylength(px, vx, py, vy);
+        dV = raylength(px, rx, py, ry);
         dof = DOF;
       }
       else {
@@ -382,14 +381,14 @@ uint32_t cast() {
 
     // HORIZONTAL LINE CHECK
     dof = 0;
-    float dH = 100000, hx = px, hy = py;
+    float dH = FLT_MAX;
     float rTan = 1 / tan(ra);
 
     if (ra < M_PI) { // looking up
-      ry = (((uint16_t)py >> 6) << 6);       // essentially acts as floor(py) to find next horizontal intersection of y
-      rx = (py - ry) * rTan + px;            // some weird signage stuff, but essentially find the y distance between ry and py, divide by the tangent to get xn and add px to get rx
-      yo = -64;                              // yo is equal to cellsize
-      xo = -yo * rTan;                       // xo is equal to the ratio of the tangent
+      ry = (((uint16_t)py >> 6) << 6) - 0.0001; // essentially acts as floor(py) to find next horizontal intersection of y
+      rx = (py - ry) * rTan + px;               // some weird signage stuff, but essentially find the y distance between ry and py, divide by the tangent to get xn and add px to get rx
+      yo = -64;                                 // yo is equal to cellsize
+      xo = -yo * rTan;                          // xo is equal to the ratio of the tangent
     }
     else if (ra > M_PI) { // looking down
       ry = (((uint16_t)py >> 6) << 6) + mapS;
@@ -409,9 +408,7 @@ uint32_t cast() {
       mp = my * mapX + mx;    // find that map square's position in the array
 
       if (mp > 0 && mp < mapX * mapY && map[mp] == 1) {
-        hx = rx;
-        hy = ry;
-        dH = raylength(px, hx, py, hy); // calculate delta between hit x,y and player x,y, use pythagoras to get hypotenuse length
+        dH = raylength(px, rx, py, ry); // calculate delta between hit x,y and player x,y, use pythagoras to get hypotenuse length
         dof = DOF;
       }
       else {
@@ -424,7 +421,7 @@ uint32_t cast() {
     if (dV < dH) {
       shrt = dV;
     }
-    if (dH < dV) {
+    else {
       shrt = dH;
     }
 
