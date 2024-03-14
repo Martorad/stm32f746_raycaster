@@ -438,7 +438,7 @@ uint32_t cast() {
     if (lineHeight > 272) { lineHeight = 272; }
     float lineOffset = (272 - lineHeight) / 2;
 
-    BSP_LCD_SetTextColor(0xFF000000 | (uint32_t)((0.0036 * lineHeight) * 0x11) << 16 | (uint32_t)((0.0036 * lineHeight) * 0xFF) << 8 | (uint32_t)((0.0036 * lineHeight) * 0x40));
+    BSP_LCD_SetTextColor(0xFF000000 | (uint32_t)((0.0036 * lineHeight) * 0x11) << 16 | (uint32_t)((0.0036 * lineHeight) * 0xFF) << 8 | (uint32_t)((0.0036 * lineHeight) * 0xFF));
     BSP_LCD_FillRect((rCount * FOV_RECT), lineOffset, FOV_RECT, lineHeight);
 
     rAngle -= FOV_INCR;
