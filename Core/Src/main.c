@@ -174,6 +174,7 @@ int main(void)
   BSP_LCD_Init();
   BSP_LCD_LayerDefaultInit(LTDC_FOREGROUND, LCD_FB_START_ADDRESS);
   BSP_LCD_LayerDefaultInit(LTDC_BACKGROUND, LCD_BB_START_ADDRESS);
+  BSP_LCD_SetLayerVisible(LTDC_BACKGROUND, DISABLE);
   BSP_LCD_DisplayOn();
 
   BSP_LCD_SelectLayer(LTDC_FOREGROUND);

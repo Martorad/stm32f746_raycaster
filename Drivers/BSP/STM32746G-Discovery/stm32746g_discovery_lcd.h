@@ -230,6 +230,7 @@ void     BSP_LCD_MspDeInit(LTDC_HandleTypeDef *hltdc, void *Params);
 void     BSP_LCD_ClockConfig(LTDC_HandleTypeDef *hltdc, void *Params);
 
 void     BSP_LCD_SWAP(uint32_t LayerIdx);
+HAL_LTDC_StateTypeDef BSP_LCD_GetDisplayState(void);
 /**
   * @}
   */ 

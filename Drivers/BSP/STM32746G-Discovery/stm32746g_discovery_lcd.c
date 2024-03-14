@@ -1634,6 +1634,9 @@ void BSP_LCD_SWAP(uint32_t LayerIdx) {
   HAL_LTDC_SetAddress(&hLtdcHandler, (LayerIdx) ? (LCD_BB_START_ADDRESS) : (LCD_FB_START_ADDRESS), (uint32_t)0);
 }
 
+HAL_LTDC_StateTypeDef BSP_LCD_GetDisplayState(void) {
+  return HAL_LTDC_GetState(&hLtdcHandler);
+}
 /**
   * @}
   */
