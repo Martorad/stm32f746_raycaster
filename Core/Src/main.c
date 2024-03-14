@@ -101,7 +101,7 @@ uint8_t _map[] = {
 };
 
 // PLAYER
-float _pPosX = 224, _pPosY = 512, _pDeltaX = 0, _pDeltaY = 0, _pAngle = 0 * FOV_INCR; // player X and Y, player delta X and Y and player Angle
+float _pPosX = 224, _pPosY = 512, _pAngle = 0 * FOV_INCR, _pDeltaX, _pDeltaY;
 
 // RENDERING
 volatile uint8_t displayFlag  = 0;
@@ -115,7 +115,8 @@ volatile uint8_t activeBuffer = 1;
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-
+  _pDeltaX =  cos(_pAngle) * INCR_TRANSLATION;
+  _pDeltaY = -sin(_pAngle) * INCR_TRANSLATION;
   /* USER CODE END 1 */
 /* Enable the CPU Cache */
 
@@ -234,16 +235,16 @@ int main(void)
     else { HAL_GPIO_WritePin(ARDUINO_SCK_D13_GPIO_Port, ARDUINO_SCK_D13_Pin, GPIO_PIN_SET); }
 
     if (HAL_GPIO_ReadPin(ARDUINO_D4_GPIO_Port, ARDUINO_D4_Pin)) { // RIGHT
-      _pAngle -= 0.0002;
+      _pAngle -= INCR_ROTATION;
       if (_pAngle < 0) { _pAngle = M_TWOPI; }
-      _pDeltaX =  cos(_pAngle) / 500;
-      _pDeltaY = -sin(_pAngle) / 500;
+      _pDeltaX =  cos(_pAngle) * INCR_TRANSLATION;
+      _pDeltaY = -sin(_pAngle) * INCR_TRANSLATION;
     }
     if (HAL_GPIO_ReadPin(ARDUINO_D5_GPIO_Port, ARDUINO_D5_Pin)) { // LEFT
-      _pAngle += 0.0002;
+      _pAngle += INCR_ROTATION;
       if (_pAngle > M_TWOPI) { _pAngle = 0; }
-      _pDeltaX =  cos(_pAngle) / 500;
-      _pDeltaY = -sin(_pAngle) / 500;
+      _pDeltaX =  cos(_pAngle) * INCR_TRANSLATION;
+      _pDeltaY = -sin(_pAngle) * INCR_TRANSLATION;
     }
     if (HAL_GPIO_ReadPin(ARDUINO_D2_GPIO_Port, ARDUINO_D2_Pin)) { // FORWARD
       _pPosX += _pDeltaX;
