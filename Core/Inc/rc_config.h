@@ -1,10 +1,12 @@
 #ifndef __RC__CONFIG__H__
 #define __RC__CONFIG__H__
 
-#define DOF 6
-#define FOV_1
+// PERFORMANCE SETTINGS
+#define DOF 16
+#define FOV_3
 #define REMOVE_FISHEYE
 
+// DO NOT CHANGE
 #ifdef FOV_1
 #define FOV      60
 #define FOV_HALF 30

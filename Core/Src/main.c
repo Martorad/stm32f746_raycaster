@@ -80,20 +80,28 @@ float rayLength(float ax, float ay, float bx, float by);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 // MAP
-uint8_t _mSizeX = 8, _mSizeY = 8, _mSizeS = 64;
+uint8_t _mSizeX = 32, _mSizeY = 16, _mSizeS = 64;
 uint8_t _map[] = {
-    1, 1, 1, 1, 1, 1, 1, 1,
-    1, 0, 0, 1, 0, 0, 1, 1,
-    1, 0, 0, 1, 0, 0, 0, 1,
-    1, 0, 0, 0, 0, 0, 0, 1,
-    1, 0, 0, 0, 1, 1, 0, 1,
-    1, 0, 0, 0, 1, 1, 0, 1,
-    1, 0, 0, 0, 0, 0, 0, 1,
-    1, 1, 1, 1, 1, 1, 1, 1
+  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,
+  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,1,
+  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,1,
+  1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,
+  1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,1,
+  1,0,0,0,0,0,0,0,1,1,1,1,1,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,
+  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,1,0,1,
+  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,1,0,1,
+  1,0,0,0,0,0,0,0,1,1,1,1,1,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,
+  1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,1,
+  1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,
+  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,1,
+  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,1,
+  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,
+  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
 };
 
 // PLAYER
-float _pPosX = 416, _pPosY = 416, _pDeltaX = 0, _pDeltaY = 0, _pAngle = 135 * FOV_INCR; // player X and Y, player delta X and Y and player Angle
+float _pPosX = 224, _pPosY = 512, _pDeltaX = 0, _pDeltaY = 0, _pAngle = 0 * FOV_INCR; // player X and Y, player delta X and Y and player Angle
 
 // RENDERING
 volatile uint8_t displayFlag  = 0;
@@ -109,6 +117,13 @@ int main(void)
   /* USER CODE BEGIN 1 */
 
   /* USER CODE END 1 */
+/* Enable the CPU Cache */
+
+  /* Enable I-Cache---------------------------------------------------------*/
+  SCB_EnableICache();
+
+  /* Enable D-Cache---------------------------------------------------------*/
+  SCB_EnableDCache();
 
   /* MCU Configuration--------------------------------------------------------*/
 
@@ -192,26 +207,27 @@ int main(void)
     /* USER CODE BEGIN 3 */
     if (displayFlag) {
       uint8_t frameTime[32];
-      itoa(1000 / cast(), frameTime, 10);
+      itoa(cast(), frameTime, 10);
       BSP_LCD_SetTextColor(0xFF000000);
       BSP_LCD_SetBackColor(0xFFFF2244);
       BSP_LCD_DisplayStringAt(0, 0, frameTime, LEFT_MODE);
 
-      uint8_t playerAngle[32];
-      itoa(_pAngle, playerAngle, 10);
-      BSP_LCD_DisplayStringAt(0, 72, playerAngle, LEFT_MODE);
+//      uint8_t playerAngle[32];
+//      itoa(_pAngle, playerAngle, 10);
+//      BSP_LCD_DisplayStringAt(0, 72, playerAngle, LEFT_MODE);
+//
+//      uint8_t playerX[32];
+//      itoa(_pPosX, playerX, 10);
+//      BSP_LCD_DisplayStringAt(0, 24, playerX, LEFT_MODE);
+//
+//      uint8_t playerY[32];
+//      itoa(_pPosY, playerY, 10);
+//      BSP_LCD_DisplayStringAt(0, 48, playerY, LEFT_MODE);
 
-      uint8_t playerX[32];
-      itoa(_pPosX, playerX, 10);
-      BSP_LCD_DisplayStringAt(0, 24, playerX, LEFT_MODE);
-
-      uint8_t playerY[32];
-      itoa(_pPosY, playerY, 10);
-      BSP_LCD_DisplayStringAt(0, 48, playerY, LEFT_MODE);
-
-      displayFlag = 0;
+//      cast();
       activeBuffer ^= 1;
       BSP_LCD_SWAP(activeBuffer);
+      displayFlag = 0;
     }
 
     if (HAL_GetTick() % 1000 < 500) { HAL_GPIO_WritePin(ARDUINO_SCK_D13_GPIO_Port, ARDUINO_SCK_D13_Pin, GPIO_PIN_RESET); }
