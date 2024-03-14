@@ -40,6 +40,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <float.h>
+#include <string.h>
 #include "math.h"
 #include "../../Drivers/BSP/STM32746G-Discovery/stm32746g_discovery_lcd.h"
 #include "rc_config.h"
@@ -176,25 +177,20 @@ int main(void)
   BSP_LCD_DisplayOn();
 
   BSP_LCD_SelectLayer(LTDC_FOREGROUND);
-  BSP_LCD_Clear(LCD_COLOR_BLACK);
-  for (uint8_t i = 0; i < 40; i++) {
-    BSP_LCD_SetTextColor(0xFF000000 | (uint32_t)((0.025 * i) * 0xFF) << 16 | (uint32_t)((0.025 * i) * 0xFF) << 8 | (uint32_t)((0.025 * i) * 0xFF));
-    BSP_LCD_FillRect(0 + i * 12, 0 + i * 2, 12, 272 - i * 4);
-  }
-
-  BSP_LCD_SelectLayer(LTDC_BACKGROUND);
-  BSP_LCD_Clear(LCD_COLOR_BLACK);
-  for (uint8_t i = 0; i < 40; i++) {
-    BSP_LCD_SetTextColor(0xFF000000 | (uint32_t)((0.025 * i) * 0xFF) << 16 | (uint32_t)((0.025 * i) * 0x00) << 8 | (uint32_t)((0.025 * i) * 0xFF));
-    BSP_LCD_FillRect(0 + i * 12, 0 + i * 2, 12, 272 - i * 4);
-  }
+//  BSP_LCD_Clear(LCD_COLOR_BLACK);
+//  for (uint8_t i = 0; i < 40; i++) {
+//    BSP_LCD_SetTextColor(0xFF000000 | (uint32_t)((0.025 * i) * 0xFF) << 16 | (uint32_t)((0.025 * i) * 0xFF) << 8 | (uint32_t)((0.025 * i) * 0xFF));
+//    BSP_LCD_FillRect(0 + i * 12, 0 + i * 2, 12, 272 - i * 4);
+//  }
+//
+//  BSP_LCD_SelectLayer(LTDC_BACKGROUND);
+//  BSP_LCD_Clear(LCD_COLOR_BLACK);
+//  for (uint8_t i = 0; i < 40; i++) {
+//    BSP_LCD_SetTextColor(0xFF000000 | (uint32_t)((0.025 * i) * 0xFF) << 16 | (uint32_t)((0.025 * i) * 0x00) << 8 | (uint32_t)((0.025 * i) * 0xFF));
+//    BSP_LCD_FillRect(0 + i * 12, 0 + i * 2, 12, 272 - i * 4);
+//  }
 
   HAL_TIM_Base_Start_IT(&htim4);
-//  HAL_Delay(3000);
-
-//  BSP_LCD_SelectLayer(LTDC_FOREGROUND);
-//  BSP_LCD_Clear(LCD_COLOR_BLACK);
-
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -227,6 +223,7 @@ int main(void)
 //      cast();
       _activeBuffer ^= 1;
       BSP_LCD_SWAP(_activeBuffer);
+//      memcpy((void*)0xC0000000, (void*)0xC0080000, 0x80000);
       _displayFlag = 0;
     }
 

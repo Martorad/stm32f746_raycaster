@@ -3,7 +3,7 @@
 
 // PERFORMANCE SETTINGS
 #define DOF 16
-#define FOV_3
+#define FOV_1
 #define REMOVE_FISHEYE
 
 // MOVEMENT SETTINGS
