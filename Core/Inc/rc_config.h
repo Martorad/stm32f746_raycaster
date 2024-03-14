@@ -10,7 +10,12 @@
 #define INCR_ROTATION    0.0001 // HIGHER IS FASTER
 #define INCR_TRANSLATION 0.001  // HIGHER IS FASTER
 
-// DO NOT CHANGE
+// ------------------------ DO NOT TOUCH ------------------------
+// INTERNAL CONFIGURATION DEFINES
+#define M_3PI_2  4.71238898038468985769
+#define FOV_INCR 0.0174533
+
+// FOV CONFIGURATION TABLES
 #ifdef FOV_1
 #define FOV      60
 #define FOV_HALF 30
@@ -27,6 +32,18 @@
 #define FOV      96
 #define FOV_HALF 48
 #define FOV_RECT 5
+#endif
+
+#ifdef FOV_4
+#define FOV      120
+#define FOV_HALF 60
+#define FOV_RECT 4
+#endif
+
+#ifdef FOV_5
+#define FOV      240
+#define FOV_HALF 120
+#define FOV_RECT 2
 #endif
 
 #endif
