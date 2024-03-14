@@ -74,14 +74,14 @@ void MX_USB_HOST_Process(void);
 
 /* USER CODE BEGIN PFP */
 uint32_t cast();
-float raylength(float ax, float ay, float bx, float by);
+float rayLength(float ax, float ay, float bx, float by);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 // MAP
-uint8_t mapX = 8, mapY = 8, mapS = 64;
-uint8_t map[] = {
+uint8_t _mSizeX = 8, _mSizeY = 8, _mSizeS = 64;
+uint8_t _map[] = {
     1, 1, 1, 1, 1, 1, 1, 1,
     1, 0, 0, 1, 0, 0, 1, 1,
     1, 0, 0, 1, 0, 0, 0, 1,
@@ -93,7 +93,7 @@ uint8_t map[] = {
 };
 
 // PLAYER
-float px = 416, py = 416, pdx = 0, pdy = 0, pa = 135 * FOV_INCR; // player X and Y, player delta X and Y and player Angle
+float _pPosX = 416, _pPosY = 416, _pDeltaX = 0, _pDeltaY = 0, _pAngle = 135 * FOV_INCR; // player X and Y, player delta X and Y and player Angle
 
 // RENDERING
 volatile uint8_t displayFlag  = 0;
@@ -184,8 +184,6 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  // map
-
   while (1)
   {
     /* USER CODE END WHILE */
@@ -200,15 +198,15 @@ int main(void)
       BSP_LCD_DisplayStringAt(0, 0, frameTime, LEFT_MODE);
 
       uint8_t playerAngle[32];
-      itoa(pa, playerAngle, 10);
+      itoa(_pAngle, playerAngle, 10);
       BSP_LCD_DisplayStringAt(0, 72, playerAngle, LEFT_MODE);
 
       uint8_t playerX[32];
-      itoa(px, playerX, 10);
+      itoa(_pPosX, playerX, 10);
       BSP_LCD_DisplayStringAt(0, 24, playerX, LEFT_MODE);
 
       uint8_t playerY[32];
-      itoa(py, playerY, 10);
+      itoa(_pPosY, playerY, 10);
       BSP_LCD_DisplayStringAt(0, 48, playerY, LEFT_MODE);
 
       displayFlag = 0;
@@ -220,24 +218,24 @@ int main(void)
     else { HAL_GPIO_WritePin(ARDUINO_SCK_D13_GPIO_Port, ARDUINO_SCK_D13_Pin, GPIO_PIN_SET); }
 
     if (HAL_GPIO_ReadPin(ARDUINO_D4_GPIO_Port, ARDUINO_D4_Pin)) { // RIGHT
-      pa -= 0.0002;
-      if (pa < 0) { pa = M_TWOPI; }
-      pdx =  cos(pa) / 500;
-      pdy = -sin(pa) / 500;
+      _pAngle -= 0.0002;
+      if (_pAngle < 0) { _pAngle = M_TWOPI; }
+      _pDeltaX =  cos(_pAngle) / 500;
+      _pDeltaY = -sin(_pAngle) / 500;
     }
     if (HAL_GPIO_ReadPin(ARDUINO_D5_GPIO_Port, ARDUINO_D5_Pin)) { // LEFT
-      pa += 0.0002;
-      if (pa > M_TWOPI) { pa = 0; }
-      pdx =  cos(pa) / 500;
-      pdy = -sin(pa) / 500;
+      _pAngle += 0.0002;
+      if (_pAngle > M_TWOPI) { _pAngle = 0; }
+      _pDeltaX =  cos(_pAngle) / 500;
+      _pDeltaY = -sin(_pAngle) / 500;
     }
     if (HAL_GPIO_ReadPin(ARDUINO_D2_GPIO_Port, ARDUINO_D2_Pin)) { // FORWARD
-      px += pdx;
-      py += pdy;
+      _pPosX += _pDeltaX;
+      _pPosY += _pDeltaY;
     }
     if (HAL_GPIO_ReadPin(ARDUINO_D3_GPIO_Port, ARDUINO_D3_Pin)) { // BACKWARD
-      px -= pdx;
-      py -= pdy;
+      _pPosX -= _pDeltaX;
+      _pPosY -= _pDeltaY;
     }
   }
   /* USER CODE END 3 */
@@ -328,13 +326,14 @@ void PeriphCommonClock_Config(void)
 
 /* USER CODE BEGIN 4 */
 uint32_t cast() {
-  uint16_t r, mx, my, mp, dof; // r is amount of rays, mx and my are map x and y positions, mp is map position in array, dof is how many steps to attempt to cast a ray, before giving up
-  float    rx, ry, ra, xo, yo, shrt; // rx and ry are the first intersect points, ra is ray angle, xo and yo are x and y offset or step, shrt is the shortest ray length
-  uint32_t startTime = HAL_GetTick();
+  // Variable naming convention: r = ray, m = map, p = performance, c = calculation
+  uint16_t rCount, rCastLimit, mX, mY, mPosition;
+  float    rIntersectX, rIntersectY, rAngle, rOffsetX, rOffsetY, rShortest;
+  uint32_t pStartTime = HAL_GetTick();
 
-  ra = pa + FOV_HALF * FOV_INCR;
-  if (ra < 0)       { ra += M_TWOPI; }
-  if (ra > M_TWOPI) { ra -= M_TWOPI; }
+  rAngle = _pAngle + FOV_HALF * FOV_INCR;
+  if (rAngle < 0)       { rAngle += M_TWOPI; }
+  if (rAngle > M_TWOPI) { rAngle -= M_TWOPI; }
 
   BSP_LCD_SelectLayer(0);
   BSP_LCD_Clear(LCD_COLOR_BLACK);
@@ -345,117 +344,112 @@ uint32_t cast() {
 //  BSP_LCD_SetTextColor(0xFF04B80A);
 //  BSP_LCD_FillRect(0, 137, 480, 136);
 
-  for (r = 0; r < FOV; r++) {
+  for (rCount = 0; rCount < FOV; rCount++) {
     // VERTICAL LINE CHECK
-    dof = 0;
-    float dV = FLT_MAX;
-    float tTan = tan(ra);
+    rCastLimit = 0;
+    float rVertical = FLT_MAX;
+    float cTan = tan(rAngle);
 
-    if (ra > M_PI_2 && ra < M_3PI_2) { // looking left
-      rx = (((uint16_t)px >> 6) << 6) - 0.0001;
-      ry = (px - rx) * tTan + py;
-      xo = -64;
-      yo = -xo * tTan;
+    if (rAngle > M_PI_2 && rAngle < M_3PI_2) { // looking left
+      rIntersectX = (((uint16_t)_pPosX >> 6) << 6) - 0.0001;
+      rIntersectY = (_pPosX - rIntersectX) * cTan + _pPosY;
+      rOffsetX = -64;
+      rOffsetY = -rOffsetX * cTan;
     }
-    else if (ra < M_PI_2 || ra > M_3PI_2) { // looking right
-      rx = (((uint16_t)px >> 6) << 6) + mapS;
-      ry = (px - rx) * tTan + py;
-      xo = 64;
-      yo = -xo * tTan;
+    else if (rAngle < M_PI_2 || rAngle > M_3PI_2) { // looking right
+      rIntersectX = (((uint16_t)_pPosX >> 6) << 6) + _mSizeS;
+      rIntersectY = (_pPosX - rIntersectX) * cTan + _pPosY;
+      rOffsetX = 64;
+      rOffsetY = -rOffsetX * cTan;
     }
     else { // looking perfectly vertical
-      ry = py;
-      rx = px;
-      dof = DOF;
+      rIntersectY = _pPosY;
+      rIntersectX = _pPosX;
+      rCastLimit = DOF;
     }
 
-    while (dof < DOF) {
-      mx = (uint16_t)rx >> 6;
-      my = (uint16_t)ry >> 6;
-      mp = my * mapX + mx;
+    while (rCastLimit < DOF) {
+      mX = (uint16_t)rIntersectX >> 6;
+      mY = (uint16_t)rIntersectY >> 6;
+      mPosition = mY * _mSizeX + mX;
 
-      if (mp > 0 && mp < mapX * mapY && map[mp] == 1) {
-        dV = raylength(px, rx, py, ry);
-        dof = DOF;
+      if (mPosition > 0 && mPosition < _mSizeX * _mSizeY && _map[mPosition] == 1) {
+        rVertical = rayLength(_pPosX, rIntersectX, _pPosY, rIntersectY);
+        rCastLimit = DOF;
       }
       else {
-        rx += xo;
-        ry += yo;
-        dof++;
+        rIntersectX += rOffsetX;
+        rIntersectY += rOffsetY;
+        rCastLimit++;
       }
     }
 
     // HORIZONTAL LINE CHECK
-    dof = 0;
-    float dH = FLT_MAX;
-    float rTan = 1 / tan(ra);
+    rCastLimit = 0;
+    float rHorizontal = FLT_MAX;
+    float cRTan = 1 / tan(rAngle);
 
-    if (ra < M_PI) { // looking up
-      ry = (((uint16_t)py >> 6) << 6) - 0.0001; // essentially acts as floor(py) to find next horizontal intersection of y
-      rx = (py - ry) * rTan + px;               // some weird signage stuff, but essentially find the y distance between ry and py, divide by the tangent to get xn and add px to get rx
-      yo = -64;                                 // yo is equal to cellsize
-      xo = -yo * rTan;                          // xo is equal to the ratio of the tangent
+    if (rAngle < M_PI) { // looking up
+      rIntersectY = (((uint16_t)_pPosY >> 6) << 6) - 0.0001;
+      rIntersectX = (_pPosY - rIntersectY) * cRTan + _pPosX;
+      rOffsetY = -64;
+      rOffsetX = -rOffsetY * cRTan;
     }
-    else if (ra > M_PI) { // looking down
-      ry = (((uint16_t)py >> 6) << 6) + mapS;
-      rx = (py - ry) * rTan + px;
-      yo = 64;
-      xo = -yo * rTan;
+    else if (rAngle > M_PI) { // looking down
+      rIntersectY = (((uint16_t)_pPosY >> 6) << 6) + _mSizeS;
+      rIntersectX = (_pPosY - rIntersectY) * cRTan + _pPosX;
+      rOffsetY = 64;
+      rOffsetX = -rOffsetY * cRTan;
     }
     else { // looking perfectly horizontal
-      ry = py;
-      rx = px;
-      dof = DOF;
+      rIntersectY = _pPosY;
+      rIntersectX = _pPosX;
+      rCastLimit = DOF;
     }
 
-    while (dof < DOF) {
-      mx = (uint16_t)rx >> 6; // divide ray's position to figure out the map square to check
-      my = (uint16_t)ry >> 6;
-      mp = my * mapX + mx;    // find that map square's position in the array
+    while (rCastLimit < DOF) {
+      mX = (uint16_t)rIntersectX >> 6;
+      mY = (uint16_t)rIntersectY >> 6;
+      mPosition = mY * _mSizeX + mX;
 
-      if (mp > 0 && mp < mapX * mapY && map[mp] == 1) {
-        dH = raylength(px, rx, py, ry); // calculate delta between hit x,y and player x,y, use pythagoras to get hypotenuse length
-        dof = DOF;
+      if (mPosition > 0 && mPosition < _mSizeX * _mSizeY && _map[mPosition] == 1) {
+        rHorizontal = rayLength(_pPosX, rIntersectX, _pPosY, rIntersectY);
+        rCastLimit = DOF;
       }
       else {
-        rx += xo;
-        ry += yo;
-        dof++;
+        rIntersectX += rOffsetX;
+        rIntersectY += rOffsetY;
+        rCastLimit++;
       }
     }
 
-    if (dV < dH) {
-      shrt = dV;
-    }
-    else {
-      shrt = dH;
-    }
+    if (rVertical < rHorizontal) { rShortest = rVertical; }
+    else { rShortest = rHorizontal; }
 
-    // Rendering
+    // RENDERING
 #ifdef REMOVE_FISHEYE
-    float ff = pa - ra;
-    if (ff < 0)       { ff += M_TWOPI; }
-    if (ff > M_TWOPI) { ff -= M_TWOPI; }
-    shrt *= cos(ff);
+    float rFisheyeFix = _pAngle - rAngle;
+    if (rFisheyeFix < 0)       { rFisheyeFix += M_TWOPI; }
+    if (rFisheyeFix > M_TWOPI) { rFisheyeFix -= M_TWOPI; }
+    rShortest *= cos(rFisheyeFix);
 #endif
 
-    float lineH = (mapS * 272) / shrt;
-    if (lineH > 272) { lineH = 272; }
+    float lineHeight = (_mSizeS * 272) / rShortest;
+    if (lineHeight > 272) { lineHeight = 272; }
+    float lineOffset = (272 - lineHeight) / 2;
 
-    float lineO = (272 - lineH) / 2;
+    BSP_LCD_SetTextColor(0xFF000000 | (uint32_t)((0.0036 * lineHeight) * 0x11) << 16 | (uint32_t)((0.0036 * lineHeight) * 0xFF) << 8 | (uint32_t)((0.0036 * lineHeight) * 0x40));
+    BSP_LCD_FillRect((rCount * FOV_RECT), lineOffset, FOV_RECT, lineHeight);
 
-    BSP_LCD_SetTextColor(0xFF000000 | (uint32_t)((0.0036 * lineH) * 0x11) << 16 | (uint32_t)((0.0036 * lineH) * 0xFF) << 8 | (uint32_t)((0.0036 * lineH) * 0x40));
-    BSP_LCD_FillRect((r * FOV_RECT), lineO, FOV_RECT, lineH);
-
-    ra -= FOV_INCR;
-    if (ra < 0)       { ra += M_TWOPI; }
-    if (ra > M_TWOPI) { ra -= M_TWOPI; }
+    rAngle -= FOV_INCR;
+    if (rAngle < 0)       { rAngle += M_TWOPI; }
+    if (rAngle > M_TWOPI) { rAngle -= M_TWOPI; }
   }
 
-  return (HAL_GetTick() - startTime);
+  return (HAL_GetTick() - pStartTime);
 }
 
-float raylength(float ax, float bx, float ay, float by) {
+float rayLength(float ax, float bx, float ay, float by) {
   return sqrt((bx - ax) * (bx - ax) + (by - ay) * (by - ay));
 }
 /* USER CODE END 4 */
