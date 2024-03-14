@@ -103,8 +103,8 @@ uint8_t _map[] = {
 float _pPosX = 224, _pPosY = 512, _pAngle = 0 * FOV_INCR, _pDeltaX, _pDeltaY;
 
 // RENDERING
-volatile uint8_t displayFlag  = 0;
-volatile uint8_t activeBuffer = 1;
+volatile uint8_t _displayFlag  = 0;
+volatile uint8_t _activeBuffer = 1;
 /* USER CODE END 0 */
 
 /**
@@ -205,7 +205,7 @@ int main(void)
     MX_USB_HOST_Process();
 
     /* USER CODE BEGIN 3 */
-    if (displayFlag) {
+    if (_displayFlag) {
       uint8_t frameTime[32];
       itoa(cast(), frameTime, 10);
       BSP_LCD_SetTextColor(0xFF000000);
@@ -225,9 +225,9 @@ int main(void)
 //      BSP_LCD_DisplayStringAt(0, 48, playerY, LEFT_MODE);
 
 //      cast();
-      activeBuffer ^= 1;
-      BSP_LCD_SWAP(activeBuffer);
-      displayFlag = 0;
+      _activeBuffer ^= 1;
+      BSP_LCD_SWAP(_activeBuffer);
+      _displayFlag = 0;
     }
 
     if (HAL_GetTick() % 1000 < 500) { HAL_GPIO_WritePin(ARDUINO_SCK_D13_GPIO_Port, ARDUINO_SCK_D13_Pin, GPIO_PIN_RESET); }
@@ -488,7 +488,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   }
   /* USER CODE BEGIN Callback 1 */
   if (htim->Instance == TIM4) {
-    displayFlag = 1;
+    _displayFlag = 1;
   }
   /* USER CODE END Callback 1 */
 }
