@@ -155,7 +155,7 @@ int main(void)
   MX_FMC_Init();
   MX_I2C1_Init();
   MX_I2C3_Init();
-//  MX_LTDC_Init();
+  MX_LTDC_Init();
   MX_QUADSPI_Init();
   MX_RTC_Init();
   MX_SAI2_Init();
@@ -201,13 +201,13 @@ int main(void)
     if (!HAL_GPIO_ReadPin(LCD_VSYNC_GPIO_Port, LCD_VSYNC_Pin)) {
       _activeBuffer ^= 1;
       BSP_LCD_SWAP(_activeBuffer);
-      cast();
+//      cast();
 
-//      uint8_t frameTime[32];
-//      itoa(cast(), frameTime, 10);
-//      BSP_LCD_SetTextColor(0xFF000000);
-//      BSP_LCD_SetBackColor(0xFFFF2244);
-//      BSP_LCD_DisplayStringAt(0, 0, frameTime, LEFT_MODE);
+      uint8_t frameTime[32];
+      itoa(cast(), frameTime, 10);
+      BSP_LCD_SetTextColor(0xFF000000);
+      BSP_LCD_SetBackColor(0xFFFF2244);
+      BSP_LCD_DisplayStringAt(0, 0, frameTime, LEFT_MODE);
 
 //      uint8_t playerAngle[32];
 //      itoa(_pAngle, playerAngle, 10);
