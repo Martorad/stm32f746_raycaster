@@ -104,8 +104,8 @@ uint8_t _map[] = {
 float _pPosX = 224, _pPosY = 512, _pAngle = 0 * FOV_INCR, _pDeltaX, _pDeltaY;
 
 // RENDERING
-volatile uint8_t _displayFlag  = 0;
-volatile uint8_t _activeBuffer = 1;
+volatile uint8_t _activeBuffer  = 1;
+
 /* USER CODE END 0 */
 
 /**
@@ -169,14 +169,12 @@ int main(void)
   MX_USART1_UART_Init();
   MX_USART6_UART_Init();
   MX_USB_HOST_Init();
-  MX_TIM4_Init();
   /* USER CODE BEGIN 2 */
   BSP_LCD_Init();
   BSP_LCD_LayerDefaultInit(LTDC_FOREGROUND, LCD_FB_START_ADDRESS);
   BSP_LCD_LayerDefaultInit(LTDC_BACKGROUND, LCD_BB_START_ADDRESS);
   BSP_LCD_SetLayerVisible(LTDC_BACKGROUND, DISABLE);
   BSP_LCD_DisplayOn();
-
   BSP_LCD_SelectLayer(LTDC_FOREGROUND);
 //  BSP_LCD_Clear(LCD_COLOR_BLACK);
 //  for (uint8_t i = 0; i < 40; i++) {
@@ -190,8 +188,6 @@ int main(void)
 //    BSP_LCD_SetTextColor(0xFF000000 | (uint32_t)((0.025 * i) * 0xFF) << 16 | (uint32_t)((0.025 * i) * 0x00) << 8 | (uint32_t)((0.025 * i) * 0xFF));
 //    BSP_LCD_FillRect(0 + i * 12, 0 + i * 2, 12, 272 - i * 4);
 //  }
-
-  HAL_TIM_Base_Start_IT(&htim4);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -202,12 +198,16 @@ int main(void)
     MX_USB_HOST_Process();
 
     /* USER CODE BEGIN 3 */
-    if (_displayFlag) {
-      uint8_t frameTime[32];
-      itoa(cast(), frameTime, 10);
-      BSP_LCD_SetTextColor(0xFF000000);
-      BSP_LCD_SetBackColor(0xFFFF2244);
-      BSP_LCD_DisplayStringAt(0, 0, frameTime, LEFT_MODE);
+    if (!HAL_GPIO_ReadPin(LCD_VSYNC_GPIO_Port, LCD_VSYNC_Pin)) {
+      _activeBuffer ^= 1;
+      BSP_LCD_SWAP(_activeBuffer);
+      cast();
+
+//      uint8_t frameTime[32];
+//      itoa(cast(), frameTime, 10);
+//      BSP_LCD_SetTextColor(0xFF000000);
+//      BSP_LCD_SetBackColor(0xFFFF2244);
+//      BSP_LCD_DisplayStringAt(0, 0, frameTime, LEFT_MODE);
 
 //      uint8_t playerAngle[32];
 //      itoa(_pAngle, playerAngle, 10);
@@ -220,12 +220,6 @@ int main(void)
 //      uint8_t playerY[32];
 //      itoa(_pPosY, playerY, 10);
 //      BSP_LCD_DisplayStringAt(0, 48, playerY, LEFT_MODE);
-
-//      cast();
-      _activeBuffer ^= 1;
-      BSP_LCD_SWAP(_activeBuffer);
-//      memcpy((void*)0xC0000000, (void*)0xC0080000, 0x80000);
-      _displayFlag = 0;
     }
 
     if (HAL_GetTick() % 1000 < 500) { HAL_GPIO_WritePin(ARDUINO_SCK_D13_GPIO_Port, ARDUINO_SCK_D13_Pin, GPIO_PIN_RESET); }
@@ -485,9 +479,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     HAL_IncTick();
   }
   /* USER CODE BEGIN Callback 1 */
-  if (htim->Instance == TIM4) {
-    _displayFlag = 1;
-  }
+
   /* USER CODE END Callback 1 */
 }
 
