@@ -2,9 +2,11 @@
 #define __RC__CONFIG__H__
 
 // PERFORMANCE SETTINGS
-#define DOF 16
 #define FOV_1
 #define REMOVE_FISHEYE
+
+#define DOF 16
+#define LINE_VERTICAL_SCALE 0.8
 
 // MOVEMENT SETTINGS
 #define INCR_ROTATION    0.0001 // HIGHER IS FASTER

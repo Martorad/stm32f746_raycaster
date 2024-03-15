@@ -347,9 +347,9 @@ uint32_t cast() {
   BSP_LCD_Clear(LCD_COLOR_BLACK);
 
 // Sky and Grass
-//  BSP_LCD_SetTextColor(0xFF1174ED);
+//  BSP_LCD_SetTextColor(0xFF477fC4);
 //  BSP_LCD_FillRect(0, 0, 480, 136);
-//  BSP_LCD_SetTextColor(0xFF04B80A);
+//  BSP_LCD_SetTextColor(0xFF069C10);
 //  BSP_LCD_FillRect(0, 137, 480, 136);
 
   for (rCount = 0; rCount < FOV; rCount++) {
@@ -443,10 +443,11 @@ uint32_t cast() {
 #endif
 
     float lineHeight = (_mSizeS * 272) / rShortest;
+    lineHeight *= LINE_VERTICAL_SCALE;
     if (lineHeight > 272) { lineHeight = 272; }
     float lineOffset = (272 - lineHeight) / 2;
 
-    BSP_LCD_SetTextColor(0xFF000000 | (uint32_t)((0.0036 * lineHeight) * 0x11) << 16 | (uint32_t)((0.0036 * lineHeight) * 0xFF) << 8 | (uint32_t)((0.0036 * lineHeight) * 0xFF));
+    BSP_LCD_SetTextColor(0xFF000000 | (uint32_t)((0.0036 * lineHeight) * 0xDD) << 16 | (uint32_t)((0.0036 * lineHeight) * 0xDD) << 8 | (uint32_t)((0.0036 * lineHeight) * 0xFF));
     BSP_LCD_FillRect((rCount * FOV_RECT), lineOffset, FOV_RECT, lineHeight);
 
     rAngle -= FOV_INCR;
