@@ -41,10 +41,10 @@
 /* #define HAL_ADC_MODULE_ENABLED */
 /* #define HAL_CAN_MODULE_ENABLED */
 /* #define HAL_CEC_MODULE_ENABLED */
-/* #define HAL_CRC_MODULE_ENABLED */
+#define HAL_CRC_MODULE_ENABLED
 /* #define HAL_DAC_MODULE_ENABLED */
 /* #define HAL_DCMI_MODULE_ENABLED */
-/* #define HAL_DMA2D_MODULE_ENABLED */
+#define HAL_DMA2D_MODULE_ENABLED
 /* #define HAL_ETH_MODULE_ENABLED */
 /* #define HAL_ETH_LEGACY_MODULE_ENABLED */
 /* #define HAL_NAND_MODULE_ENABLED */
@@ -56,7 +56,7 @@
 /* #define HAL_IWDG_MODULE_ENABLED */
 /* #define HAL_LPTIM_MODULE_ENABLED */
 /* #define HAL_LTDC_MODULE_ENABLED */
-/* #define HAL_QSPI_MODULE_ENABLED */
+#define HAL_QSPI_MODULE_ENABLED
 /* #define HAL_RNG_MODULE_ENABLED */
 /* #define HAL_RTC_MODULE_ENABLED */
 /* #define HAL_SAI_MODULE_ENABLED */
@@ -148,8 +148,8 @@
 #define  VDD_VALUE                    3300U /*!< Value of VDD in mv */
 #define  TICK_INT_PRIORITY            ((uint32_t)0U) /*!< tick interrupt priority */
 #define  USE_RTOS                     0U
-#define  PREFETCH_ENABLE              0U
-#define  ART_ACCELERATOR_ENABLE        0U /* To enable instruction cache and prefetch */
+#define  PREFETCH_ENABLE              1U
+#define  ART_ACCELERATOR_ENABLE        1U /* To enable instruction cache and prefetch */
 
 #define  USE_HAL_ADC_REGISTER_CALLBACKS         0U /* ADC register callback disabled       */
 #define  USE_HAL_CAN_REGISTER_CALLBACKS         0U /* CAN register callback disabled       */
