@@ -29,6 +29,11 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include <stdio.h>
+#include <stdlib.h>
+#include <float.h>
+#include <string.h>
+#include <math.h>
 #include "../../Drivers/BSP/STM32746G-Discovery/stm32746g_discovery_lcd.h"
 /* USER CODE END Includes */
 
@@ -111,6 +116,13 @@ int main(void)
   MX_USB_OTG_FS_HCD_Init();
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
+  BSP_LCD_Init();
+  BSP_LCD_LayerDefaultInit(LTDC_FOREGROUND, LCD_FB_START_ADDRESS);
+  BSP_LCD_LayerDefaultInit(LTDC_BACKGROUND, LCD_BB_START_ADDRESS);
+  BSP_LCD_SetLayerVisible(LTDC_BACKGROUND, DISABLE);
+  BSP_LCD_DisplayOn();
+  BSP_LCD_SelectLayer(LTDC_FOREGROUND);
+  BSP_LCD_Clear(LCD_COLOR_BLACK);
 
   /* USER CODE END 2 */
 
