@@ -36,7 +36,6 @@
      PG14   ------> ETH_TXD1
      PB8   ------> I2C1_SCL
      PB5   ------> USB_OTG_HS_ULPI_D7
-     PB4   ------> S_TIM3_CH1
      PD7   ------> SPDIFRX_IN0
      PC12   ------> SDMMC1_CK
      PA15   ------> S_TIM2_CH1_ETR
@@ -57,7 +56,6 @@
      PD2   ------> SDMMC1_CMD
      PI1   ------> SPI2_SCK
      PH14   ------> DCMI_D4
-     PI0   ------> S_TIM5_CH4
      PC9   ------> SDMMC1_D1
      PA8   ------> S_TIM1_CH1
      PC8   ------> SDMMC1_D0
@@ -129,7 +127,7 @@ void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(DCMI_PWR_EN_GPIO_Port, DCMI_PWR_EN_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOG, ARDUINO_D4_Pin|ARDUINO_D2_Pin|EXT_RST_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(EXT_RST_GPIO_Port, EXT_RST_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : PtPin */
   GPIO_InitStruct.Pin = OTG_HS_OverCurrent_Pin;
@@ -164,12 +162,10 @@ void MX_GPIO_Init(void)
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
   /*Configure GPIO pin : PtPin */
-  GPIO_InitStruct.Pin = ARDUINO_PWM_D3_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+  GPIO_InitStruct.Pin = ARDUINO_D3_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  GPIO_InitStruct.Alternate = GPIO_AF2_TIM3;
-  HAL_GPIO_Init(ARDUINO_PWM_D3_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(ARDUINO_D3_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : PtPin */
   GPIO_InitStruct.Pin = SPDIF_RX0_Pin;
@@ -322,12 +318,10 @@ void MX_GPIO_Init(void)
   HAL_GPIO_Init(GPIOH, &GPIO_InitStruct);
 
   /*Configure GPIO pin : PtPin */
-  GPIO_InitStruct.Pin = ARDUINO_PWM_CS_D5_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+  GPIO_InitStruct.Pin = ARDUINO_D5_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  GPIO_InitStruct.Alternate = GPIO_AF2_TIM5;
-  HAL_GPIO_Init(ARDUINO_PWM_CS_D5_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(ARDUINO_D5_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : PtPin */
   GPIO_InitStruct.Pin = ARDUINO_PWM_D10_Pin;
@@ -360,10 +354,9 @@ void MX_GPIO_Init(void)
   HAL_GPIO_Init(ULPI_NXT_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : PGPin PGPin PGPin */
-  GPIO_InitStruct.Pin = ARDUINO_D4_Pin|ARDUINO_D2_Pin|EXT_RST_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pin = ARDUINO_D4_Pin|ARDUINO_D2_Pin|RMII_RXER_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOG, &GPIO_InitStruct);
 
   /*Configure GPIO pins : PFPin PFPin PFPin PFPin
@@ -391,10 +384,11 @@ void MX_GPIO_Init(void)
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
   /*Configure GPIO pin : PtPin */
-  GPIO_InitStruct.Pin = RMII_RXER_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pin = EXT_RST_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(RMII_RXER_GPIO_Port, &GPIO_InitStruct);
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(EXT_RST_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : PAPin PAPin PAPin */
   GPIO_InitStruct.Pin = RMII_REF_CLK_Pin|RMII_MDIO_Pin|RMII_CRS_DV_Pin;

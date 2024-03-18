@@ -22,6 +22,7 @@
 #include "dma2d.h"
 #include "ltdc.h"
 #include "quadspi.h"
+#include "tim.h"
 #include "usart.h"
 #include "usb_otg.h"
 #include "gpio.h"
@@ -39,12 +40,19 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
+typedef struct{
+  float x;
+  float y;
+} vector;
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define MAP_SIZE_X    24
+#define MAP_SIZE_Y    24
 
+#define SCREEN_WIDTH  480
+#define SCREEN_HEIGHT 272
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -62,12 +70,48 @@
 void SystemClock_Config(void);
 void PeriphCommonClock_Config(void);
 /* USER CODE BEGIN PFP */
-
+void cast(void);
+uint32_t CLUT(uint8_t index, int8_t hitSide);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+// SYSTEM
+volatile uint64_t _microSeconds;
+uint64_t _time, _oldTime;
+const float _screenWidth = SCREEN_WIDTH, _screenHeight = SCREEN_HEIGHT;
+volatile uint8_t _activeBuffer = 1;
 
+// MAP
+uint8_t _map[MAP_SIZE_X][MAP_SIZE_Y] = {
+  {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+  {1,0,0,0,0,0,2,2,2,2,2,0,0,0,0,3,0,3,0,3,0,0,0,1},
+  {1,0,0,0,0,0,2,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,1},
+  {1,0,0,0,0,0,2,0,0,0,2,0,0,0,0,3,0,0,0,3,0,0,0,1},
+  {1,0,0,0,0,0,2,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,1},
+  {1,0,0,0,0,0,2,2,0,2,2,0,0,0,0,3,0,3,0,3,0,0,0,1},
+  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+  {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+  {1,4,4,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+  {1,4,0,4,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+  {1,4,0,0,0,0,5,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+  {1,4,0,4,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+  {1,4,0,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+  {1,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+  {1,4,4,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+  {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
+};
+
+// PLAYER
+vector _pPos = {22, 12}, _pDir = {-1, 0}, _pPln = {0, 0.66};
 /* USER CODE END 0 */
 
 /**
@@ -115,6 +159,7 @@ int main(void)
   MX_LTDC_Init();
   MX_USB_OTG_FS_HCD_Init();
   MX_USART1_UART_Init();
+  MX_TIM6_Init();
   /* USER CODE BEGIN 2 */
   BSP_LCD_Init();
   BSP_LCD_LayerDefaultInit(LTDC_FOREGROUND, LCD_FB_START_ADDRESS);
@@ -124,15 +169,22 @@ int main(void)
   BSP_LCD_SelectLayer(LTDC_FOREGROUND);
   BSP_LCD_Clear(LCD_COLOR_BLACK);
 
+  HAL_TIM_Base_Start_IT(&htim6);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+//  cast();
   while (1)
   {
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+    if (!HAL_GPIO_ReadPin(LCD_VSYNC_GPIO_Port, LCD_VSYNC_Pin)) {
+      _activeBuffer ^= 1;
+      BSP_LCD_SWAP(_activeBuffer);
+      cast();
+    }
   }
   /* USER CODE END 3 */
 }
@@ -218,7 +270,101 @@ void PeriphCommonClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+  if (htim->Instance == TIM6) {
+    _microSeconds++;
+  }
+}
 
+void cast(void) {
+  BSP_LCD_SelectLayer(0);
+  BSP_LCD_Clear(LCD_COLOR_BLACK);
+
+  for (uint16_t rCount = 0; rCount < _screenWidth; rCount++) {
+    float    planeOffset = 2 * rCount / _screenWidth - 1;                               // Calculate ray angle as a component of screen width, normalize from -1 to 1
+    vector   rDir = {_pDir.x + _pPln.x * planeOffset, _pDir.y + _pPln.y * planeOffset}; // Calculate ray direction using the camera plane offset
+    uint16_t mapX = (uint16_t)_pPos.x, mapY = (uint16_t)_pPos.y;                        // Floor player position floats to integers
+    float    rSideDistX, rSideDistY;                                                    // Length of the ray to the first X and Y intersects
+    float    rDeltaDistX = abs(1 / rDir.x), rDeltaDistY = abs(1 / rDir.y);              // Delta distance from first intersect to next intersect
+    float    rWallDist;                                                                 // Stores length of entire ray
+    int8_t   rStepX, rStepY;                                                            // Stores ray step, always either -1 or 1
+    int8_t   rHit = 0, rHitSide;                                                        // Flags, set when ray hits a wall and when it is determined whether an X (0) or Y (1) wall was hit
+
+    if (rDir.x < 0) {
+      rStepX = -1;
+      rSideDistX = (_pPos.x - mapX) * rDeltaDistX;
+    }
+    else {
+      rStepX = 1;
+      rSideDistX = (mapX + 1.0 - _pPos.x) * rDeltaDistX;
+    }
+    if (rDir.y < 0) {
+      rStepY = -1;
+      rSideDistY = (_pPos.y - mapY) * rDeltaDistY ;
+    }
+    else {
+      rStepY = 1;
+      rSideDistY = (mapY + 1.0 - _pPos.y) * rDeltaDistY;
+    }
+
+    while (rHit == 0) {
+      if (rSideDistX < rSideDistY) {
+        rSideDistX += rDeltaDistX;
+        mapX += rStepX;
+        rHitSide = 0;
+      }
+      else {
+        rSideDistY += rDeltaDistY;
+        mapY += rStepY;
+        rHitSide = 1;
+      }
+
+      if (_map[mapX][mapY]) { rHit = 1; }
+    }
+
+    if (rHitSide) { rWallDist = rSideDistY - rDeltaDistY; }
+    else          { rWallDist = rSideDistX - rDeltaDistX; }
+
+    int16_t lineHeight = (int16_t)(_screenHeight / rWallDist);
+    int16_t lineStart  = -lineHeight / 2 + _screenHeight / 2;
+    if (lineStart < 0) { lineStart = 0; }
+
+    BSP_LCD_SetTextColor(CLUT(_map[mapX][mapY], rHitSide));
+    BSP_LCD_DrawVLine(rCount, lineStart, lineHeight);
+  }
+
+  _oldTime = _time;
+  _time = _microSeconds;
+  uint64_t frameTime = (_time - _oldTime) / 1000;
+
+  uint8_t frameTimeS[32];
+  itoa(frameTime, frameTimeS, 10);
+  BSP_LCD_SetTextColor(0xFF000000);
+  BSP_LCD_SetBackColor(0xFFFF2244);
+  BSP_LCD_DisplayStringAt(0, 0, frameTimeS, LEFT_MODE);
+}
+
+uint32_t CLUT(uint8_t index, int8_t hitSide) {
+  if (hitSide) { // Y side wall
+    switch (index) {
+      case 1:  return 0xFFAA0000;
+      case 2:  return 0xFF00AA00;
+      case 3:  return 0xFF0000AA;
+      case 4:  return 0xFFAAAAAA;
+      default: return 0xFFAAAA00;
+    }
+  }
+  else { // X side wall
+    switch (index) {
+      case 1:  return 0xFFFF0000;
+      case 2:  return 0xFF00FF00;
+      case 3:  return 0xFF0000FF;
+      case 4:  return 0xFFFFFFFF;
+      default: return 0xFFFFFF00;
+    }
+  }
+}
 /* USER CODE END 4 */
 
 /**

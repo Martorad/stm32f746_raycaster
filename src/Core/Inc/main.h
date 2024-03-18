@@ -73,8 +73,8 @@ void Error_Handler(void);
 #define ARDUINO_SCL_D15_GPIO_Port GPIOB
 #define ULPI_D7_Pin GPIO_PIN_5
 #define ULPI_D7_GPIO_Port GPIOB
-#define ARDUINO_PWM_D3_Pin GPIO_PIN_4
-#define ARDUINO_PWM_D3_GPIO_Port GPIOB
+#define ARDUINO_D3_Pin GPIO_PIN_4
+#define ARDUINO_D3_GPIO_Port GPIOB
 #define SWO_Pin GPIO_PIN_3
 #define SWO_GPIO_Port GPIOB
 #define SPDIF_RX0_Pin GPIO_PIN_7
@@ -187,8 +187,8 @@ void Error_Handler(void);
 #define DCMI_PWR_EN_GPIO_Port GPIOH
 #define DCMI_D4_Pin GPIO_PIN_14
 #define DCMI_D4_GPIO_Port GPIOH
-#define ARDUINO_PWM_CS_D5_Pin GPIO_PIN_0
-#define ARDUINO_PWM_CS_D5_GPIO_Port GPIOI
+#define ARDUINO_D5_Pin GPIO_PIN_0
+#define ARDUINO_D5_GPIO_Port GPIOI
 #define VCP_TX_Pin GPIO_PIN_9
 #define VCP_TX_GPIO_Port GPIOA
 #define RCC_OSC32_OUT_Pin GPIO_PIN_15
