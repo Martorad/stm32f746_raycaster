@@ -76,6 +76,7 @@ void MX_USB_HOST_Process(void);
 uint32_t cast();
 float rayLength(float ax, float ay, float bx, float by);
 void pageFlip();
+uint32_t CLUT(uint8_t index, uint8_t hitSide);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -88,12 +89,12 @@ uint8_t _map[] = {
   1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,1,
   1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,1,
   1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,
-  1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,1,
-  1,0,0,0,0,0,0,0,1,1,1,1,1,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,
+  1,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,1,
+  1,0,0,0,0,0,0,0,2,2,1,1,1,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,
   1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,1,0,1,
   1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,1,0,1,
-  1,0,0,0,0,0,0,0,1,1,1,1,1,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,
-  1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,1,
+  1,0,0,0,0,0,0,0,2,2,1,1,1,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,
+  1,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,1,
   1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,
   1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,1,
   1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,1,
@@ -334,6 +335,7 @@ uint32_t cast() {
   uint16_t rCount, rCastLimit, mX, mY, mPosition;
   float    rIntersectX, rIntersectY, rAngle, rOffsetX, rOffsetY, rShortest;
   uint32_t pStartTime = HAL_GetTick();
+  uint8_t  mColorV;
 
   rAngle = _pAngle + FOV_HALF * FOV_INCR;
   if (rAngle < 0)       { rAngle += M_TWOPI; }
@@ -341,12 +343,6 @@ uint32_t cast() {
 
   BSP_LCD_SelectLayer(0);
   BSP_LCD_Clear(LCD_COLOR_BLACK);
-
-// Sky and Grass
-//  BSP_LCD_SetTextColor(0xFF477fC4);
-//  BSP_LCD_FillRect(0, 0, 480, 136);
-//  BSP_LCD_SetTextColor(0xFF069C10);
-//  BSP_LCD_FillRect(0, 137, 480, 136);
 
   for (rCount = 0; rCount < FOV; rCount++) {
     // VERTICAL LINE CHECK
@@ -377,9 +373,9 @@ uint32_t cast() {
       mY = (uint16_t)rIntersectY >> 6;
       mPosition = mY * _mSizeX + mX;
 
-      if (mPosition > 0 && mPosition < _mSizeX * _mSizeY && _map[mPosition] == 1) {
+      if (mPosition > 0 && mPosition < _mSizeX * _mSizeY && _map[mPosition] >= 1) {
         rVertical = rayLength(_pPosX, rIntersectX, _pPosY, rIntersectY);
-        rCastLimit = DOF;
+        rCastLimit = 0xAAAA;
       }
       else {
         rIntersectX += rOffsetX;
@@ -387,6 +383,8 @@ uint32_t cast() {
         rCastLimit++;
       }
     }
+
+    mColorV = _map[mPosition];
 
     // HORIZONTAL LINE CHECK
     rCastLimit = 0;
@@ -416,9 +414,9 @@ uint32_t cast() {
       mY = (uint16_t)rIntersectY >> 6;
       mPosition = mY * _mSizeX + mX;
 
-      if (mPosition > 0 && mPosition < _mSizeX * _mSizeY && _map[mPosition] == 1) {
+      if (mPosition > 0 && mPosition < _mSizeX * _mSizeY && _map[mPosition] >= 1) {
         rHorizontal = rayLength(_pPosX, rIntersectX, _pPosY, rIntersectY);
-        rCastLimit = DOF;
+        rCastLimit = 0xAAAA;
       }
       else {
         rIntersectX += rOffsetX;
@@ -427,8 +425,17 @@ uint32_t cast() {
       }
     }
 
-    if (rVertical < rHorizontal) { rShortest = rVertical; }
-    else { rShortest = rHorizontal; }
+    uint8_t colorIndex, hitSide;
+    if (rVertical < rHorizontal) {
+      rShortest = rVertical;
+      colorIndex = mColorV;
+      hitSide = 1;
+    }
+    else {
+      rShortest = rHorizontal;
+      colorIndex = _map[mPosition];
+      hitSide = 0;
+    }
 
     // RENDERING
 #ifdef REMOVE_FISHEYE
@@ -438,15 +445,21 @@ uint32_t cast() {
     rShortest *= cos(rFisheyeFix);
 #endif
 
-    float lineHeight = (_mSizeS * 272) / rShortest;
-    lineHeight *= LINE_VERTICAL_SCALE;
-    if (lineHeight > 272) { lineHeight = 272; }
+    float lineHeight;
+    if (rCastLimit == 0xAAAA) {
+      lineHeight = (_mSizeS * 272) / rShortest;
+      lineHeight *= LINE_VERTICAL_SCALE;
+      if (lineHeight > 272) { lineHeight = 272; }
+    }
+    else {
+//      lineHeight = 0;
+    }
     uint16_t lineOffset = (uint16_t)(272 - lineHeight) >> 1;
 
 #ifdef DEBUG_FULLBRIGHT
     BSP_LCD_SetTextColor(0xFFFFFFFF);
 #else
-    BSP_LCD_SetTextColor(0xFF000000 | (uint32_t)((0.0036 * lineHeight) * 0xDD) << 16 | (uint32_t)((0.0036 * lineHeight) * 0xDD) << 8 | (uint32_t)((0.0036 * lineHeight) * 0xFF));
+    BSP_LCD_SetTextColor(CLUT(colorIndex, hitSide));
 #endif
     BSP_LCD_FillRect((rCount * FOV_RECT), lineOffset, FOV_RECT, lineHeight);
 
@@ -466,6 +479,27 @@ void pageFlip() {
   static volatile uint8_t activeBuffer = 1;
   activeBuffer ^= 1;
   BSP_LCD_SWAP(activeBuffer);
+}
+
+uint32_t CLUT(uint8_t index, uint8_t hitSide) {
+  if (hitSide) { // Y side wall
+    switch (index) {
+      case 1:  return 0xFFAA0000;
+      case 2:  return 0xFF00AA00;
+      case 3:  return 0xFF0000AA;
+      case 4:  return 0xFFAAAA00;
+      default: return 0xFFAAAAAA;
+    }
+  }
+  else { // X side wall
+    switch (index) {
+      case 1:  return 0xFFFF0000;
+      case 2:  return 0xFF00FF00;
+      case 3:  return 0xFF0000FF;
+      case 4:  return 0xFFFFFF00;
+      default: return 0xFFFFFFFF;
+    }
+  }
 }
 /* USER CODE END 4 */
 
