@@ -104,7 +104,7 @@ uint8_t _map[] = {
 };
 
 // PLAYER
-float _pPosX = 224, _pPosY = 512, _pAngle = 0 * FOV_INCR, _pDeltaX, _pDeltaY;
+float _pPosX = 224, _pPosY = 512, _pAngle = 0 * FOV_INCR, _pDeltaX, _pDeltaY, _pMovSpeed, _pRotSpeed;
 
 /* USER CODE END 0 */
 
@@ -176,18 +176,6 @@ int main(void)
   BSP_LCD_SetLayerVisible(LTDC_BACKGROUND, DISABLE);
   BSP_LCD_DisplayOn();
   BSP_LCD_SelectLayer(LTDC_FOREGROUND);
-//  BSP_LCD_Clear(LCD_COLOR_BLACK);
-//  for (uint8_t i = 0; i < 40; i++) {
-//    BSP_LCD_SetTextColor(0xFF000000 | (uint32_t)((0.025 * i) * 0xFF) << 16 | (uint32_t)((0.025 * i) * 0xFF) << 8 | (uint32_t)((0.025 * i) * 0xFF));
-//    BSP_LCD_FillRect(0 + i * 12, 0 + i * 2, 12, 272 - i * 4);
-//  }
-//
-//  BSP_LCD_SelectLayer(LTDC_BACKGROUND);
-//  BSP_LCD_Clear(LCD_COLOR_BLACK);
-//  for (uint8_t i = 0; i < 40; i++) {
-//    BSP_LCD_SetTextColor(0xFF000000 | (uint32_t)((0.025 * i) * 0xFF) << 16 | (uint32_t)((0.025 * i) * 0x00) << 8 | (uint32_t)((0.025 * i) * 0xFF));
-//    BSP_LCD_FillRect(0 + i * 12, 0 + i * 2, 12, 272 - i * 4);
-//  }
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -204,36 +192,20 @@ int main(void)
       uint8_t frameTime[32];
       itoa(cast(), frameTime, 10);
       BSP_LCD_SetTextColor(0xFF000000);
-      BSP_LCD_SetBackColor(0xFFFF2244);
       BSP_LCD_DisplayStringAt(0, 0, frameTime, LEFT_MODE);
-
-//      uint8_t playerAngle[32];
-//      itoa(_pAngle, playerAngle, 10);
-//      BSP_LCD_DisplayStringAt(0, 72, playerAngle, LEFT_MODE);
-//
-//      uint8_t playerX[32];
-//      itoa(_pPosX, playerX, 10);
-//      BSP_LCD_DisplayStringAt(0, 24, playerX, LEFT_MODE);
-//
-//      uint8_t playerY[32];
-//      itoa(_pPosY, playerY, 10);
-//      BSP_LCD_DisplayStringAt(0, 48, playerY, LEFT_MODE);
     }
-
-    if (HAL_GetTick() % 1000 < 500) { HAL_GPIO_WritePin(ARDUINO_SCK_D13_GPIO_Port, ARDUINO_SCK_D13_Pin, GPIO_PIN_RESET); }
-    else { HAL_GPIO_WritePin(ARDUINO_SCK_D13_GPIO_Port, ARDUINO_SCK_D13_Pin, GPIO_PIN_SET); }
 
     if (HAL_GPIO_ReadPin(ARDUINO_D4_GPIO_Port, ARDUINO_D4_Pin)) { // RIGHT
-      _pAngle -= INCR_ROTATION;
+      _pAngle -= _pRotSpeed;
       if (_pAngle < 0) { _pAngle = M_TWOPI; }
-      _pDeltaX =  cos(_pAngle) * INCR_TRANSLATION;
-      _pDeltaY = -sin(_pAngle) * INCR_TRANSLATION;
+      _pDeltaX =  cos(_pAngle) * _pMovSpeed;
+      _pDeltaY = -sin(_pAngle) * _pMovSpeed;
     }
     if (HAL_GPIO_ReadPin(ARDUINO_D5_GPIO_Port, ARDUINO_D5_Pin)) { // LEFT
-      _pAngle += INCR_ROTATION;
+      _pAngle += _pRotSpeed;
       if (_pAngle > M_TWOPI) { _pAngle = 0; }
-      _pDeltaX =  cos(_pAngle) * INCR_TRANSLATION;
-      _pDeltaY = -sin(_pAngle) * INCR_TRANSLATION;
+      _pDeltaX =  cos(_pAngle) * _pMovSpeed;
+      _pDeltaY = -sin(_pAngle) * _pMovSpeed;
     }
     if (HAL_GPIO_ReadPin(ARDUINO_D2_GPIO_Port, ARDUINO_D2_Pin)) { // FORWARD
       _pPosX += _pDeltaX;
@@ -338,12 +310,12 @@ uint32_t cast() {
   uint32_t pStartTime = HAL_GetTick();
   uint8_t  mColorV, mColorH;
 
+  BSP_LCD_SelectLayer(0);
+  BSP_LCD_Clear(LCD_COLOR_BLACK);
+
   rAngle = _pAngle + FOV_HALF * FOV_INCR;
   if (rAngle < 0)       { rAngle += M_TWOPI; }
   if (rAngle > M_TWOPI) { rAngle -= M_TWOPI; }
-
-  BSP_LCD_SelectLayer(0);
-  BSP_LCD_Clear(LCD_COLOR_BLACK);
 
   for (rCount = 0; rCount < FOV; rCount++) {
     // VERTICAL LINE CHECK
@@ -468,7 +440,12 @@ uint32_t cast() {
     if (rAngle > M_TWOPI) { rAngle -= M_TWOPI; }
   }
 
-  return (HAL_GetTick() - pStartTime);
+  uint64_t frameTime = HAL_GetTick() - pStartTime;
+
+  _pMovSpeed = frameTime * INCR_TRANSLATION;
+  _pRotSpeed = frameTime * INCR_ROTATION;
+
+  return frameTime;
 }
 
 float rayLength(float ax, float bx, float ay, float by) {
@@ -541,6 +518,7 @@ void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
   /* User can add his own implementation to report the HAL error return state */
+  HAL_GPIO_WritePin(ARDUINO_SCK_D13_GPIO_Port, ARDUINO_SCK_D13_Pin, GPIO_PIN_SET);
   __disable_irq();
   while (1)
   {
