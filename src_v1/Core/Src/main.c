@@ -75,6 +75,7 @@ void MX_USB_HOST_Process(void);
 /* USER CODE BEGIN PFP */
 uint32_t cast();
 float rayLength(float ax, float ay, float bx, float by);
+void pageFlip();
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -102,9 +103,6 @@ uint8_t _map[] = {
 
 // PLAYER
 float _pPosX = 224, _pPosY = 512, _pAngle = 0 * FOV_INCR, _pDeltaX, _pDeltaY;
-
-// RENDERING
-volatile uint8_t _activeBuffer  = 1;
 
 /* USER CODE END 0 */
 
@@ -199,9 +197,7 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
     if (!HAL_GPIO_ReadPin(LCD_VSYNC_GPIO_Port, LCD_VSYNC_Pin)) {
-      _activeBuffer ^= 1;
-      BSP_LCD_SWAP(_activeBuffer);
-//      cast();
+      pageFlip();
 
       uint8_t frameTime[32];
       itoa(cast(), frameTime, 10);
@@ -464,6 +460,12 @@ uint32_t cast() {
 
 float rayLength(float ax, float bx, float ay, float by) {
   return sqrt((bx - ax) * (bx - ax) + (by - ay) * (by - ay));
+}
+
+void pageFlip() {
+  static volatile uint8_t activeBuffer = 1;
+  activeBuffer ^= 1;
+  BSP_LCD_SWAP(activeBuffer);
 }
 /* USER CODE END 4 */
 
