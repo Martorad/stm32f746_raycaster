@@ -51,7 +51,7 @@ typedef struct{
 #define MAP_SIZE_X    24
 #define MAP_SIZE_Y    24
 
-#define SCREEN_WIDTH  480
+#define SCREEN_WIDTH  60
 #define SCREEN_HEIGHT 272
 /* USER CODE END PD */
 
@@ -128,10 +128,10 @@ int main(void)
 /* Enable the CPU Cache */
 
   /* Enable I-Cache---------------------------------------------------------*/
-  SCB_EnableICache();
+//  SCB_EnableICache();
 
   /* Enable D-Cache---------------------------------------------------------*/
-  SCB_EnableDCache();
+//  SCB_EnableDCache();
 
   /* MCU Configuration--------------------------------------------------------*/
 
@@ -306,12 +306,12 @@ void cast(void) {
 
   for (uint16_t rCount = 0; rCount < _screenWidth; rCount++) {
     float    planeOffset = 2 * rCount / _screenWidth - 1;                               // Calculate ray angle as a component of screen width, normalize from -1 to 1
-//    vector   rDir = {_pDirX + _pPlnX * planeOffset, _pDirY + _pPlnY * planeOffset}; // Calculate ray direction using the camera plane offset
+//    vector   rDir = {_pDirX + _pPlnX * planeOffset, _pDirY + _pPlnY * planeOffset};   // Calculate ray direction using the camera plane offset
     float    rDirX = _pDirX + _pPlnX * planeOffset;
     float    rDirY = _pDirY + _pPlnY * planeOffset;
-    uint16_t mapX = (uint16_t)_pPosX, mapY = (uint16_t)_pPosY;                        // Floor player position floats to integers
+    uint16_t mapX = (uint16_t)_pPosX, mapY = (uint16_t)_pPosY;                          // Floor player position floats to integers
     float    rSideDistX, rSideDistY;                                                    // Length of the ray to the first X and Y intersects
-    float    rDeltaDistX = abs(1 / rDirX), rDeltaDistY = abs(1 / rDirY);              // Delta distance from first intersect to next intersect
+    float    rDeltaDistX = abs(1 / rDirX), rDeltaDistY = abs(1 / rDirY);                // Delta distance from first intersect to next intersect
     float    rWallDist;                                                                 // Stores length of entire ray
     int8_t   rStepX, rStepY;                                                            // Stores ray step, always either -1 or 1
     int8_t   rHit = 0, rHitSide;                                                        // Flags, set when ray hits a wall and when it is determined whether an X (0) or Y (1) wall was hit
@@ -356,7 +356,8 @@ void cast(void) {
     if (lineStart < 0) { lineStart = 0; }
 
     BSP_LCD_SetTextColor(CLUT(_map[mapX][mapY], rHitSide));
-    BSP_LCD_DrawVLine(rCount, lineStart, lineHeight);
+//    BSP_LCD_DrawVLine(rCount, lineStart, lineHeight);
+    BSP_LCD_FillRect(rCount * 8, lineStart, 8, lineHeight);
   }
 
   _oldTime = _time;

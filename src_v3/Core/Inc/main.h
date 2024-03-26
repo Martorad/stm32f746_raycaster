@@ -54,6 +54,8 @@ void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
 void pageFlip();
+uint32_t cast();
+float rayLength(float ax, float ay, float bx, float by);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/

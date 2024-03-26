@@ -27,7 +27,6 @@
 #include "usb_otg.h"
 #include "gpio.h"
 #include "fmc.h"
-
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
@@ -36,6 +35,7 @@
 #include <string.h>
 #include <math.h>
 #include "../../Drivers/BSP/STM32746G-Discovery/stm32746g_discovery_lcd.h"
+#include "rc_config.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -45,7 +45,8 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
+#define MAP_SIZE_X 24
+#define MAP_SIZE_Y 24
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -57,6 +58,28 @@
 
 /* USER CODE BEGIN PV */
 volatile uint64_t _microSeconds;
+
+uint8_t _mSizeX = 32, _mSizeY = 16;
+uint8_t _map[] = {
+  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,
+  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,1,
+  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,1,
+  1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,
+  1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,1,
+  1,0,0,0,0,0,0,0,1,1,1,1,1,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,
+  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,1,0,1,
+  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,1,0,1,
+  1,0,0,0,0,0,0,0,1,1,1,1,1,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,
+  1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,1,
+  1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,
+  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,1,
+  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,1,
+  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,
+  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+};
+
+float _pPosX = 3.5, _pPosY = 8, _pAngle = 0 * FOV_INCR, _pDeltaX, _pDeltaY;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -138,7 +161,32 @@ int main(void)
     /* USER CODE BEGIN 3 */
     if (!HAL_GPIO_ReadPin(LCD_VSYNC_GPIO_Port, LCD_VSYNC_Pin)) {
       pageFlip();
-//      cast();
+      uint8_t frameTime[32];
+      itoa(cast(), frameTime, 10);
+      BSP_LCD_SetTextColor(0xFF000000);
+      BSP_LCD_SetBackColor(0xFFFF2244);
+      BSP_LCD_DisplayStringAt(0, 0, frameTime, LEFT_MODE);
+    }
+
+    if (HAL_GPIO_ReadPin(ARDUINO_D4_GPIO_Port, ARDUINO_D4_Pin)) { // RIGHT
+      _pAngle -= INCR_ROTATION;
+      if (_pAngle < 0) { _pAngle = M_TWOPI; }
+      _pDeltaX =  cos(_pAngle) * INCR_TRANSLATION;
+      _pDeltaY = -sin(_pAngle) * INCR_TRANSLATION;
+    }
+    if (HAL_GPIO_ReadPin(ARDUINO_D5_GPIO_Port, ARDUINO_D5_Pin)) { // LEFT
+      _pAngle += INCR_ROTATION;
+      if (_pAngle > M_TWOPI) { _pAngle = 0; }
+      _pDeltaX =  cos(_pAngle) * INCR_TRANSLATION;
+      _pDeltaY = -sin(_pAngle) * INCR_TRANSLATION;
+    }
+    if (HAL_GPIO_ReadPin(ARDUINO_D2_GPIO_Port, ARDUINO_D2_Pin)) { // FORWARD
+      _pPosX += _pDeltaX;
+      _pPosY += _pDeltaY;
+    }
+    if (HAL_GPIO_ReadPin(ARDUINO_D3_GPIO_Port, ARDUINO_D3_Pin)) { // BACKWARD
+      _pPosX -= _pDeltaX;
+      _pPosY -= _pDeltaY;
     }
   }
   /* USER CODE END 3 */
@@ -236,6 +284,133 @@ void pageFlip() {
   static uint8_t activeBuffer = 1;
   activeBuffer ^= 1;
   BSP_LCD_SWAP(activeBuffer);
+}
+
+uint32_t cast() {
+  BSP_LCD_SelectLayer(0);
+  BSP_LCD_Clear(LCD_COLOR_BLACK);
+
+  // Variable naming convention: r = ray, m = map, p = performance, c = calculation
+  uint16_t rCount, rCastLimit, mX, mY, mPosition;
+  float    rIntersectX, rIntersectY, rAngle, rOffsetX, rOffsetY, rShortest;
+  uint32_t pStartTime = HAL_GetTick();
+
+  rAngle = _pAngle + FOV_HALF * FOV_INCR;
+  if (rAngle < 0)       { rAngle += M_TWOPI; }
+  if (rAngle > M_TWOPI) { rAngle -= M_TWOPI; }
+
+  for (rCount = 0; rCount < FOV; rCount++) {
+    // VERTICAL LINE CHECK
+    rCastLimit = 0;
+    float rVertical = FLT_MAX;
+    float cTan = tan(rAngle);
+
+    if (rAngle > M_PI_2 && rAngle < M_3PI_2) { // looking left
+      rIntersectX = (uint16_t)_pPosX - 1;
+      rIntersectY = (_pPosX - rIntersectX) * cTan + _pPosY;
+      rOffsetX = -1;
+      rOffsetY = -rOffsetX * cTan;
+    }
+    else if (rAngle < M_PI_2 || rAngle > M_3PI_2) { // looking right
+      rIntersectX = (uint16_t)_pPosX + 1;
+      rIntersectY = (_pPosX - rIntersectX) * cTan + _pPosY;
+      rOffsetX = 1;
+      rOffsetY = -rOffsetX * cTan;
+    }
+    else { // looking perfectly vertical
+      rIntersectY = _pPosY;
+      rIntersectX = _pPosX;
+      rCastLimit = DOF;
+    }
+
+    while (rCastLimit < DOF) {
+      mX = (uint16_t)rIntersectX;
+      mY = (uint16_t)rIntersectY;
+      mPosition = mY * _mSizeX + mX;
+
+      if (mPosition > 0 && mPosition < _mSizeX * _mSizeY && _map[mPosition] == 1) {
+        rVertical = rayLength(_pPosX, rIntersectX, _pPosY, rIntersectY);
+        rCastLimit = DOF;
+      }
+      else {
+        rIntersectX += rOffsetX;
+        rIntersectY += rOffsetY;
+        rCastLimit++;
+      }
+    }
+
+    // HORIZONTAL LINE CHECK
+    rCastLimit = 0;
+    float rHorizontal = FLT_MAX;
+    float cRTan = 1 / tan(rAngle);
+
+    if (rAngle < M_PI) { // looking up
+      rIntersectY = (uint16_t)_pPosY - 1;
+      rIntersectX = (_pPosY - rIntersectY) * cRTan + _pPosX;
+      rOffsetY = -1;
+      rOffsetX = -rOffsetY * cRTan;
+    }
+    else if (rAngle > M_PI) { // looking down
+      rIntersectY = (uint16_t)_pPosY + 1;
+      rIntersectX = (_pPosY - rIntersectY) * cRTan + _pPosX;
+      rOffsetY = 1;
+      rOffsetX = -rOffsetY * cRTan;
+    }
+    else { // looking perfectly horizontal
+      rIntersectY = _pPosY;
+      rIntersectX = _pPosX;
+      rCastLimit = DOF;
+    }
+
+    while (rCastLimit < DOF) {
+      mX = (uint16_t)rIntersectX;
+      mY = (uint16_t)rIntersectY;
+      mPosition = mY * _mSizeX + mX;
+
+      if (mPosition > 0 && mPosition < _mSizeX * _mSizeY && _map[mPosition] == 1) {
+        rHorizontal = rayLength(_pPosX, rIntersectX, _pPosY, rIntersectY);
+        rCastLimit = DOF;
+      }
+      else {
+        rIntersectX += rOffsetX;
+        rIntersectY += rOffsetY;
+        rCastLimit++;
+      }
+    }
+
+    if (rVertical < rHorizontal) { rShortest = rVertical; }
+    else { rShortest = rHorizontal; }
+
+    // RENDERING
+#ifdef REMOVE_FISHEYE
+    float rFisheyeFix = _pAngle - rAngle;
+    if (rFisheyeFix < 0)       { rFisheyeFix += M_TWOPI; }
+    if (rFisheyeFix > M_TWOPI) { rFisheyeFix -= M_TWOPI; }
+    rShortest *= cos(rFisheyeFix);
+#endif
+
+    float lineHeight = 272 / rShortest;
+    lineHeight *= LINE_VERTICAL_SCALE;
+    if (lineHeight > 272) { lineHeight = 272; }
+    uint16_t lineOffset = (uint16_t)(272 - lineHeight) >> 1;
+
+#ifdef DEBUG_FULLBRIGHT
+    BSP_LCD_SetTextColor(0xFFFFFFFF);
+#else
+    BSP_LCD_SetTextColor(0xFF000000 | (uint32_t)((0.0036 * lineHeight) * 0xDD) << 16 | (uint32_t)((0.0036 * lineHeight) * 0xDD) << 8 | (uint32_t)((0.0036 * lineHeight) * 0xFF));
+#endif
+    BSP_LCD_FillRect((rCount * FOV_RECT), lineOffset, FOV_RECT, lineHeight);
+
+    rAngle -= FOV_INCR;
+    if (rAngle < 0)       { rAngle += M_TWOPI; }
+    if (rAngle > M_TWOPI) { rAngle -= M_TWOPI; }
+  }
+
+  return (HAL_GetTick() - pStartTime);
+}
+
+float rayLength(float ax, float bx, float ay, float by) {
+  return sqrt((bx - ax) * (bx - ax) + (by - ay) * (by - ay));
 }
 /* USER CODE END 4 */
 
