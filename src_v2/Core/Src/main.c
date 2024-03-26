@@ -112,7 +112,8 @@ uint8_t _map[MAP_SIZE_X][MAP_SIZE_Y] = {
 };
 
 // PLAYER
-vector _pPos = {22, 12}, _pDir = {-1, 0}, _pPln = {0, 0.66};
+//vector _pPos = {22, 12}, _pDir = {-1, 0}, _pPln = {0, 0.66};
+float _pPosX = 22, _pPosY = 12, _pDirX = -1, _pDirY = 0, _pPlnX = 0, _pPlnY = 0.66;
 /* USER CODE END 0 */
 
 /**
@@ -188,21 +189,21 @@ int main(void)
     }
 
     if (HAL_GPIO_ReadPin(ARDUINO_D2_GPIO_Port, ARDUINO_D2_Pin)) { // FORWARD
-      if (_map[(int)(_pPos.x + _pDir.x * _moveSpeed)][(int)_pPos.y] == 0) { _pPos.x += _pDir.x * _moveSpeed; }
-      if (_map[(int)_pPos.x][(int)(_pPos.y + _pDir.y * _moveSpeed)] == 0) { _pPos.y += _pDir.y * _moveSpeed; }
+      if (_map[(int)(_pPosX + _pDirX * _moveSpeed)][(int)_pPosY] == 0) { _pPosX += _pDirX * _moveSpeed; }
+      if (_map[(int)_pPosX][(int)(_pPosY + _pDirY * _moveSpeed)] == 0) { _pPosY += _pDirY * _moveSpeed; }
     }
     if (HAL_GPIO_ReadPin(ARDUINO_D3_GPIO_Port, ARDUINO_D3_Pin)) { // BACKWARD
-      if (_map[(int)(_pPos.x - _pDir.x * _moveSpeed)][(int)_pPos.y] == 0) { _pPos.x -= _pDir.x * _moveSpeed; }
-      if (_map[(int)_pPos.x][(int)(_pPos.y - _pDir.y * _moveSpeed)] == 0) { _pPos.y -= _pDir.y * _moveSpeed; }
+      if (_map[(int)(_pPosX - _pDirX * _moveSpeed)][(int)_pPosY] == 0) { _pPosX -= _pDirX * _moveSpeed; }
+      if (_map[(int)_pPosX][(int)(_pPosY - _pDirY * _moveSpeed)] == 0) { _pPosY -= _pDirY * _moveSpeed; }
     }
     if (HAL_GPIO_ReadPin(ARDUINO_D4_GPIO_Port, ARDUINO_D4_Pin)) { // RIGHT
-      float oldDirX = _pDir.x;
-      _pDir.x = _pDir.x * cos(-_rotSpeed) - _pDir.y * sin(-_rotSpeed);
-      _pDir.y = oldDirX * sin(-_rotSpeed) + _pDir.y * cos(-_rotSpeed);
+      float oldDirX = _pDirX;
+      _pDirX = _pDirX * cos(-_rotSpeed) - _pDirY * sin(-_rotSpeed);
+      _pDirY = oldDirX * sin(-_rotSpeed) + _pDirY * cos(-_rotSpeed);
 
-      float oldPlnX = _pPln.x;
-      _pPln.x = _pPln.x * cos(-_rotSpeed) - _pPln.y * sin(-_rotSpeed);
-      _pPln.y = oldPlnX * sin(-_rotSpeed) + _pPln.y * cos(-_rotSpeed);
+      float oldPlnX = _pPlnX;
+      _pPlnX = _pPlnX * cos(-_rotSpeed) - _pPlnY * sin(-_rotSpeed);
+      _pPlnY = oldPlnX * sin(-_rotSpeed) + _pPlnY * cos(-_rotSpeed);
     }
     if (HAL_GPIO_ReadPin(ARDUINO_D5_GPIO_Port, ARDUINO_D5_Pin)) { // LEFT
 
@@ -305,29 +306,31 @@ void cast(void) {
 
   for (uint16_t rCount = 0; rCount < _screenWidth; rCount++) {
     float    planeOffset = 2 * rCount / _screenWidth - 1;                               // Calculate ray angle as a component of screen width, normalize from -1 to 1
-    vector   rDir = {_pDir.x + _pPln.x * planeOffset, _pDir.y + _pPln.y * planeOffset}; // Calculate ray direction using the camera plane offset
-    uint16_t mapX = (uint16_t)_pPos.x, mapY = (uint16_t)_pPos.y;                        // Floor player position floats to integers
+//    vector   rDir = {_pDirX + _pPlnX * planeOffset, _pDirY + _pPlnY * planeOffset}; // Calculate ray direction using the camera plane offset
+    float    rDirX = _pDirX + _pPlnX * planeOffset;
+    float    rDirY = _pDirY + _pPlnY * planeOffset;
+    uint16_t mapX = (uint16_t)_pPosX, mapY = (uint16_t)_pPosY;                        // Floor player position floats to integers
     float    rSideDistX, rSideDistY;                                                    // Length of the ray to the first X and Y intersects
-    float    rDeltaDistX = abs(1 / rDir.x), rDeltaDistY = abs(1 / rDir.y);              // Delta distance from first intersect to next intersect
+    float    rDeltaDistX = abs(1 / rDirX), rDeltaDistY = abs(1 / rDirY);              // Delta distance from first intersect to next intersect
     float    rWallDist;                                                                 // Stores length of entire ray
     int8_t   rStepX, rStepY;                                                            // Stores ray step, always either -1 or 1
     int8_t   rHit = 0, rHitSide;                                                        // Flags, set when ray hits a wall and when it is determined whether an X (0) or Y (1) wall was hit
 
-    if (rDir.x < 0) {
+    if (rDirX < 0) {
       rStepX = -1;
-      rSideDistX = (_pPos.x - mapX) * rDeltaDistX;
+      rSideDistX = (_pPosX - mapX) * rDeltaDistX;
     }
     else {
       rStepX = 1;
-      rSideDistX = (mapX + 1.0 - _pPos.x) * rDeltaDistX;
+      rSideDistX = (mapX + 1.0 - _pPosX) * rDeltaDistX;
     }
-    if (rDir.y < 0) {
+    if (rDirY < 0) {
       rStepY = -1;
-      rSideDistY = (_pPos.y - mapY) * rDeltaDistY ;
+      rSideDistY = (_pPosY - mapY) * rDeltaDistY ;
     }
     else {
       rStepY = 1;
-      rSideDistY = (mapY + 1.0 - _pPos.y) * rDeltaDistY;
+      rSideDistY = (mapY + 1.0 - _pPosY) * rDeltaDistY;
     }
 
     while (rHit == 0) {
