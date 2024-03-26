@@ -2,7 +2,7 @@
 #define __RC__CONFIG__H__
 
 // PERFORMANCE SETTINGS
-#define FOV_4
+#define FOV_1
 #define REMOVE_FISHEYE
 
 #define DOF 16

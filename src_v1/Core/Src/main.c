@@ -427,6 +427,7 @@ uint32_t cast() {
 
     mColorH = _map[mPosition];
 
+    // RENDERING
     uint8_t colorIndex, hitSide;
     uint16_t rCastTotal;
     if (rVertical < rHorizontal) {
@@ -442,7 +443,6 @@ uint32_t cast() {
       rCastTotal = rCastLimitH;
     }
 
-    // RENDERING
 #ifdef REMOVE_FISHEYE
     float rFisheyeFix = _pAngle - rAngle;
     if (rFisheyeFix < 0)       { rFisheyeFix += M_TWOPI; }
@@ -455,18 +455,12 @@ uint32_t cast() {
       lineHeight = (_mSizeS * 272) / rShortest;
       lineHeight *= LINE_VERTICAL_SCALE;
       if (lineHeight > 272) { lineHeight = 272; }
+      if (lineHeight > 272 / DOF) {
+        uint16_t lineOffset = (uint16_t)(272 - lineHeight) >> 1;
+        BSP_LCD_SetTextColor(CLUT(colorIndex, hitSide));
+        BSP_LCD_FillRect((rCount * FOV_RECT), lineOffset, FOV_RECT, lineHeight);
+      }
     }
-    else {
-      lineHeight = 0;
-    }
-    uint16_t lineOffset = (uint16_t)(272 - lineHeight) >> 1;
-
-#ifdef DEBUG_FULLBRIGHT
-    BSP_LCD_SetTextColor(0xFFFFFFFF);
-#else
-    BSP_LCD_SetTextColor(CLUT(colorIndex, hitSide));
-#endif
-    BSP_LCD_FillRect((rCount * FOV_RECT), lineOffset, FOV_RECT, lineHeight);
 
     rAngle -= FOV_INCR;
     if (rAngle < 0)       { rAngle += M_TWOPI; }
