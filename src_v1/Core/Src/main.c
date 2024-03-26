@@ -77,6 +77,7 @@ uint32_t cast();
 float rayLength(float ax, float ay, float bx, float by);
 void pageFlip();
 uint32_t CLUT(uint8_t index, uint8_t hitSide);
+uint32_t dimColor(uint32_t inputColor, float dimmingFactor);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -454,10 +455,10 @@ uint32_t cast() {
     if (rCastTotal == 0xAAAA) {
       lineHeight = (_mSizeS * 272) / rShortest;
       lineHeight *= LINE_VERTICAL_SCALE;
-      if (lineHeight > 272) { lineHeight = 272; }
-      if (lineHeight > 272 / DOF) {
+      if (lineHeight > 272 / DOF) { // if line is smaller than the shortest possible line defined by DOF, don't bother drawing it
+        if (lineHeight > 272) { lineHeight = 272; }
         uint16_t lineOffset = (uint16_t)(272 - lineHeight) >> 1;
-        BSP_LCD_SetTextColor(CLUT(colorIndex, hitSide));
+        BSP_LCD_SetTextColor(dimColor(CLUT(colorIndex, hitSide), lineHeight / 68));
         BSP_LCD_FillRect((rCount * FOV_RECT), lineOffset, FOV_RECT, lineHeight);
       }
     }
@@ -499,6 +500,15 @@ uint32_t CLUT(uint8_t index, uint8_t hitSide) {
       default: return 0xFFFFFFFF;
     }
   }
+}
+
+uint32_t dimColor(uint32_t inputColor, float dimmingFactor) {
+  if (dimmingFactor > 1) { return inputColor; }
+  if (dimmingFactor < 0) { dimmingFactor = 0; }
+  return 0xFF000000 |
+  (0x00FF0000 & (uint32_t)((0x00FF0000 & inputColor) * dimmingFactor)) |
+  (0x0000FF00 & (uint32_t)((0x0000FF00 & inputColor) * dimmingFactor)) |
+  (0x000000FF & (uint32_t)((0x000000FF & inputColor) * dimmingFactor));
 }
 /* USER CODE END 4 */
 
