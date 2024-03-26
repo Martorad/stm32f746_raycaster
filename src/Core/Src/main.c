@@ -81,6 +81,7 @@ volatile uint64_t _microSeconds;
 uint64_t _time, _oldTime;
 const float _screenWidth = SCREEN_WIDTH, _screenHeight = SCREEN_HEIGHT;
 volatile uint8_t _activeBuffer = 1;
+volatile float _moveSpeed, _rotSpeed;
 
 // MAP
 uint8_t _map[MAP_SIZE_X][MAP_SIZE_Y] = {
@@ -184,6 +185,27 @@ int main(void)
       _activeBuffer ^= 1;
       BSP_LCD_SWAP(_activeBuffer);
       cast();
+    }
+
+    if (HAL_GPIO_ReadPin(ARDUINO_D2_GPIO_Port, ARDUINO_D2_Pin)) { // FORWARD
+      if (_map[(int)(_pPos.x + _pDir.x * _moveSpeed)][(int)_pPos.y] == 0) { _pPos.x += _pDir.x * _moveSpeed; }
+      if (_map[(int)_pPos.x][(int)(_pPos.y + _pDir.y * _moveSpeed)] == 0) { _pPos.y += _pDir.y * _moveSpeed; }
+    }
+    if (HAL_GPIO_ReadPin(ARDUINO_D3_GPIO_Port, ARDUINO_D3_Pin)) { // BACKWARD
+      if (_map[(int)(_pPos.x - _pDir.x * _moveSpeed)][(int)_pPos.y] == 0) { _pPos.x -= _pDir.x * _moveSpeed; }
+      if (_map[(int)_pPos.x][(int)(_pPos.y - _pDir.y * _moveSpeed)] == 0) { _pPos.y -= _pDir.y * _moveSpeed; }
+    }
+    if (HAL_GPIO_ReadPin(ARDUINO_D4_GPIO_Port, ARDUINO_D4_Pin)) { // RIGHT
+      float oldDirX = _pDir.x;
+      _pDir.x = _pDir.x * cos(-_rotSpeed) - _pDir.y * sin(-_rotSpeed);
+      _pDir.y = oldDirX * sin(-_rotSpeed) + _pDir.y * cos(-_rotSpeed);
+
+      float oldPlnX = _pPln.x;
+      _pPln.x = _pPln.x * cos(-_rotSpeed) - _pPln.y * sin(-_rotSpeed);
+      _pPln.y = oldPlnX * sin(-_rotSpeed) + _pPln.y * cos(-_rotSpeed);
+    }
+    if (HAL_GPIO_ReadPin(ARDUINO_D5_GPIO_Port, ARDUINO_D5_Pin)) { // LEFT
+
     }
   }
   /* USER CODE END 3 */
@@ -343,6 +365,9 @@ void cast(void) {
   BSP_LCD_SetTextColor(0xFF000000);
   BSP_LCD_SetBackColor(0xFFFF2244);
   BSP_LCD_DisplayStringAt(0, 0, frameTimeS, LEFT_MODE);
+
+  _moveSpeed = frameTime * 0.00005;
+  _rotSpeed  = frameTime * 0.00003;
 }
 
 uint32_t CLUT(uint8_t index, int8_t hitSide) {
@@ -376,6 +401,7 @@ void Error_Handler(void)
   /* USER CODE BEGIN Error_Handler_Debug */
   /* User can add his own implementation to report the HAL error return state */
   __disable_irq();
+  HAL_GPIO_WritePin(ARDUINO_D13_GPIO_Port, ARDUINO_D13_Pin, GPIO_PIN_SET);
   while (1)
   {
   }
