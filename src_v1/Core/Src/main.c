@@ -87,16 +87,16 @@ uint8_t _map[] = {
   1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
   1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,
   1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,1,
-  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,1,
+  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,2,0,1,
   1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,
-  1,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,1,
+  1,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,4,0,1,
   1,0,0,0,0,0,0,0,2,2,1,1,1,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,
-  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,1,0,1,
-  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,1,0,1,
+  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,2,0,0,0,3,0,1,
+  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,2,0,0,0,3,0,1,
   1,0,0,0,0,0,0,0,2,2,1,1,1,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,
-  1,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,1,
+  1,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,4,0,1,
   1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,
-  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,1,
+  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,2,0,1,
   1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,1,
   1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,
   1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
@@ -332,10 +332,10 @@ void PeriphCommonClock_Config(void)
 /* USER CODE BEGIN 4 */
 uint32_t cast() {
   // Variable naming convention: r = ray, m = map, p = performance, c = calculation
-  uint16_t rCount, rCastLimit, mX, mY, mPosition;
+  uint16_t rCount, rCastLimitV, rCastLimitH, mX, mY, mPosition;
   float    rIntersectX, rIntersectY, rAngle, rOffsetX, rOffsetY, rShortest;
   uint32_t pStartTime = HAL_GetTick();
-  uint8_t  mColorV;
+  uint8_t  mColorV, mColorH;
 
   rAngle = _pAngle + FOV_HALF * FOV_INCR;
   if (rAngle < 0)       { rAngle += M_TWOPI; }
@@ -346,7 +346,7 @@ uint32_t cast() {
 
   for (rCount = 0; rCount < FOV; rCount++) {
     // VERTICAL LINE CHECK
-    rCastLimit = 0;
+    rCastLimitV = 0;
     float rVertical = FLT_MAX;
     float cTan = tan(rAngle);
 
@@ -365,29 +365,29 @@ uint32_t cast() {
     else { // looking perfectly vertical
       rIntersectY = _pPosY;
       rIntersectX = _pPosX;
-      rCastLimit = DOF;
+      rCastLimitV = DOF;
     }
 
-    while (rCastLimit < DOF) {
+    while (rCastLimitV < DOF) {
       mX = (uint16_t)rIntersectX >> 6;
       mY = (uint16_t)rIntersectY >> 6;
       mPosition = mY * _mSizeX + mX;
 
       if (mPosition > 0 && mPosition < _mSizeX * _mSizeY && _map[mPosition] >= 1) {
         rVertical = rayLength(_pPosX, rIntersectX, _pPosY, rIntersectY);
-        rCastLimit = 0xAAAA;
+        rCastLimitV = 0xAAAA;
       }
       else {
         rIntersectX += rOffsetX;
         rIntersectY += rOffsetY;
-        rCastLimit++;
+        rCastLimitV++;
       }
     }
 
     mColorV = _map[mPosition];
 
     // HORIZONTAL LINE CHECK
-    rCastLimit = 0;
+    rCastLimitH = 0;
     float rHorizontal = FLT_MAX;
     float cRTan = 1 / tan(rAngle);
 
@@ -406,35 +406,40 @@ uint32_t cast() {
     else { // looking perfectly horizontal
       rIntersectY = _pPosY;
       rIntersectX = _pPosX;
-      rCastLimit = DOF;
+      rCastLimitH = DOF;
     }
 
-    while (rCastLimit < DOF) {
+    while (rCastLimitH < DOF) {
       mX = (uint16_t)rIntersectX >> 6;
       mY = (uint16_t)rIntersectY >> 6;
       mPosition = mY * _mSizeX + mX;
 
       if (mPosition > 0 && mPosition < _mSizeX * _mSizeY && _map[mPosition] >= 1) {
         rHorizontal = rayLength(_pPosX, rIntersectX, _pPosY, rIntersectY);
-        rCastLimit = 0xAAAA;
+        rCastLimitH = 0xAAAA;
       }
       else {
         rIntersectX += rOffsetX;
         rIntersectY += rOffsetY;
-        rCastLimit++;
+        rCastLimitH++;
       }
     }
 
+    mColorH = _map[mPosition];
+
     uint8_t colorIndex, hitSide;
+    uint16_t rCastTotal;
     if (rVertical < rHorizontal) {
       rShortest = rVertical;
       colorIndex = mColorV;
       hitSide = 1;
+      rCastTotal = rCastLimitV;
     }
     else {
       rShortest = rHorizontal;
-      colorIndex = _map[mPosition];
+      colorIndex = mColorH;
       hitSide = 0;
+      rCastTotal = rCastLimitH;
     }
 
     // RENDERING
@@ -446,13 +451,13 @@ uint32_t cast() {
 #endif
 
     float lineHeight;
-    if (rCastLimit == 0xAAAA) {
+    if (rCastTotal == 0xAAAA) {
       lineHeight = (_mSizeS * 272) / rShortest;
       lineHeight *= LINE_VERTICAL_SCALE;
       if (lineHeight > 272) { lineHeight = 272; }
     }
     else {
-//      lineHeight = 0;
+      lineHeight = 0;
     }
     uint16_t lineOffset = (uint16_t)(272 - lineHeight) >> 1;
 
