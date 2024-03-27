@@ -72,11 +72,7 @@ void PeriphCommonClock_Config(void);
 void MX_USB_HOST_Process(void);
 
 /* USER CODE BEGIN PFP */
-uint32_t cast();
-float rayLength(float ax, float ay, float bx, float by);
-void pageFlip();
-uint32_t CLUT(uint8_t index, uint8_t hitSide);
-uint32_t dimColor(uint32_t inputColor, float dimmingFactor);
+
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
