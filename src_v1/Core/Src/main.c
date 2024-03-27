@@ -333,8 +333,8 @@ uint32_t cast() {
       rOffsetY = -rOffsetX * cTan;
     }
     else { // looking perfectly vertical
-      rIntersectY = _pPosY;
       rIntersectX = _pPosX;
+      rIntersectY = _pPosY;
       rCastLimitV = DOF;
     }
 
