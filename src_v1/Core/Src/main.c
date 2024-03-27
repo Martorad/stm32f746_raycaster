@@ -302,10 +302,10 @@ void PeriphCommonClock_Config(void)
 /* USER CODE BEGIN 4 */
 uint32_t cast() {
   // Variable naming convention: r = ray, m = map, p = performance, c = calculation
-  uint16_t rCount, rCastLimitV, rCastLimitH, mX, mY, mPosition = 0;
-  float    rIntersectX, rIntersectY, rAngle, rOffsetX, rOffsetY, rShortest;
   uint32_t pStartTime = HAL_GetTick();
+  uint16_t rCount, rCastLimitV, rCastLimitH, mX, mY, mPosition = 0;
   uint8_t  mColorV, mColorH;
+  float    rIntersectX, rIntersectY, rAngle, rOffsetX, rOffsetY, rShortest;
 
   BSP_LCD_SelectLayer(0);
   BSP_LCD_Clear(LCD_COLOR_BLACK);
@@ -437,7 +437,7 @@ uint32_t cast() {
     if (rAngle > M_TWOPI) { rAngle -= M_TWOPI; }
   }
 
-  uint64_t frameTime = HAL_GetTick() - pStartTime;
+  uint32_t frameTime = HAL_GetTick() - pStartTime;
 
   _pMovSpeed = frameTime * INCR_TRANSLATION;
   _pRotSpeed = frameTime * INCR_ROTATION;
