@@ -82,7 +82,7 @@ uint32_t dimColor(uint32_t inputColor, float dimmingFactor);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 // MAP
-uint8_t _mSizeX = 32, _mSizeY = 16, _mSizeS = 64;
+uint8_t _mSizeX = 32, _mSizeY = 16;
 uint8_t _map[] = {
   1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
   1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,1,1,0,0,0,0,0,0,0,1,
@@ -103,7 +103,7 @@ uint8_t _map[] = {
 };
 
 // PLAYER
-float _pPosX = 224, _pPosY = 512, _pAngle = 0 * FOV_INCR, _pDeltaX, _pDeltaY, _pMovSpeed, _pRotSpeed;
+float _pPosX = 3.5, _pPosY = 8, _pAngle = 0 * FOV_INCR, _pDeltaX, _pDeltaY, _pMovSpeed, _pRotSpeed;
 
 /* USER CODE END 0 */
 
@@ -321,15 +321,15 @@ uint32_t cast() {
     float cTan = tan(rAngle);
 
     if (rAngle > M_PI_2 && rAngle < M_3PI_2) { // looking left
-      rIntersectX = (((uint16_t)_pPosX >> 6) << 6) - 0.0001;
+      rIntersectX = (uint16_t)_pPosX - 0.000001;
       rIntersectY = (_pPosX - rIntersectX) * cTan + _pPosY;
-      rOffsetX = -64;
+      rOffsetX = -1;
       rOffsetY = -rOffsetX * cTan;
     }
     else if (rAngle < M_PI_2 || rAngle > M_3PI_2) { // looking right
-      rIntersectX = (((uint16_t)_pPosX >> 6) << 6) + _mSizeS;
+      rIntersectX = (uint16_t)_pPosX + 1;
       rIntersectY = (_pPosX - rIntersectX) * cTan + _pPosY;
-      rOffsetX = 64;
+      rOffsetX = 1;
       rOffsetY = -rOffsetX * cTan;
     }
     else { // looking perfectly vertical
@@ -339,8 +339,8 @@ uint32_t cast() {
     }
 
     while (rCastLimitV < DOF) {
-      mX = (uint16_t)rIntersectX >> 6;
-      mY = (uint16_t)rIntersectY >> 6;
+      mX = (uint16_t)rIntersectX;
+      mY = (uint16_t)rIntersectY;
       mPosition = mY * _mSizeX + mX;
 
       if (mPosition > 0 && mPosition < _mSizeX * _mSizeY && _map[mPosition] >= 1) {
@@ -362,15 +362,15 @@ uint32_t cast() {
     float cRTan = 1 / tan(rAngle);
 
     if (rAngle < M_PI) { // looking up
-      rIntersectY = (((uint16_t)_pPosY >> 6) << 6) - 0.0001;
+      rIntersectY = (uint16_t)_pPosY - 0.000001;
       rIntersectX = (_pPosY - rIntersectY) * cRTan + _pPosX;
-      rOffsetY = -64;
+      rOffsetY = -1;
       rOffsetX = -rOffsetY * cRTan;
     }
     else if (rAngle > M_PI) { // looking down
-      rIntersectY = (((uint16_t)_pPosY >> 6) << 6) + _mSizeS;
+      rIntersectY = (uint16_t)_pPosY + 1;
       rIntersectX = (_pPosY - rIntersectY) * cRTan + _pPosX;
-      rOffsetY = 64;
+      rOffsetY = 1;
       rOffsetX = -rOffsetY * cRTan;
     }
     else { // looking perfectly horizontal
@@ -380,8 +380,8 @@ uint32_t cast() {
     }
 
     while (rCastLimitH < DOF) {
-      mX = (uint16_t)rIntersectX >> 6;
-      mY = (uint16_t)rIntersectY >> 6;
+      mX = (uint16_t)rIntersectX;
+      mY = (uint16_t)rIntersectY;
       mPosition = mY * _mSizeX + mX;
 
       if (mPosition > 0 && mPosition < _mSizeX * _mSizeY && _map[mPosition] >= 1) {
@@ -422,7 +422,7 @@ uint32_t cast() {
 
     float lineHeight;
     if (rCastTotal == 0xAAAA) {
-      lineHeight = (_mSizeS * 272) / rShortest;
+      lineHeight = 272 / rShortest;
       lineHeight *= LINE_VERTICAL_SCALE;
       if (lineHeight > 272 / DOF) { // if line is smaller than the shortest possible line defined by DOF, don't bother drawing it
         if (lineHeight > 272) { lineHeight = 272; }
