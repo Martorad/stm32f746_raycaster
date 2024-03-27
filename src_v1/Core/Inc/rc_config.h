@@ -5,7 +5,7 @@
 #define FOV_5
 #define REMOVE_FISHEYE
 
-#define DOF 16
+#define DOF 20
 #define LINE_VERTICAL_SCALE 0.8
 
 // MOVEMENT SETTINGS
