@@ -59,13 +59,20 @@
 #endif
 
 #ifdef  FOV_5
+#define FOV      160
+#define FOV_HALF 80
+#define FOV_RECT 3
+#define FOV_INCR 0.005817767
+#endif
+
+#ifdef  FOV_6
 #define FOV      240
 #define FOV_HALF 120
 #define FOV_RECT 2
 #define FOV_INCR 0.004363325
 #endif
 
-#ifdef  FOV_6
+#ifdef  FOV_7
 #define FOV      480
 #define FOV_HALF 240
 #define FOV_RECT 1
