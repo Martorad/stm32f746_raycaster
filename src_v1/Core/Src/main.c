@@ -430,7 +430,7 @@ uint32_t cast() {
 }
 #ifdef USE_FAST_SQRT
 float rayLength(float ax, float bx, float ay, float by) {
-  union { float f; uint32_t i; } val = {(bx - ax) * (bx - ax) + (by - ay) * (by - ay)};
+  union { float f; uint32_t i; } val = { (bx - ax) * (bx - ax) + (by - ay) * (by - ay) };
   val.i = (1 << 29) + (val.i >> 1) - (1 << 22) - 0x3FD40;
   return val.f;
 }
