@@ -320,7 +320,7 @@ uint32_t cast() {
       rIntersectX = (uint16_t)_pPosX - 0.000001;
       rOffsetX = -1;
     }
-    else if (rAngle < M_PI_2 || rAngle > M_3PI_2) { // looking right
+    else { // looking right
       rIntersectX = (uint16_t)_pPosX + 1;
       rOffsetX = 1;
     }
@@ -354,7 +354,7 @@ uint32_t cast() {
       rIntersectY = (uint16_t)_pPosY - 0.000001;
       rOffsetY = -1;
     }
-    else if (rAngle > M_PI) { // looking down
+    else { // looking down
       rIntersectY = (uint16_t)_pPosY + 1;
       rOffsetY = 1;
     }
