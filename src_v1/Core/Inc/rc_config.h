@@ -5,7 +5,7 @@
 #define FOV_5
 #define REMOVE_FISHEYE
 
-#define DOF 20
+#define DOF 16
 
 // AESTHETIC SETTINGS
 #define LINE_VERTICAL_SCALE 1.5

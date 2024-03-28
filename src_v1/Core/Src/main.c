@@ -394,29 +394,30 @@ uint32_t cast() {
     mColorH = _map[mPosition];
 
     // RENDERING
-    uint8_t  colorIndex, hitSide;
     uint16_t rCastTotal;
-    if (rVertical < rHorizontal) {
-      rShortest = rVertical;
-      colorIndex = mColorV;
-      hitSide = 1;
-      rCastTotal = rCastLimitV;
-    }
-    else {
-      rShortest = rHorizontal;
-      colorIndex = mColorH;
-      hitSide = 0;
-      rCastTotal = rCastLimitH;
-    }
-
-#ifdef REMOVE_FISHEYE
-    float rFisheyeFix = _pAngle - rAngle;
-    if (rFisheyeFix < 0)       { rFisheyeFix += M_TWOPI; }
-    if (rFisheyeFix > M_TWOPI) { rFisheyeFix -= M_TWOPI; }
-    rShortest *= cos(rFisheyeFix);
-#endif
+    if (rVertical < rHorizontal) { rCastTotal = rCastLimitV; }
+    else                         { rCastTotal = rCastLimitH; }
 
     if (rCastTotal == R_HIT) {
+      uint8_t  colorIndex, hitSide;
+      if (rVertical < rHorizontal) {
+        rShortest = rVertical;
+        colorIndex = mColorV;
+        hitSide = 1;
+      }
+      else {
+        rShortest = rHorizontal;
+        colorIndex = mColorH;
+        hitSide = 0;
+      }
+
+#ifdef REMOVE_FISHEYE
+      float rFisheyeFix = _pAngle - rAngle;
+      if (rFisheyeFix < 0)       { rFisheyeFix += M_TWOPI; }
+      if (rFisheyeFix > M_TWOPI) { rFisheyeFix -= M_TWOPI; }
+      rShortest *= cos(rFisheyeFix);
+#endif
+
       float    lineHeight = 272 / rShortest;
       uint16_t lineOffset = 0;
 
@@ -424,7 +425,7 @@ uint32_t cast() {
       if (lineHeight > 272 / DOF) { // if line is smaller than the shortest possible line defined by DOF, don't bother drawing it
         if (lineHeight > 272) { lineHeight = 272; }
         else { lineOffset = (uint16_t)(272 - lineHeight) >> 1; }
-        BSP_LCD_SetTextColor(dimColor(CLUT(colorIndex, hitSide), lineHeight / 68));
+        BSP_LCD_SetTextColor(dimColor(CLUT(colorIndex, hitSide), (DOF - rShortest) * 0.166));
         BSP_LCD_FillRect((rCount * FOV_RECT), lineOffset, FOV_RECT, lineHeight);
       }
     }
@@ -475,7 +476,6 @@ uint32_t CLUT(uint8_t index, uint8_t hitSide) {
 
 uint32_t dimColor(uint32_t inputColor, float dimmingFactor) {
   if (dimmingFactor > 1) { return inputColor; }
-  if (dimmingFactor < 0) { dimmingFactor = 0; }
   return 0xFF000000 |
   (0x00FF0000 & (uint32_t)((0x00FF0000 & inputColor) * dimmingFactor)) |
   (0x0000FF00 & (uint32_t)((0x0000FF00 & inputColor) * dimmingFactor)) |
