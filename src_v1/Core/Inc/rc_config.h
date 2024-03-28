@@ -2,7 +2,7 @@
 #define __RC__CONFIG__H__
 
 // PERFORMANCE SETTINGS
-#define RES_5
+#define RES_N
 #define REMOVE_FISHEYE
 
 #define DOF 24
@@ -25,6 +25,13 @@
 
 // RESOLUTION CONFIGURATION TABLES
 // FOV_RECT describes the width of each rectangle drawn on screen. Smaller width rectangles have higher fidelity, at the cost of speed. Odd width rectangles mean that symmetrical frames cannot be drawn.
+#ifdef  RES_N
+#define FOV      10
+#define FOV_HALF 5
+#define FOV_RECT 48
+#define FOV_INCR 0.1047198
+#endif
+
 #ifdef  RES_0
 #define FOV      30
 #define FOV_HALF 15
