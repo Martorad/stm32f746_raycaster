@@ -315,13 +315,13 @@ uint32_t cast() {
     float rVertical = FLT_MAX;
     float cTan = tan(rAngle);
 
-    if (rAngle > M_PI_2 && rAngle < M_3PI_2) { // looking left
-      rIntersectX = (uint16_t)_pPosX - 0.000001;
-      rOffsetX = -1;
-    }
-    else { // looking right
+    if (rAngle < M_PI_2 || rAngle > M_3PI_2) { // looking right
       rIntersectX = (uint16_t)_pPosX + 1;
       rOffsetX = 1;
+    }
+    else { // looking left
+      rIntersectX = (uint16_t)_pPosX - 0.000001;
+      rOffsetX = -1;
     }
     rIntersectY = (_pPosX - rIntersectX) * cTan + _pPosY;
     rOffsetY = -rOffsetX * cTan;
@@ -347,7 +347,7 @@ uint32_t cast() {
     // HORIZONTAL LINE CHECK
     rCastLimitH = 0;
     float rHorizontal = FLT_MAX;
-    float cRTan = 1 / tan(rAngle);
+    float cRTan = 1 / cTan;
 
     if (rAngle < M_PI) { // looking up
       rIntersectY = (uint16_t)_pPosY - 0.000001;
