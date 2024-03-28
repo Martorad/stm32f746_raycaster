@@ -298,9 +298,9 @@ void PeriphCommonClock_Config(void)
 uint32_t cast() {
   // Variable naming convention: r = ray, m = map, p = performance, c = calculation
   uint32_t pStartTime = HAL_GetTick();
-  uint16_t rCount, rCastLimitV = 0, rCastLimitH = 0, mX, mY, mPosition = 0;
+  uint16_t rCount, rCastLimitV, rCastLimitH, mX, mY, mPosition = 0;
   uint8_t  mColorV, mColorH;
-  float    rIntersectX = _pPosX, rIntersectY = _pPosY, rAngle, rOffsetX, rOffsetY, rShortest;
+  float    rIntersectX, rIntersectY, rAngle, rOffsetX, rOffsetY, rShortest;
 
   BSP_LCD_SelectLayer(0);
   BSP_LCD_Clear(LCD_COLOR_BLACK);
