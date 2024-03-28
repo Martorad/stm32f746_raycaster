@@ -411,7 +411,7 @@ uint32_t cast() {
       if (lineHeight > 272 / DOF) { // if line is smaller than the shortest possible line defined by DOF, don't bother drawing it
         if (lineHeight > 272) { lineHeight = 272; }
         else { lineOffset = (uint16_t)(272 - lineHeight) >> 1; }
-        BSP_LCD_SetTextColor(dimColor(CLUT(colorIndex, hitSide), (DOF - rShortest) * 0.166));
+        BSP_LCD_SetTextColor(dimColor(CLUT(colorIndex, hitSide), (DOF - rShortest) * L_COEFF));
         BSP_LCD_FillRect((rCount * FOV_RECT), lineOffset, FOV_RECT, lineHeight);
       }
     }
