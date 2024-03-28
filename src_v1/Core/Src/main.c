@@ -341,7 +341,7 @@ uint32_t cast() {
 
       if (mPosition > 0 && mPosition < _mSizeX * _mSizeY && _map[mPosition] >= 1) {
         rVertical = rayLength(_pPosX, rIntersectX, _pPosY, rIntersectY);
-        rCastLimitV = 0xAAAA;
+        rCastLimitV = R_HIT;
       }
       else {
         rIntersectX += rOffsetX;
@@ -382,7 +382,7 @@ uint32_t cast() {
 
       if (mPosition > 0 && mPosition < _mSizeX * _mSizeY && _map[mPosition] >= 1) {
         rHorizontal = rayLength(_pPosX, rIntersectX, _pPosY, rIntersectY);
-        rCastLimitH = 0xAAAA;
+        rCastLimitH = R_HIT;
       }
       else {
         rIntersectX += rOffsetX;
@@ -394,7 +394,7 @@ uint32_t cast() {
     mColorH = _map[mPosition];
 
     // RENDERING
-    uint8_t colorIndex, hitSide;
+    uint8_t  colorIndex, hitSide;
     uint16_t rCastTotal;
     if (rVertical < rHorizontal) {
       rShortest = rVertical;
@@ -416,13 +416,14 @@ uint32_t cast() {
     rShortest *= cos(rFisheyeFix);
 #endif
 
-    float lineHeight;
-    if (rCastTotal == 0xAAAA) {
-      lineHeight = 272 / rShortest;
+    if (rCastTotal == R_HIT) {
+      float    lineHeight = 272 / rShortest;
+      uint16_t lineOffset = 0;
+
       lineHeight *= LINE_VERTICAL_SCALE;
       if (lineHeight > 272 / DOF) { // if line is smaller than the shortest possible line defined by DOF, don't bother drawing it
         if (lineHeight > 272) { lineHeight = 272; }
-        uint16_t lineOffset = (uint16_t)(272 - lineHeight) >> 1;
+        else { lineOffset = (uint16_t)(272 - lineHeight) >> 1; }
         BSP_LCD_SetTextColor(dimColor(CLUT(colorIndex, hitSide), lineHeight / 68));
         BSP_LCD_FillRect((rCount * FOV_RECT), lineOffset, FOV_RECT, lineHeight);
       }

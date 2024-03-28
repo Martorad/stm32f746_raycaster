@@ -6,6 +6,8 @@
 #define REMOVE_FISHEYE
 
 #define DOF 20
+
+// AESTHETIC SETTINGS
 #define LINE_VERTICAL_SCALE 1.5
 
 // MOVEMENT SETTINGS
@@ -15,9 +17,10 @@
 // DEBUG SETTINGS
 //#define DEBUG_FULLBRIGHT
 
-// ------------------------ DO NOT TOUCH ------------------------
+// <------------------------ DO NOT TOUCH ------------------------>
 // INTERNAL CONFIGURATION DEFINES
 #define M_3PI_2  4.71238898038468985769
+#define R_HIT    0xAAAA
 
 // FOV CONFIGURATION TABLES
 #ifdef  FOV_0
