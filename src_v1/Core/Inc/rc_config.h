@@ -2,11 +2,10 @@
 #define __RC__CONFIG__H__
 
 // PERFORMANCE SETTINGS
-#define FOV_4
+#define FOV_5
 #define REMOVE_FISHEYE
-#define USE_FAST_SQRT
 
-#define DOF 16
+#define DOF 24
 
 // AESTHETIC SETTINGS
 #define LINE_VERTICAL_SCALE 1.5

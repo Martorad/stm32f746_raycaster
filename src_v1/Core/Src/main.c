@@ -411,7 +411,7 @@ uint32_t cast() {
       if (lineHeight > 272 / DOF) { // if line is smaller than the shortest possible line defined by DOF, don't bother drawing it
         if (lineHeight > 272) { lineHeight = 272; }
         else { lineOffset = (uint16_t)(272 - lineHeight) >> 1; }
-        BSP_LCD_SetTextColor(dimColor(CLUT(colorIndex, hitSide), (DOF - rShortest) * 0.166));
+        BSP_LCD_SetTextColor(dimColor(CLUT(colorIndex, hitSide), (DOF - rShortest) / (DOF * 0.33)));
         BSP_LCD_FillRect((rCount * FOV_RECT), lineOffset, FOV_RECT, lineHeight);
       }
     }
@@ -428,17 +428,20 @@ uint32_t cast() {
 
   return frameTime;
 }
-#ifdef USE_FAST_SQRT
 float rayLength(float ax, float bx, float ay, float by) {
-  union { float f; uint32_t i; } val = { (bx - ax) * (bx - ax) + (by - ay) * (by - ay) };
-  val.i = (1 << 29) + (val.i >> 1) - (1 << 22) - 0x3FD40;
-  return val.f;
+  return fsqrt((bx - ax) * (bx - ax) + (by - ay) * (by - ay));
 }
-#else
-float rayLength(float ax, float bx, float ay, float by) {
-  return sqrt((bx - ax) * (bx - ax) + (by - ay) * (by - ay));
+
+float fsqrt(float x){
+  if (x == 0) return 0;
+  float g = x / 2.0;
+
+  g = 0.5 * (g + x / g);
+  g = 0.5 * (g + x / g);
+  g = 0.5 * (g + x / g);
+
+  return g;
 }
-#endif
 
 void pageFlip() {
   static volatile uint8_t activeBuffer = 1;
