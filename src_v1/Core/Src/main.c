@@ -299,9 +299,9 @@ void PeriphCommonClock_Config(void)
 uint32_t cast() {
   // Variable naming convention: r = ray, m = map, p = performance, c = calculation
   uint32_t pStartTime = HAL_GetTick();
-  uint16_t rCount, rCastLimitV, rCastLimitH, mX, mY, mPosition = 0;
+  uint16_t rCount, rCastLimitV = 0, rCastLimitH = 0, mX, mY, mPosition = 0;
   uint8_t  mColorV, mColorH;
-  float    rIntersectX, rIntersectY, rAngle, rOffsetX, rOffsetY, rShortest;
+  float    rIntersectX = _pPosX, rIntersectY = _pPosY, rAngle, rOffsetX, rOffsetY, rShortest;
 
   BSP_LCD_SelectLayer(0);
   BSP_LCD_Clear(LCD_COLOR_BLACK);
@@ -318,21 +318,14 @@ uint32_t cast() {
 
     if (rAngle > M_PI_2 && rAngle < M_3PI_2) { // looking left
       rIntersectX = (uint16_t)_pPosX - 0.000001;
-      rIntersectY = (_pPosX - rIntersectX) * cTan + _pPosY;
       rOffsetX = -1;
-      rOffsetY = -rOffsetX * cTan;
     }
     else if (rAngle < M_PI_2 || rAngle > M_3PI_2) { // looking right
       rIntersectX = (uint16_t)_pPosX + 1;
-      rIntersectY = (_pPosX - rIntersectX) * cTan + _pPosY;
       rOffsetX = 1;
-      rOffsetY = -rOffsetX * cTan;
     }
-    else { // looking perfectly vertical
-      rIntersectX = _pPosX;
-      rIntersectY = _pPosY;
-      rCastLimitV = DOF;
-    }
+    rIntersectY = (_pPosX - rIntersectX) * cTan + _pPosY;
+    rOffsetY = -rOffsetX * cTan;
 
     while (rCastLimitV < DOF) {
       mX = (uint16_t)rIntersectX;
@@ -359,21 +352,14 @@ uint32_t cast() {
 
     if (rAngle < M_PI) { // looking up
       rIntersectY = (uint16_t)_pPosY - 0.000001;
-      rIntersectX = (_pPosY - rIntersectY) * cRTan + _pPosX;
       rOffsetY = -1;
-      rOffsetX = -rOffsetY * cRTan;
     }
     else if (rAngle > M_PI) { // looking down
       rIntersectY = (uint16_t)_pPosY + 1;
-      rIntersectX = (_pPosY - rIntersectY) * cRTan + _pPosX;
       rOffsetY = 1;
-      rOffsetX = -rOffsetY * cRTan;
     }
-    else { // looking perfectly horizontal
-      rIntersectY = _pPosY;
-      rIntersectX = _pPosX;
-      rCastLimitH = DOF;
-    }
+    rIntersectX = (_pPosY - rIntersectY) * cRTan + _pPosX;
+    rOffsetX = -rOffsetY * cRTan;
 
     while (rCastLimitH < DOF) {
       mX = (uint16_t)rIntersectX;
