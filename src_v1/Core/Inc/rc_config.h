@@ -4,6 +4,7 @@
 // PERFORMANCE SETTINGS
 #define FOV_4
 #define REMOVE_FISHEYE
+#define USE_FAST_SQRT
 
 #define DOF 16
 
