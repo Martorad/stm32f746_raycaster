@@ -197,27 +197,27 @@ int main(void)
       sprintf((char*)frameTime, "%li", cast());
       BSP_LCD_SetTextColor(0xFF0000FF);
       BSP_LCD_DisplayStringAt(0, 0, frameTime, LEFT_MODE);
-    }
 
-    if (HAL_GPIO_ReadPin(ARDUINO_D4_GPIO_Port, ARDUINO_D4_Pin)) { // RIGHT
-      _pAngle -= _pRotSpeed;
-      if (_pAngle < 0) { _pAngle = M_TWOPI; }
-      _pDeltaX =  cos(_pAngle) * _pMovSpeed;
-      _pDeltaY = -sin(_pAngle) * _pMovSpeed;
-    }
-    if (HAL_GPIO_ReadPin(ARDUINO_D5_GPIO_Port, ARDUINO_D5_Pin)) { // LEFT
-      _pAngle += _pRotSpeed;
-      if (_pAngle > M_TWOPI) { _pAngle = 0; }
-      _pDeltaX =  cos(_pAngle) * _pMovSpeed;
-      _pDeltaY = -sin(_pAngle) * _pMovSpeed;
-    }
-    if (HAL_GPIO_ReadPin(ARDUINO_D2_GPIO_Port, ARDUINO_D2_Pin)) { // FORWARD
-      _pPosX += _pDeltaX;
-      _pPosY += _pDeltaY;
-    }
-    if (HAL_GPIO_ReadPin(ARDUINO_D3_GPIO_Port, ARDUINO_D3_Pin)) { // BACKWARD
-      _pPosX -= _pDeltaX;
-      _pPosY -= _pDeltaY;
+      if (HAL_GPIO_ReadPin(ARDUINO_D4_GPIO_Port, ARDUINO_D4_Pin)) { // RIGHT
+        _pAngle -= _pRotSpeed;
+        if (_pAngle < 0) { _pAngle = M_TWOPI; }
+        _pDeltaX =  cos(_pAngle) * _pMovSpeed;
+        _pDeltaY = -sin(_pAngle) * _pMovSpeed;
+      }
+      if (HAL_GPIO_ReadPin(ARDUINO_D5_GPIO_Port, ARDUINO_D5_Pin)) { // LEFT
+        _pAngle += _pRotSpeed;
+        if (_pAngle > M_TWOPI) { _pAngle = 0; }
+        _pDeltaX =  cos(_pAngle) * _pMovSpeed;
+        _pDeltaY = -sin(_pAngle) * _pMovSpeed;
+      }
+      if (HAL_GPIO_ReadPin(ARDUINO_D2_GPIO_Port, ARDUINO_D2_Pin)) { // FORWARD
+        _pPosX += _pDeltaX;
+        _pPosY += _pDeltaY;
+      }
+      if (HAL_GPIO_ReadPin(ARDUINO_D3_GPIO_Port, ARDUINO_D3_Pin)) { // BACKWARD
+        _pPosX -= _pDeltaX;
+        _pPosY -= _pDeltaY;
+      }
     }
   }
   /* USER CODE END 3 */
