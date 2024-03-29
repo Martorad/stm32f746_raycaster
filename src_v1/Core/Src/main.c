@@ -101,6 +101,9 @@ uint8_t _map[] = {
 // PLAYER
 float _pPosX = 1, _pPosY = 8, _pAngle = 0 * FOV_INCR, _pDeltaX, _pDeltaY, _pMovSpeed, _pRotSpeed;
 
+// SYSTEM
+volatile uint32_t _sysElapsedTicks = 0; // 10K frequency
+
 /* USER CODE END 0 */
 
 /**
@@ -110,8 +113,7 @@ float _pPosX = 1, _pPosY = 8, _pAngle = 0 * FOV_INCR, _pDeltaX, _pDeltaY, _pMovS
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-  _pDeltaX =  cos(_pAngle) * 15 * INCR_TRANSLATION;
-  _pDeltaY = -sin(_pAngle) * 15 * INCR_TRANSLATION;
+
   /* USER CODE END 1 */
 /* Enable the CPU Cache */
 
@@ -162,13 +164,22 @@ int main(void)
   MX_USART1_UART_Init();
   MX_USART6_UART_Init();
   MX_USB_HOST_Init();
+  MX_TIM7_Init();
   /* USER CODE BEGIN 2 */
   BSP_LCD_Init();
   BSP_LCD_LayerRgb565Init(LTDC_FOREGROUND, LCD_FB_START_ADDRESS);
   BSP_LCD_LayerRgb565Init(LTDC_BACKGROUND, LCD_BB_START_ADDRESS);
   BSP_LCD_SetLayerVisible(LTDC_BACKGROUND, DISABLE);
   BSP_LCD_DisplayOn();
+  BSP_LCD_SelectLayer(LTDC_BACKGROUND);
+  BSP_LCD_SetFont(&Font16);
   BSP_LCD_SelectLayer(LTDC_FOREGROUND);
+
+  HAL_TIM_Base_Start_IT(&htim7);
+
+  cast();
+  _pDeltaX =  cos(_pAngle) * _pMovSpeed;
+  _pDeltaY = -sin(_pAngle) * _pMovSpeed;
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -182,9 +193,9 @@ int main(void)
     if (!HAL_GPIO_ReadPin(LCD_VSYNC_GPIO_Port, LCD_VSYNC_Pin)) {
       pageFlip();
 
-      uint8_t frameTime[32];
-      itoa(cast(), frameTime, 10);
-      BSP_LCD_SetTextColor(0xFF000000);
+      uint8_t frameTime[8];
+      sprintf((char*)frameTime, "%li", cast());
+      BSP_LCD_SetTextColor(0xFF0000FF);
       BSP_LCD_DisplayStringAt(0, 0, frameTime, LEFT_MODE);
     }
 
@@ -297,7 +308,7 @@ void PeriphCommonClock_Config(void)
 /* USER CODE BEGIN 4 */
 uint32_t cast() {
   // Variable naming convention: r = ray, m = map, p = performance, c = calculation
-  uint32_t pStartTime = HAL_GetTick();
+  uint32_t pStartTime = _sysElapsedTicks;
   uint16_t rCount, rCastLimitV, rCastLimitH, mX, mY, mPosition = 0;
   uint8_t  mColorV, mColorH;
   float    rIntersectX, rIntersectY, rAngle, rOffsetX, rOffsetY, rShortest;
@@ -420,7 +431,7 @@ uint32_t cast() {
     if (rAngle > M_TWOPI) { rAngle -= M_TWOPI; }
   }
 
-  uint32_t frameTime = HAL_GetTick() - pStartTime;
+  uint32_t frameTime = _sysElapsedTicks - pStartTime;
 
   _pMovSpeed = frameTime * INCR_TRANSLATION;
   _pRotSpeed = frameTime * INCR_ROTATION;
@@ -491,9 +502,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   /* USER CODE BEGIN Callback 0 */
 
   /* USER CODE END Callback 0 */
-  if (htim->Instance == TIM6) {
-    HAL_IncTick();
-  }
+  if (htim->Instance == TIM6) { HAL_IncTick(); }
+  if (htim->Instance == TIM7) { _sysElapsedTicks++; }
   /* USER CODE BEGIN Callback 1 */
 
   /* USER CODE END Callback 1 */
