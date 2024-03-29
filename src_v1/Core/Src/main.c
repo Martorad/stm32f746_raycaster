@@ -192,11 +192,7 @@ int main(void)
     /* USER CODE BEGIN 3 */
     if (!HAL_GPIO_ReadPin(LCD_VSYNC_GPIO_Port, LCD_VSYNC_Pin)) {
       pageFlip();
-
-      uint8_t frameTime[8];
-      sprintf((char*)frameTime, "%li", cast());
-      BSP_LCD_SetTextColor(0xFF0000FF);
-      BSP_LCD_DisplayStringAt(0, 0, frameTime, LEFT_MODE);
+      showFPS(cast());
 
       if (HAL_GPIO_ReadPin(ARDUINO_D4_GPIO_Port, ARDUINO_D4_Pin)) { // RIGHT
         _pAngle -= _pRotSpeed;
@@ -486,6 +482,13 @@ uint32_t dimColor(uint32_t inputColor, float dimmingFactor) {
   (0x00FF0000 & (uint32_t)((0x00FF0000 & inputColor) * dimmingFactor)) |
   (0x0000FF00 & (uint32_t)((0x0000FF00 & inputColor) * dimmingFactor)) |
   (0x000000FF & (uint32_t)((0x000000FF & inputColor) * dimmingFactor));
+}
+
+void showFPS(uint32_t frameTime) {
+  uint8_t frameTimeS[8];
+  sprintf((char*)frameTimeS, "%li", frameTime);
+  BSP_LCD_SetTextColor(0xFF0000FF);
+  BSP_LCD_DisplayStringAt(0, 0, frameTimeS, LEFT_MODE);
 }
 /* USER CODE END 4 */
 
