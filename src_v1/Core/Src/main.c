@@ -339,7 +339,7 @@ uint32_t cast() {
     while (rCastLimitV < DOF) {
       mPosition = (uint16_t)rIntersectY * _mSizeX + (uint16_t)rIntersectX;
 
-      if (mPosition > 0 && mPosition < _mSizeX * _mSizeY && _map[mPosition] >= 1) {
+      if (_map[mPosition]) {
         rLenV = rayLength(_pPosX, rIntersectX, _pPosY, rIntersectY);
         rCastLimitV = R_HIT;
       }
@@ -367,7 +367,7 @@ uint32_t cast() {
     while (rCastLimitH < DOF) {
       mPosition = (uint16_t)rIntersectY * _mSizeX + (uint16_t)rIntersectX;
 
-      if (mPosition > 0 && mPosition < _mSizeX * _mSizeY && _map[mPosition] >= 1) {
+      if (_map[mPosition]) {
         rLenH = rayLength(_pPosX, rIntersectX, _pPosY, rIntersectY);
         rCastLimitH = R_HIT;
       }
