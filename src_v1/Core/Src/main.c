@@ -330,7 +330,7 @@ uint32_t cast() {
       rOffsetX = 1;
     }
     else { // looking left
-      rIntersectX = (uint16_t)_pPosX - 0.000001;
+      rIntersectX = (uint16_t)_pPosX - 0.000002;
       rOffsetX = -1;
     }
     rIntersectY = (_pPosX - rIntersectX) * cTan + _pPosY;
@@ -354,7 +354,7 @@ uint32_t cast() {
 
     // HORIZONTAL LINE CHECK
     if (rAngle < M_PI) { // looking up
-      rIntersectY = (uint16_t)_pPosY - 0.000001;
+      rIntersectY = (uint16_t)_pPosY - 0.000002;
       rOffsetY = -1;
     }
     else { // looking down
