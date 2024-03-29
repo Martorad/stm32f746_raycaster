@@ -2,7 +2,7 @@
 #define __RC__CONFIG__H__
 
 // PERFORMANCE SETTINGS
-#define RES_N
+#define RES_5
 #define REMOVE_FISHEYE
 
 #define DOF 24
