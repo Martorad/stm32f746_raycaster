@@ -330,7 +330,7 @@ uint32_t cast() {
       rOffsetX = 1;
     }
     else { // looking left
-      rIntersectX = (uint16_t)_pPosX - 0.000002;
+      rIntersectX = (uint16_t)_pPosX - 0.000002; // this will cause a floating point error if the map size exceeds 64, double it in that case to get map size up to 128
       rOffsetX = -1;
     }
     rIntersectY = (_pPosX - rIntersectX) * cTan + _pPosY;
