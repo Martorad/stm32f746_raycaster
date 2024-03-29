@@ -451,7 +451,7 @@ void pageFlip() {
   BSP_LCD_SWAP(activeBuffer);
 }
 
-uint32_t CLUT(uint8_t index, uint8_t hitSide) {
+uint32_t CLUT(uint8_t index, uint8_t hitSide) { // Compared to an array of const uint32_t, this is faster, as tested on Full resolution.
   if (hitSide) { // Y side wall
     switch (index) {
       case 1:  return 0xFFAA0000;
