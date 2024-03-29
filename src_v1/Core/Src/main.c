@@ -102,7 +102,7 @@ uint8_t _map[] = {
 float _pPosX = 1.5, _pPosY = 8, _pAngle = 0 * FOV_INCR, _pDeltaX, _pDeltaY, _pMovSpeed, _pRotSpeed;
 
 // SYSTEM
-volatile uint32_t _sysElapsedTicks = 0; // 10K frequency
+volatile uint32_t _sysElapsedTicks = 0; // 10K frequency, 1 tick = 100us = 0.1ms
 
 /* USER CODE END 0 */
 
@@ -305,7 +305,7 @@ void PeriphCommonClock_Config(void)
 uint32_t cast() {
   // Variable naming convention: r = ray, m = map, p = performance, c = calculation
   uint32_t pStartTime = _sysElapsedTicks;
-  uint16_t rCount, rCastLimitV, rCastLimitH, mX, mY, mPosition = 0;
+  uint16_t rCount, rCastLimitV, rCastLimitH, mPosition = 0;
   uint8_t  mColorV, mColorH;
   float    rIntersectX, rIntersectY, rAngle, rOffsetX, rOffsetY, rShortest;
 
@@ -334,9 +334,7 @@ uint32_t cast() {
     rOffsetY = -rOffsetX * cTan;
 
     while (rCastLimitV < DOF) {
-      mX = (uint16_t)rIntersectX;
-      mY = (uint16_t)rIntersectY;
-      mPosition = mY * _mSizeX + mX;
+      mPosition = (uint16_t)rIntersectY * _mSizeX + (uint16_t)rIntersectX;
 
       if (mPosition > 0 && mPosition < _mSizeX * _mSizeY && _map[mPosition] >= 1) {
         rVertical = rayLength(_pPosX, rIntersectX, _pPosY, rIntersectY);
@@ -368,9 +366,7 @@ uint32_t cast() {
     rOffsetX = -rOffsetY * cRTan;
 
     while (rCastLimitH < DOF) {
-      mX = (uint16_t)rIntersectX;
-      mY = (uint16_t)rIntersectY;
-      mPosition = mY * _mSizeX + mX;
+      mPosition = (uint16_t)rIntersectY * _mSizeX + (uint16_t)rIntersectX;
 
       if (mPosition > 0 && mPosition < _mSizeX * _mSizeY && _map[mPosition] >= 1) {
         rHorizontal = rayLength(_pPosX, rIntersectX, _pPosY, rIntersectY);
