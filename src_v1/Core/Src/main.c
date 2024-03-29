@@ -103,6 +103,7 @@ float _pPosX = 1.5, _pPosY = 8, _pAngle = 0 * FOV_INCR, _pDeltaX, _pDeltaY, _pMo
 
 // SYSTEM
 volatile uint32_t _sysElapsedTicks = 0; // 10K frequency, 1 tick = 100us = 0.1ms
+float _fisheyeCosLUT[FOV];
 
 /* USER CODE END 0 */
 
@@ -174,6 +175,8 @@ int main(void)
   BSP_LCD_SelectLayer(LTDC_BACKGROUND);
   BSP_LCD_SetFont(&Font16);
   BSP_LCD_SelectLayer(LTDC_FOREGROUND);
+
+  for (uint16_t i = 0; i < FOV; i++) { _fisheyeCosLUT[i] = cos((FOV_HALF - i) * FOV_INCR); } // Pre-calculate all cosine values to correct fisheye effect later
 
   HAL_TIM_Base_Start_IT(&htim7);
 
@@ -399,13 +402,7 @@ uint32_t cast() {
         hitSide = 0;
       }
 
-#ifdef REMOVE_FISHEYE
-      float rFisheyeFix = _pAngle - rAngle;
-      if (rFisheyeFix < 0)       { rFisheyeFix += M_TWOPI; }
-      if (rFisheyeFix > M_TWOPI) { rFisheyeFix -= M_TWOPI; }
-      rShortest *= cos(rFisheyeFix);
-#endif
-
+      rShortest *= _fisheyeCosLUT[rCount];
       float    lineHeight = 272 / rShortest;
       uint16_t lineOffset = 0;
 

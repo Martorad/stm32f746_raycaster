@@ -3,7 +3,6 @@
 
 // PERFORMANCE SETTINGS
 #define RES_6
-#define REMOVE_FISHEYE
 
 #define DOF 24
 
