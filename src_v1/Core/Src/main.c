@@ -99,7 +99,7 @@ uint8_t _map[] = {
 };
 
 // PLAYER
-float _pPosX = 1, _pPosY = 8, _pAngle = 0 * FOV_INCR, _pDeltaX, _pDeltaY, _pMovSpeed, _pRotSpeed;
+float _pPosX = 1.5, _pPosY = 8, _pAngle = 0 * FOV_INCR, _pDeltaX, _pDeltaY, _pMovSpeed, _pRotSpeed;
 
 // SYSTEM
 volatile uint32_t _sysElapsedTicks = 0; // 10K frequency
@@ -211,12 +211,12 @@ int main(void)
         _pDeltaY = -sin(_pAngle) * _pMovSpeed;
       }
       if (HAL_GPIO_ReadPin(ARDUINO_D2_GPIO_Port, ARDUINO_D2_Pin)) { // FORWARD
-        _pPosX += _pDeltaX;
-        _pPosY += _pDeltaY;
+        if (_map[(uint16_t)_pPosY * _mSizeX + (uint16_t)(_pPosX + ((_pDeltaX < 0) ? -P_HITBOX_SIZE : P_HITBOX_SIZE))] == 0) { _pPosX += _pDeltaX; }
+        if (_map[(uint16_t)(_pPosY + ((_pDeltaY < 0) ? -P_HITBOX_SIZE : P_HITBOX_SIZE)) * _mSizeX + (uint16_t)_pPosX] == 0) { _pPosY += _pDeltaY; }
       }
       if (HAL_GPIO_ReadPin(ARDUINO_D3_GPIO_Port, ARDUINO_D3_Pin)) { // BACKWARD
-        _pPosX -= _pDeltaX;
-        _pPosY -= _pDeltaY;
+        if (_map[(uint16_t)_pPosY * _mSizeX + (uint16_t)(_pPosX - ((_pDeltaX < 0) ? -P_HITBOX_SIZE : P_HITBOX_SIZE))] == 0) { _pPosX -= _pDeltaX; }
+        if (_map[(uint16_t)(_pPosY - ((_pDeltaY < 0) ? -P_HITBOX_SIZE : P_HITBOX_SIZE)) * _mSizeX + (uint16_t)_pPosX] == 0) { _pPosY -= _pDeltaY; }
       }
     }
   }

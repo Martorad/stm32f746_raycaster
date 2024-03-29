@@ -2,7 +2,7 @@
 #define __RC__CONFIG__H__
 
 // PERFORMANCE SETTINGS
-#define RES_5
+#define RES_6
 #define REMOVE_FISHEYE
 
 #define DOF 24
@@ -11,8 +11,9 @@
 #define LINE_VERTICAL_SCALE 1.5
 
 // MOVEMENT SETTINGS
-#define INCR_ROTATION    0.0002  // HIGHER IS FASTER
-#define INCR_TRANSLATION 0.0015  // HIGHER IS FASTER
+#define INCR_ROTATION    0.0002  // Higher is faster
+#define INCR_TRANSLATION 0.0012  // Higher is faster
+#define P_HITBOX_SIZE    0.3     // In units of map squares
 
 // DEBUG SETTINGS
 //#define DEBUG_FULLBRIGHT
