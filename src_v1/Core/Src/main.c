@@ -310,7 +310,7 @@ uint32_t cast() {
   uint32_t pStartTime = _sysElapsedTicks;
   uint16_t rCount, rCastLimitV, rCastLimitH, mPosition = 0;
   uint8_t  mColorV, mColorH;
-  float    rIntersectX, rIntersectY, rAngle, rOffsetX, rOffsetY, rShortest;
+  float    rIntersectX, rIntersectY, rAngle, rOffsetX, rOffsetY, rShortest, rLenV, rLenH, cTan, cRTan;
 
   BSP_LCD_SelectLayer(0);
   BSP_LCD_Clear(LCD_COLOR_BLACK);
@@ -320,11 +320,11 @@ uint32_t cast() {
   if (rAngle > M_TWOPI) { rAngle -= M_TWOPI; }
 
   for (rCount = 0; rCount < FOV; rCount++) {
-    // VERTICAL LINE CHECK
-    rCastLimitV = 0;
-    float rVertical = FLT_MAX;
-    float const cTan = tan(rAngle);
+    rCastLimitV = 0; rCastLimitH = 0;
+    rLenV = FLT_MAX; rLenH = FLT_MAX;
+    cTan = tan(rAngle); cRTan = 1 / cTan;
 
+    // VERTICAL LINE CHECK
     if (rAngle < M_PI_2 || rAngle > M_3PI_2) { // looking right
       rIntersectX = (uint16_t)_pPosX + 1;
       rOffsetX = 1;
@@ -340,7 +340,7 @@ uint32_t cast() {
       mPosition = (uint16_t)rIntersectY * _mSizeX + (uint16_t)rIntersectX;
 
       if (mPosition > 0 && mPosition < _mSizeX * _mSizeY && _map[mPosition] >= 1) {
-        rVertical = rayLength(_pPosX, rIntersectX, _pPosY, rIntersectY);
+        rLenV = rayLength(_pPosX, rIntersectX, _pPosY, rIntersectY);
         rCastLimitV = R_HIT;
       }
       else {
@@ -353,10 +353,6 @@ uint32_t cast() {
     mColorV = _map[mPosition];
 
     // HORIZONTAL LINE CHECK
-    rCastLimitH = 0;
-    float rHorizontal = FLT_MAX;
-    float const cRTan = 1 / cTan;
-
     if (rAngle < M_PI) { // looking up
       rIntersectY = (uint16_t)_pPosY - 0.000001;
       rOffsetY = -1;
@@ -372,7 +368,7 @@ uint32_t cast() {
       mPosition = (uint16_t)rIntersectY * _mSizeX + (uint16_t)rIntersectX;
 
       if (mPosition > 0 && mPosition < _mSizeX * _mSizeY && _map[mPosition] >= 1) {
-        rHorizontal = rayLength(_pPosX, rIntersectX, _pPosY, rIntersectY);
+        rLenH = rayLength(_pPosX, rIntersectX, _pPosY, rIntersectY);
         rCastLimitH = R_HIT;
       }
       else {
@@ -386,18 +382,18 @@ uint32_t cast() {
 
     // RENDERING
     uint16_t rCastTotal;
-    if (rVertical < rHorizontal) { rCastTotal = rCastLimitV; }
-    else                         { rCastTotal = rCastLimitH; }
+    if (rLenV < rLenH) { rCastTotal = rCastLimitV; }
+    else               { rCastTotal = rCastLimitH; }
 
     if (rCastTotal == R_HIT) {
       uint8_t  colorIndex, hitSide;
-      if (rVertical < rHorizontal) {
-        rShortest = rVertical;
+      if (rLenV < rLenH) {
+        rShortest = rLenV;
         colorIndex = mColorV;
         hitSide = 1;
       }
       else {
-        rShortest = rHorizontal;
+        rShortest = rLenH;
         colorIndex = mColorH;
         hitSide = 0;
       }
