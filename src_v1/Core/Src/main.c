@@ -400,10 +400,10 @@ uint32_t cast() {
 
       rShortest *= _fisheyeCosLUT[rCount];
       float    lineHeight = 272 / rShortest;
-      uint16_t lineOffset = 0;
 
       lineHeight *= LINE_VERTICAL_SCALE;
       if (lineHeight > 272 / DOF) { // if line is smaller than the shortest possible line defined by DOF, don't bother drawing it
+        uint16_t lineOffset = 0;
         if (lineHeight > 272) { lineHeight = 272; }
         else { lineOffset = (uint16_t)(272 - lineHeight) >> 1; }
         BSP_LCD_SetTextColor(dimColor(CLUT(colorIndex, hitSide), (DOF - rShortest) * L_COEFF));
