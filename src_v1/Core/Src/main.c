@@ -323,11 +323,11 @@ uint32_t cast() {
     rCastLimitV = 0; rCastLimitH = 0;
     rLenV = FLT_MAX; rLenH = FLT_MAX;
     cTan = tan(rAngle); cRTan = 1 / cTan;
+    union { float f; uint32_t u; } sign;
 
     // VERTICAL LINE CHECK
-    if (rAngle < M_PI_2 || rAngle > M_3PI_2) { rOffsetX = 1; } // looking right
-    else { rOffsetX = -1; } // looking left
-    union { float f; uint32_t u; } sign; sign.f = rOffsetX; sign.u = sign.u >> 31; // A bit of a hack - extract sign bit from the float and use it to correct the value of rIntersect and mPosition in the array. Done to avoid floating point error when map size exceeds a power of two and to optimize above if-statement.
+    rOffsetX = (rAngle < M_PI_2 || rAngle > M_3PI_2) ? 1 : -1; // looking right / left
+    sign.f = rOffsetX; sign.u = sign.u >> 31; // A bit of a hack - extract sign bit from the float and use it to correct the value of rIntersect and mPosition in the array. Done to avoid floating point error when map size exceeds a power of two and to optimize above if-statement.
     rIntersectX = (uint16_t)_pPosX + !sign.u;
     rIntersectY = (_pPosX - rIntersectX) * cTan + _pPosY;
     rOffsetY = -rOffsetX * cTan;
@@ -349,8 +349,7 @@ uint32_t cast() {
     mColorV = _map[mPosition];
 
     // HORIZONTAL LINE CHECK
-    if (rAngle < M_PI) {rOffsetY = -1; } // looking up
-    else { rOffsetY = 1; } // looking down
+    rOffsetY = (rAngle < M_PI) ? -1 : 1; // looking up / down
     sign.f = rOffsetY; sign.u = sign.u >> 31;
     rIntersectY = (uint16_t)_pPosY + !sign.u;
     rIntersectX = (_pPosY - rIntersectY) * cRTan + _pPosX;
