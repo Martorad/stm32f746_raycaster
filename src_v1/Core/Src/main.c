@@ -325,19 +325,15 @@ uint32_t cast() {
     cTan = tan(rAngle); cRTan = 1 / cTan;
 
     // VERTICAL LINE CHECK
-    if (rAngle < M_PI_2 || rAngle > M_3PI_2) { // looking right
-      rIntersectX = (uint16_t)_pPosX + 1;
-      rOffsetX = 1;
-    }
-    else { // looking left
-      rIntersectX = (uint16_t)_pPosX - 0.000002; // this will cause a floating point error if the map size exceeds 64, double it in that case to get map size up to 128
-      rOffsetX = -1;
-    }
+    if (rAngle < M_PI_2 || rAngle > M_3PI_2) { rOffsetX = 1; } // looking right
+    else { rOffsetX = -1; } // looking left
+    union { float f; uint32_t u; } sign; sign.f = rOffsetX; sign.u = sign.u >> 31;
+    rIntersectX = (uint16_t)_pPosX + !sign.u;
     rIntersectY = (_pPosX - rIntersectX) * cTan + _pPosY;
     rOffsetY = -rOffsetX * cTan;
 
     while (rCastLimitV < DOF) {
-      mPosition = (uint16_t)rIntersectY * _mSizeX + (uint16_t)rIntersectX;
+      mPosition = (uint16_t)rIntersectY * _mSizeX + (uint16_t)rIntersectX - sign.u;
 
       if (_map[mPosition]) {
         rLenV = rayLength(_pPosX, rIntersectX, _pPosY, rIntersectY);
@@ -353,19 +349,15 @@ uint32_t cast() {
     mColorV = _map[mPosition];
 
     // HORIZONTAL LINE CHECK
-    if (rAngle < M_PI) { // looking up
-      rIntersectY = (uint16_t)_pPosY - 0.000002;
-      rOffsetY = -1;
-    }
-    else { // looking down
-      rIntersectY = (uint16_t)_pPosY + 1;
-      rOffsetY = 1;
-    }
+    if (rAngle < M_PI) {rOffsetY = -1; } // looking up
+    else { rOffsetY = 1; } // looking down
+    sign.f = rOffsetY; sign.u = sign.u >> 31;
+    rIntersectY = (uint16_t)_pPosY + !sign.u;
     rIntersectX = (_pPosY - rIntersectY) * cRTan + _pPosX;
     rOffsetX = -rOffsetY * cRTan;
 
     while (rCastLimitH < DOF) {
-      mPosition = (uint16_t)rIntersectY * _mSizeX + (uint16_t)rIntersectX;
+      mPosition = ((uint16_t)rIntersectY - sign.u) * _mSizeX + (uint16_t)rIntersectX;
 
       if (_map[mPosition]) {
         rLenH = rayLength(_pPosX, rIntersectX, _pPosY, rIntersectY);
