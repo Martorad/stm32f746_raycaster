@@ -327,7 +327,7 @@ uint32_t cast() {
     // VERTICAL LINE CHECK
     if (rAngle < M_PI_2 || rAngle > M_3PI_2) { rOffsetX = 1; } // looking right
     else { rOffsetX = -1; } // looking left
-    union { float f; uint32_t u; } sign; sign.f = rOffsetX; sign.u = sign.u >> 31;
+    union { float f; uint32_t u; } sign; sign.f = rOffsetX; sign.u = sign.u >> 31; // A bit of a hack - extract sign bit from the float and use it to correct the value of rIntersect and mPosition in the array. Done to avoid floating point error when map size exceeds a power of two and to optimize above if-statement.
     rIntersectX = (uint16_t)_pPosX + !sign.u;
     rIntersectY = (_pPosX - rIntersectX) * cTan + _pPosY;
     rOffsetY = -rOffsetX * cTan;
