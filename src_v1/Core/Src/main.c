@@ -399,7 +399,7 @@ uint32_t cast() {
       }
 
       rShortest *= _fisheyeCosLUT[rCount];
-      float    lineHeight = 272 / rShortest;
+      float lineHeight = 272 / rShortest;
 
       lineHeight *= LINE_VERTICAL_SCALE;
       if (lineHeight > 272 / DOF) { // if line is smaller than the shortest possible line defined by DOF, don't bother drawing it
