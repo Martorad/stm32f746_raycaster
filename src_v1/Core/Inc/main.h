@@ -54,12 +54,12 @@ void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
 uint32_t cast();
-float    rayLength(float ax, float ay, float bx, float by);
-float    fsqrt(float x);
-void     pageFlip();
 uint32_t CLUT(uint8_t index, uint8_t hitSide);
 uint32_t dimColor(uint32_t inputColor, float dimmingFactor);
+float    rayLength(float ax, float ay, float bx, float by);
+float    fsqrt(float x);
 void     showFPS(uint32_t frameTime);
+void     pageFlip();
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
