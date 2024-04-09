@@ -43,6 +43,7 @@
 #include "math.h"
 #include "../../Drivers/BSP/STM32746G-Discovery/stm32746g_discovery_lcd.h"
 #include "rc_config.h"
+#include "textures.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -393,13 +394,30 @@ uint32_t cast() {
       float lineHeight = 272 / rShortest;
 
       lineHeight *= LINE_VERTICAL_SCALE;
-      if (lineHeight > 272 / DOF) { // if line is smaller than the shortest possible line defined by DOF, don't bother drawing it
+      if (lineHeight > TEXTURE_SIZE) { // if line is smaller than the shortest possible line defined by DOF, don't bother drawing it
         uint16_t lineOffset = 0;
-        if (lineHeight > 272) { lineHeight = 272; }
+        uint16_t skipLines = 0;
+        float    tY = 0;
+        float    tYStep = lineHeight / TEXTURE_SIZE;
+        float    tOffset = (lineHeight - 272) / 2;
+        uint16_t firstLine = (uint16_t)tOffset % (uint16_t)tYStep;
+
+        if (lineHeight > 272) { skipLines = tOffset / tYStep; }
         else { lineOffset = (uint16_t)(272 - lineHeight) >> 1; }
 //        BSP_LCD_SetTextColor(dimColor(CLUT(colorIndex, hitSide), (DOF - rShortest) * L_COEFF));
-        BSP_LCD_SetTextColor(CLUT(colorIndex, hitSide));
-        BSP_LCD_FillRect((rCount * FOV_RECT), lineOffset, FOV_RECT, lineHeight);
+//        BSP_LCD_SetTextColor(CLUT(colorIndex, hitSide));
+//        BSP_LCD_FillRect((rCount * FOV_RECT), lineOffset, FOV_RECT, lineHeight);
+
+        for (uint16_t i = skipLines; i < TEXTURE_SIZE - skipLines; i++) {
+          if (_textures[0][(uint16_t)(i * TEXTURE_SIZE)]) { BSP_LCD_SetTextColor(LCD_COLOR_WHITE); }
+          else { BSP_LCD_SetTextColor(LCD_COLOR_YELLOW); }
+
+          if (i == skipLines) { BSP_LCD_FillRect((rCount * FOV_RECT), lineOffset + tY, FOV_RECT, firstLine); }
+          else if (i == TEXTURE_SIZE - skipLines - 1) { BSP_LCD_FillRect((rCount * FOV_RECT), lineOffset + tY, FOV_RECT, firstLine); }
+          else { BSP_LCD_FillRect((rCount * FOV_RECT), lineOffset + tY, FOV_RECT, tYStep + 1); }
+
+          tY += tYStep;
+        }
       }
     }
 

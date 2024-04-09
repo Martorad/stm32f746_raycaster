@@ -8,6 +8,8 @@
 #ifndef INC_TEXTURES_H_
 #define INC_TEXTURES_H_
 
+#define TEXTURE_SIZE 16
+
 uint8_t _textures[4][256] = {
   { // Checkerboard
     1,1,1,1,0,0,0,0,1,1,1,1,0,0,0,0,
