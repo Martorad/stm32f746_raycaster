@@ -397,7 +397,8 @@ uint32_t cast() {
         uint16_t lineOffset = 0;
         if (lineHeight > 272) { lineHeight = 272; }
         else { lineOffset = (uint16_t)(272 - lineHeight) >> 1; }
-        BSP_LCD_SetTextColor(dimColor(CLUT(colorIndex, hitSide), (DOF - rShortest) * L_COEFF));
+//        BSP_LCD_SetTextColor(dimColor(CLUT(colorIndex, hitSide), (DOF - rShortest) * L_COEFF));
+        BSP_LCD_SetTextColor(CLUT(colorIndex, hitSide));
         BSP_LCD_FillRect((rCount * FOV_RECT), lineOffset, FOV_RECT, lineHeight);
       }
     }
