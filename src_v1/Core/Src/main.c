@@ -311,6 +311,7 @@ uint32_t cast() {
   uint16_t rCount, rCastLimitV, rCastLimitH, mPosition = 0;
   uint8_t  mColorV, mColorH;
   float    rIntersectX, rIntersectY, rAngle, rOffsetX, rOffsetY, rShortest, rLenV, rLenH, cTan, cRTan;
+  union    { float f; uint32_t u; } sign;
 
   BSP_LCD_SelectLayer(0);
   BSP_LCD_Clear(LCD_COLOR_BLACK);
@@ -323,7 +324,6 @@ uint32_t cast() {
     rCastLimitV = 0; rCastLimitH = 0;
     rLenV = FLT_MAX; rLenH = FLT_MAX;
     cTan = tan(rAngle); cRTan = 1 / cTan;
-    union { float f; uint32_t u; } sign;
 
     // VERTICAL LINE CHECK
     rOffsetX = (rAngle < M_PI_2 || rAngle > M_3PI_2) ? 1 : -1; // looking right / left
