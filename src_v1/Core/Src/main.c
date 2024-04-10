@@ -395,10 +395,10 @@ uint32_t cast() {
 
       if (lineHeight > SCREEN_HEIGHT / DOF) { // if line is smaller than the shortest possible line defined by DOF, don't bother drawing it
         uint16_t lineOffset, skipLines;
-        float    tX, tY = 0, tYStep = lineHeight / TEXTURE_SIZE, tOffset = (lineHeight - 272) / 2, firstLine;
+        float    tX, tY = 0, tYStep = lineHeight / TEXTURE_SIZE, tOffset = (lineHeight - SCREEN_HEIGHT) / 2, firstLine;
 
-        if (hitSide) { tX = (rIntersectYV - (uint32_t)rIntersectYV) * TEXTURE_SIZE; }
-        else         { tX = (rIntersectXH - (uint32_t)rIntersectXH) * TEXTURE_SIZE; }
+        if (hitSide) { tX = TEXTURE_SIZE - (rIntersectYV - (uint32_t)rIntersectYV) * TEXTURE_SIZE; if (rAngle < M_PI_2 || rAngle > M_3PI_2) { tX = TEXTURE_SIZE - tX; }}
+        else         { tX = TEXTURE_SIZE - (rIntersectXH - (uint32_t)rIntersectXH) * TEXTURE_SIZE; if (rAngle < M_PI)                       { tX = TEXTURE_SIZE - tX; }}
 
         if (lineHeight > SCREEN_HEIGHT) {
           skipLines = tOffset / tYStep;
