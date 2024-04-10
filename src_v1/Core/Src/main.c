@@ -393,7 +393,7 @@ uint32_t cast() {
       rShortest *= _fisheyeCosLUT[rCount];
       float lineHeight = SCREEN_HEIGHT / rShortest * LINE_VERTICAL_SCALE;
 
-      if (lineHeight > TEXTURE_SIZE) { // if line is smaller than the shortest possible line defined by DOF, don't bother drawing it
+      if (lineHeight > SCREEN_HEIGHT / DOF) { // if line is smaller than the shortest possible line defined by DOF, don't bother drawing it
         uint16_t lineOffset, skipLines;
         float    tX = 0, tY = 0, tYStep = lineHeight / TEXTURE_SIZE, tOffset = (lineHeight - 272) / 2, firstLine;
 
