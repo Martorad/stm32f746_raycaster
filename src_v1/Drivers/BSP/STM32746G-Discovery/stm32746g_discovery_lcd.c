@@ -1579,17 +1579,22 @@ static void LL_FillBuffer(uint32_t LayerIndex, void *pDst, uint32_t xSize, uint3
   hDma2dHandler.Instance = DMA2D;
   
   /* DMA2D Initialization */
-  if(HAL_DMA2D_Init(&hDma2dHandler) == HAL_OK) 
-  {
-    if(HAL_DMA2D_ConfigLayer(&hDma2dHandler, LayerIndex) == HAL_OK) 
-    {
-      if (HAL_DMA2D_Start(&hDma2dHandler, ColorIndex, (uint32_t)pDst, xSize, ySize) == HAL_OK)
-      {
-        /* Polling For DMA transfer */  
-        HAL_DMA2D_PollForTransfer(&hDma2dHandler, 10);
-      }
-    }
-  } 
+//  if(HAL_DMA2D_Init(&hDma2dHandler) == HAL_OK)
+//  {
+//    if(HAL_DMA2D_ConfigLayer(&hDma2dHandler, LayerIndex) == HAL_OK)
+//    {
+//      if (HAL_DMA2D_Start(&hDma2dHandler, ColorIndex, (uint32_t)pDst, xSize, ySize) == HAL_OK)
+//      {
+//        /* Polling For DMA transfer */
+//        HAL_DMA2D_PollForTransfer(&hDma2dHandler, 100000);
+//      }
+//    }
+//  }
+  HAL_StatusTypeDef status;
+  do { status = HAL_DMA2D_Init(&hDma2dHandler); }                                            while (status != HAL_OK);
+  do { status = HAL_DMA2D_ConfigLayer(&hDma2dHandler, LayerIndex); }                         while (status != HAL_OK);
+  do { status = HAL_DMA2D_Start(&hDma2dHandler, ColorIndex, (uint32_t)pDst, xSize, ySize); } while (status != HAL_OK);
+  do { status = HAL_DMA2D_PollForTransfer(&hDma2dHandler, 10); }                             while (status != HAL_OK);
 }
 
 /**

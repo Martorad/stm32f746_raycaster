@@ -43,6 +43,7 @@
 #include "math.h"
 #include "../../Drivers/BSP/STM32746G-Discovery/stm32746g_discovery_lcd.h"
 #include "rc_config.h"
+#include "textures.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -80,22 +81,22 @@ void MX_USB_HOST_Process(void);
 // MAP
 const uint8_t _mSizeX = 48, _mSizeY = 16;
 const uint8_t _map[] = {
-  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,5,6,5,6,5,6,5,6,5,6,5,6,5,6,5,6,
-  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,1,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,
-  1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,1,0,1,0,1,1,0,0,0,0,0,0,1,0,1,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,7,
-  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,3,1,0,0,0,0,0,0,0,2,0,1,5,6,0,0,0,0,0,0,0,0,0,0,0,0,0,7,
-  1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,
-  1,0,0,0,0,0,0,0,2,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,4,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,
-  1,0,1,2,3,4,5,6,5,4,3,2,1,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,
-  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,2,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,
-  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,2,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,
-  1,0,1,2,3,4,5,6,5,4,3,2,1,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,
-  1,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,4,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,
-  1,1,1,1,1,1,1,1,1,4,4,4,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,
-  1,4,4,4,4,4,4,4,4,4,4,0,0,4,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,2,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,
-  1,4,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,1,4,5,0,0,0,0,0,0,0,0,0,0,0,0,0,7,
-  1,4,4,4,4,4,4,4,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,
-  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,5,6,5,6,5,6,5,6,5,6,5,6,5,6,5,6
+  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,5,5,5,5,1,1,1,1,1,1,1,1,1,1,1,1,1,
+  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,1,1,0,0,0,0,0,0,0,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+  1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,1,0,1,0,1,1,0,0,0,0,0,0,1,0,5,0,5,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,1,1,0,0,0,0,0,0,0,1,0,5,5,5,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+  1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+  1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,5,5,5,5,5,5,1,
+  1,0,1,1,1,1,1,1,1,1,1,1,1,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,5,0,0,0,0,5,1,
+  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,3,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,5,0,0,0,0,5,1,
+  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,3,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,5,0,0,0,0,5,1,
+  1,0,1,1,1,1,1,1,1,1,1,1,1,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,1,
+  1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,5,5,5,5,5,5,1,
+  1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+  1,1,1,1,1,1,1,1,1,1,1,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+  1,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+  1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
 };
 
 // PLAYER
@@ -306,11 +307,11 @@ void PeriphCommonClock_Config(void)
 
 /* USER CODE BEGIN 4 */
 uint32_t cast() {
-  // Variable naming convention: r = ray, m = map, p = performance, c = calculation
+  // Variable naming convention: r = ray, m = map, p = performance, c = calculation, t = texture
   uint32_t pStartTime = _sysElapsedTicks;
   uint16_t rCount, rCastLimitV, rCastLimitH, mPosition = 0;
-  uint8_t  mColorV, mColorH;
-  float    rIntersectX, rIntersectY, rAngle, rOffsetX, rOffsetY, rShortest, rLenV, rLenH, cTan, cRTan;
+  uint8_t  mTextureV, mTextureH;
+  float    rIntersectXV, rIntersectYV, rIntersectXH, rIntersectYH, rAngle, rOffsetX, rOffsetY, rShortest, rLenV, rLenH, cTan, cRTan;
   union    { float f; uint32_t u; } sign;
 
   BSP_LCD_SelectLayer(0);
@@ -328,48 +329,48 @@ uint32_t cast() {
     // VERTICAL LINE CHECK
     rOffsetX = (rAngle < M_PI_2 || rAngle > M_3PI_2) ? 1 : -1; // looking right / left
     sign.f = rOffsetX; sign.u = sign.u >> 31; // A bit of a hack - extract sign bit from the float and use it to correct the value of rIntersect and mPosition in the array. Done to avoid floating point error when map size exceeds a power of two and to optimize above if-statement.
-    rIntersectX = (uint16_t)_pPosX + !sign.u;
-    rIntersectY = (_pPosX - rIntersectX) * cTan + _pPosY;
+    rIntersectXV = (uint16_t)_pPosX + !sign.u;
+    rIntersectYV = (_pPosX - rIntersectXV) * cTan + _pPosY;
     rOffsetY = -rOffsetX * cTan;
 
     while (rCastLimitV < DOF) {
-      mPosition = (uint16_t)rIntersectY * _mSizeX + (uint16_t)rIntersectX - sign.u;
+      mPosition = (uint16_t)rIntersectYV * _mSizeX + (uint16_t)rIntersectXV - sign.u;
 
       if (_map[mPosition]) {
-        rLenV = rayLength(_pPosX, rIntersectX, _pPosY, rIntersectY);
+        rLenV = rayLength(_pPosX, rIntersectXV, _pPosY, rIntersectYV);
         rCastLimitV = R_HIT;
       }
       else {
-        rIntersectX += rOffsetX;
-        rIntersectY += rOffsetY;
+        rIntersectXV += rOffsetX;
+        rIntersectYV += rOffsetY;
         rCastLimitV++;
       }
     }
 
-    mColorV = _map[mPosition];
+    mTextureV = _map[mPosition] - 1;
 
     // HORIZONTAL LINE CHECK
     rOffsetY = (rAngle < M_PI) ? -1 : 1; // looking up / down
     sign.f = rOffsetY; sign.u = sign.u >> 31;
-    rIntersectY = (uint16_t)_pPosY + !sign.u;
-    rIntersectX = (_pPosY - rIntersectY) * cRTan + _pPosX;
+    rIntersectYH = (uint16_t)_pPosY + !sign.u;
+    rIntersectXH = (_pPosY - rIntersectYH) * cRTan + _pPosX;
     rOffsetX = -rOffsetY * cRTan;
 
     while (rCastLimitH < DOF) {
-      mPosition = ((uint16_t)rIntersectY - sign.u) * _mSizeX + (uint16_t)rIntersectX;
+      mPosition = ((uint16_t)rIntersectYH - sign.u) * _mSizeX + (uint16_t)rIntersectXH;
 
       if (_map[mPosition]) {
-        rLenH = rayLength(_pPosX, rIntersectX, _pPosY, rIntersectY);
+        rLenH = rayLength(_pPosX, rIntersectXH, _pPosY, rIntersectYH);
         rCastLimitH = R_HIT;
       }
       else {
-        rIntersectX += rOffsetX;
-        rIntersectY += rOffsetY;
+        rIntersectXH += rOffsetX;
+        rIntersectYH += rOffsetY;
         rCastLimitH++;
       }
     }
 
-    mColorH = _map[mPosition];
+    mTextureH = _map[mPosition] - 1;
 
     // RENDERING
     uint16_t rCastTotal;
@@ -377,29 +378,46 @@ uint32_t cast() {
     else               { rCastTotal = rCastLimitH; }
 
     if (rCastTotal == R_HIT) {
-      uint8_t  colorIndex, hitSide;
+      uint8_t tTextureIndex, hitSide;
       if (rLenV < rLenH) {
         rShortest = rLenV;
-        colorIndex = mColorV;
+        tTextureIndex = mTextureV;
         hitSide = 1;
       }
       else {
         rShortest = rLenH;
-        colorIndex = mColorH;
+        tTextureIndex = mTextureH;
         hitSide = 0;
       }
 
       rShortest *= _fisheyeCosLUT[rCount];
-      float lineHeight = 272 / rShortest;
+      float lineHeight = SCREEN_HEIGHT / rShortest * LINE_VERTICAL_SCALE;
 
-      lineHeight *= LINE_VERTICAL_SCALE;
-      if (lineHeight > 272 / DOF) { // if line is smaller than the shortest possible line defined by DOF, don't bother drawing it
-        uint16_t lineOffset = 0;
-        if (lineHeight > 272) { lineHeight = 272; }
-        else { lineOffset = (uint16_t)(272 - lineHeight) >> 1; }
-//        BSP_LCD_SetTextColor(dimColor(CLUT(colorIndex, hitSide), (DOF - rShortest) * L_COEFF));
-        BSP_LCD_SetTextColor(CLUT(colorIndex, hitSide));
-        BSP_LCD_FillRect((rCount * FOV_RECT), lineOffset, FOV_RECT, lineHeight);
+      if (lineHeight > SCREEN_HEIGHT / DOF) { // if line is smaller than the shortest possible line defined by DOF, don't bother drawing it
+        uint16_t lineOffset, skipLines;
+        float    tX, tY = 0, tYStep = lineHeight / TEXTURE_SIZE, tOffset = (lineHeight - SCREEN_HEIGHT) / 2, firstLine;
+
+        if (hitSide) { tX = (1 - (rIntersectYV - (uint32_t)rIntersectYV)) * TEXTURE_SIZE; if (rAngle < M_PI_2 || rAngle > M_3PI_2) { tX = TEXTURE_SIZE - tX; }}
+        else         { tX = (1 - (rIntersectXH - (uint32_t)rIntersectXH)) * TEXTURE_SIZE; if (rAngle < M_PI)                       { tX = TEXTURE_SIZE - tX; }}
+
+        if (lineHeight > SCREEN_HEIGHT) {
+          skipLines = tOffset / tYStep;
+          firstLine = tYStep - (tOffset - skipLines * tYStep);
+          tY = firstLine;
+          for (uint16_t i = skipLines; i < TEXTURE_SIZE - skipLines; i++) {
+            BSP_LCD_SetTextColor(_textures[tTextureIndex + hitSide][i * TEXTURE_SIZE + (uint16_t)(tX)]);
+            if (i != skipLines && i != TEXTURE_SIZE - skipLines - 1) { BSP_LCD_FillRect((rCount * FOV_RECT), tY, FOV_RECT, tYStep + 1); tY += tYStep; }
+            else                                                     { BSP_LCD_FillRect((rCount * FOV_RECT), (i == skipLines) ? 0 : tY, FOV_RECT, firstLine); }
+          }
+        }
+        else {
+          lineOffset = (uint16_t)(SCREEN_HEIGHT - lineHeight) >> 1;
+          for (uint16_t i = 0; i < TEXTURE_SIZE; i++) {
+            BSP_LCD_SetTextColor(_textures[tTextureIndex + hitSide][i * TEXTURE_SIZE + (uint16_t)(tX)]);
+            BSP_LCD_FillRect((rCount * FOV_RECT), lineOffset + tY, FOV_RECT, tYStep + 1);
+            tY += tYStep;
+          }
+        }
       }
     }
 
@@ -490,10 +508,13 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   /* USER CODE BEGIN Callback 0 */
 
   /* USER CODE END Callback 0 */
-  if (htim->Instance == TIM6) { HAL_IncTick(); }
-  if (htim->Instance == TIM7) { _sysElapsedTicks++; }
+  if (htim->Instance == TIM6) {
+    HAL_IncTick();
+  }
   /* USER CODE BEGIN Callback 1 */
-
+  if (htim->Instance == TIM7) {
+    _sysElapsedTicks++;
+  }
   /* USER CODE END Callback 1 */
 }
 
