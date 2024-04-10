@@ -81,15 +81,15 @@ void MX_USB_HOST_Process(void);
 // MAP
 const uint8_t _mSizeX = 48, _mSizeY = 16;
 const uint8_t _map[] = {
-  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,1,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-  1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,1,0,1,0,1,1,0,0,0,0,0,0,1,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,1,1,0,0,0,0,0,0,0,1,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,3,3,3,3,1,1,1,1,1,1,1,1,1,1,1,1,1,
+  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,1,1,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+  1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,1,0,1,0,1,1,0,0,0,0,0,0,1,0,3,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,1,1,0,0,0,0,0,0,0,1,0,3,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
   1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
   1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
   1,0,1,1,1,1,1,1,1,1,1,1,1,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,3,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,3,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
   1,0,1,1,1,1,1,1,1,1,1,1,1,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
   1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
   1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
@@ -391,7 +391,7 @@ uint32_t cast() {
       }
 
       rShortest *= _fisheyeCosLUT[rCount];
-      float lineHeight = 272 / rShortest * LINE_VERTICAL_SCALE;
+      float lineHeight = SCREEN_HEIGHT / rShortest * LINE_VERTICAL_SCALE;
 
       if (lineHeight > TEXTURE_SIZE) { // if line is smaller than the shortest possible line defined by DOF, don't bother drawing it
         uint16_t lineOffset = 0, skipLines = 0;
@@ -400,20 +400,20 @@ uint32_t cast() {
         if (hitSide) { tX = (rIntersectYV - (uint32_t)rIntersectYV) * TEXTURE_SIZE; }
         else         { tX = (rIntersectXH - (uint32_t)rIntersectXH) * TEXTURE_SIZE; }
 
-        if (lineHeight > 272) {
+        if (lineHeight > SCREEN_HEIGHT) {
           skipLines = tOffset / tYStep;
           firstLine = tYStep - (tOffset - skipLines * tYStep);
           tY = firstLine;
           for (uint16_t i = skipLines; i < TEXTURE_SIZE - skipLines; i++) {
             BSP_LCD_SetTextColor(_textures[tTextureIndex + hitSide][i * TEXTURE_SIZE + (uint16_t)(tX)]);
 
-            if (i != skipLines && i != TEXTURE_SIZE - skipLines - 1) { BSP_LCD_FillRect((rCount * FOV_RECT), (uint16_t)tY, FOV_RECT, (uint16_t)tYStep + 1); tY += tYStep; }
+            if (i != skipLines && i != TEXTURE_SIZE - skipLines - 1) { BSP_LCD_FillRect((rCount * FOV_RECT), tY, FOV_RECT, tYStep + 1); tY += tYStep; }
             else if (i == skipLines) { BSP_LCD_FillRect((rCount * FOV_RECT), 0, FOV_RECT, firstLine); }
             else { BSP_LCD_FillRect((rCount * FOV_RECT), tY, FOV_RECT, firstLine); }
           }
         }
         else {
-          lineOffset = (uint16_t)(272 - lineHeight) >> 1;
+          lineOffset = (uint16_t)(SCREEN_HEIGHT - lineHeight) >> 1;
           for (uint16_t i = 0; i < TEXTURE_SIZE; i++) {
             BSP_LCD_SetTextColor(_textures[tTextureIndex + hitSide][i * TEXTURE_SIZE + (uint16_t)(tX)]);
 
