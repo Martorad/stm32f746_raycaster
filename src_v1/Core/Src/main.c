@@ -347,6 +347,7 @@ uint32_t cast() {
       }
     }
 
+    float rIntersectYOld = rIntersectY;
     mColorV = _map[mPosition];
 
     // HORIZONTAL LINE CHECK
@@ -404,7 +405,7 @@ uint32_t cast() {
         float    tx = 0;
 
         if (hitSide) {
-          tx = (rIntersectY - (uint32_t)rIntersectY) * TEXTURE_SIZE;
+          tx = (rIntersectYOld - (uint32_t)rIntersectYOld) * TEXTURE_SIZE;
         }
         else {
           tx = (rIntersectX - (uint32_t)rIntersectX) * TEXTURE_SIZE;
@@ -423,6 +424,7 @@ uint32_t cast() {
           for (uint16_t i = skipLines; i < TEXTURE_SIZE - skipLines; i++) {
             if (_textures[2][i * TEXTURE_SIZE + (uint16_t)(tx)]) { BSP_LCD_SetTextColor(LCD_COLOR_RED); }
             else { BSP_LCD_SetTextColor(LCD_COLOR_BLUE); }
+            BSP_LCD_SetTextColor(dimColor(BSP_LCD_GetTextColor(), (hitSide) ? (0.85) : (1)));
 
             if (i == skipLines) { BSP_LCD_FillRect((rCount * FOV_RECT), 0, FOV_RECT, firstLine); }
             else if (i == TEXTURE_SIZE - skipLines - 1) { BSP_LCD_FillRect((rCount * FOV_RECT), tY, FOV_RECT, firstLine); }
@@ -433,6 +435,7 @@ uint32_t cast() {
           for (uint16_t i = 0; i < TEXTURE_SIZE; i++) {
             if (_textures[2][i * TEXTURE_SIZE + (uint16_t)(tx)]) { BSP_LCD_SetTextColor(LCD_COLOR_RED); }
             else { BSP_LCD_SetTextColor(LCD_COLOR_BLUE); }
+            BSP_LCD_SetTextColor(dimColor(BSP_LCD_GetTextColor(), (hitSide) ? (0.85) : (1)));
 
             BSP_LCD_FillRect((rCount * FOV_RECT), lineOffset + tY, FOV_RECT, tYStep + 1);
             tY += tYStep;
