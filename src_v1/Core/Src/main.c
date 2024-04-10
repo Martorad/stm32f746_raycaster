@@ -81,22 +81,22 @@ void MX_USB_HOST_Process(void);
 // MAP
 const uint8_t _mSizeX = 48, _mSizeY = 16;
 const uint8_t _map[] = {
-  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,5,6,5,6,5,6,5,6,5,6,5,6,5,6,5,6,
-  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,1,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,
-  1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,1,0,1,0,1,1,0,0,0,0,0,0,1,0,1,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,7,
-  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,3,1,0,0,0,0,0,0,0,2,0,1,5,6,0,0,0,0,0,0,0,0,0,0,0,0,0,7,
-  1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,
-  1,0,0,0,0,0,0,0,2,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,4,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,
-  1,0,1,2,3,4,5,6,5,4,3,2,1,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,
-  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,2,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,
-  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,2,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,
-  1,0,1,2,3,4,5,6,5,4,3,2,1,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,
-  1,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,4,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,
-  1,1,1,1,1,1,1,1,1,4,4,4,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,
-  1,4,4,4,4,4,4,4,4,4,4,0,0,4,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,2,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,
-  1,4,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,1,4,5,0,0,0,0,0,0,0,0,0,0,0,0,0,7,
-  1,4,4,4,4,4,4,4,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,
-  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,5,6,5,6,5,6,5,6,5,6,5,6,5,6,5,6
+  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,1,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+  1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,1,0,1,0,1,1,0,0,0,0,0,0,1,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,1,1,0,0,0,0,0,0,0,1,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+  1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+  1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+  1,0,1,1,1,1,1,1,1,1,1,1,1,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+  1,0,1,1,1,1,1,1,1,1,1,1,1,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+  1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+  1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+  1,1,1,1,1,1,1,1,1,1,1,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+  1,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+  1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
 };
 
 // PLAYER
@@ -307,10 +307,10 @@ void PeriphCommonClock_Config(void)
 
 /* USER CODE BEGIN 4 */
 uint32_t cast() {
-  // Variable naming convention: r = ray, m = map, p = performance, c = calculation
+  // Variable naming convention: r = ray, m = map, p = performance, c = calculation, t = texture
   uint32_t pStartTime = _sysElapsedTicks;
   uint16_t rCount, rCastLimitV, rCastLimitH, mPosition = 0;
-  uint8_t  mColorV, mColorH;
+  uint8_t  mTextureV, mTextureH;
   float    rIntersectXV, rIntersectYV, rIntersectXH, rIntersectYH, rAngle, rOffsetX, rOffsetY, rShortest, rLenV, rLenH, cTan, cRTan;
   union    { float f; uint32_t u; } sign;
 
@@ -347,7 +347,7 @@ uint32_t cast() {
       }
     }
 
-    mColorV = _map[mPosition];
+    mTextureV = _map[mPosition] - 1;
 
     // HORIZONTAL LINE CHECK
     rOffsetY = (rAngle < M_PI) ? -1 : 1; // looking up / down
@@ -370,7 +370,7 @@ uint32_t cast() {
       }
     }
 
-    mColorH = _map[mPosition];
+    mTextureH = _map[mPosition] - 1;
 
     // RENDERING
     uint16_t rCastTotal;
@@ -378,22 +378,21 @@ uint32_t cast() {
     else               { rCastTotal = rCastLimitH; }
 
     if (rCastTotal == R_HIT) {
-      uint8_t  colorIndex, hitSide;
+      uint8_t tTextureIndex, hitSide;
       if (rLenV < rLenH) {
         rShortest = rLenV;
-        colorIndex = mColorV;
+        tTextureIndex = mTextureV;
         hitSide = 1;
       }
       else {
         rShortest = rLenH;
-        colorIndex = mColorH;
+        tTextureIndex = mTextureH;
         hitSide = 0;
       }
 
       rShortest *= _fisheyeCosLUT[rCount];
-      float lineHeight = 272 / rShortest;
+      float lineHeight = 272 / rShortest * LINE_VERTICAL_SCALE;
 
-      lineHeight *= LINE_VERTICAL_SCALE;
       if (lineHeight > TEXTURE_SIZE) { // if line is smaller than the shortest possible line defined by DOF, don't bother drawing it
         uint16_t lineOffset = 0, skipLines = 0;
         float    tX = 0, tY = 0, tYStep = lineHeight / TEXTURE_SIZE, tOffset = (lineHeight - 272) / 2, firstLine = 0;;
@@ -406,17 +405,17 @@ uint32_t cast() {
           firstLine = tYStep - (tOffset - skipLines * tYStep);
           tY = firstLine;
           for (uint16_t i = skipLines; i < TEXTURE_SIZE - skipLines; i++) {
-            BSP_LCD_SetTextColor(_textures[hitSide][i * TEXTURE_SIZE + (uint16_t)(tX)]);
+            BSP_LCD_SetTextColor(_textures[tTextureIndex + hitSide][i * TEXTURE_SIZE + (uint16_t)(tX)]);
 
-            if (i == skipLines) { BSP_LCD_FillRect((rCount * FOV_RECT), 0, FOV_RECT, firstLine); }
-            else if (i == TEXTURE_SIZE - skipLines - 1) { BSP_LCD_FillRect((rCount * FOV_RECT), tY, FOV_RECT, firstLine); }
-            else { BSP_LCD_FillRect((rCount * FOV_RECT), (uint16_t)tY, FOV_RECT, (uint16_t)tYStep + 1); tY += tYStep; }
+            if (i != skipLines && i != TEXTURE_SIZE - skipLines - 1) { BSP_LCD_FillRect((rCount * FOV_RECT), (uint16_t)tY, FOV_RECT, (uint16_t)tYStep + 1); tY += tYStep; }
+            else if (i == skipLines) { BSP_LCD_FillRect((rCount * FOV_RECT), 0, FOV_RECT, firstLine); }
+            else { BSP_LCD_FillRect((rCount * FOV_RECT), tY, FOV_RECT, firstLine); }
           }
         }
         else {
           lineOffset = (uint16_t)(272 - lineHeight) >> 1;
           for (uint16_t i = 0; i < TEXTURE_SIZE; i++) {
-            BSP_LCD_SetTextColor(_textures[hitSide][i * TEXTURE_SIZE + (uint16_t)(tX)]);
+            BSP_LCD_SetTextColor(_textures[tTextureIndex + hitSide][i * TEXTURE_SIZE + (uint16_t)(tX)]);
 
             BSP_LCD_FillRect((rCount * FOV_RECT), lineOffset + tY, FOV_RECT, tYStep + 1);
             tY += tYStep;
