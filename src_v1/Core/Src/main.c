@@ -395,7 +395,7 @@ uint32_t cast() {
 
       if (lineHeight > SCREEN_HEIGHT / DOF) { // if line is smaller than the shortest possible line defined by DOF, don't bother drawing it
         uint16_t lineOffset, skipLines;
-        float    tX = 0, tY = 0, tYStep = lineHeight / TEXTURE_SIZE, tOffset = (lineHeight - 272) / 2, firstLine;
+        float    tX, tY = 0, tYStep = lineHeight / TEXTURE_SIZE, tOffset = (lineHeight - 272) / 2, firstLine;
 
         if (hitSide) { tX = (rIntersectYV - (uint32_t)rIntersectYV) * TEXTURE_SIZE; }
         else         { tX = (rIntersectXH - (uint32_t)rIntersectXH) * TEXTURE_SIZE; }
@@ -407,8 +407,7 @@ uint32_t cast() {
           for (uint16_t i = skipLines; i < TEXTURE_SIZE - skipLines; i++) {
             BSP_LCD_SetTextColor(_textures[tTextureIndex + hitSide][i * TEXTURE_SIZE + (uint16_t)(tX)]);
             if (i != skipLines && i != TEXTURE_SIZE - skipLines - 1) { BSP_LCD_FillRect((rCount * FOV_RECT), tY, FOV_RECT, tYStep + 1); tY += tYStep; }
-            else if (i == skipLines)                                 { BSP_LCD_FillRect((rCount * FOV_RECT),  0, FOV_RECT, firstLine); }
-            else                                                     { BSP_LCD_FillRect((rCount * FOV_RECT), tY, FOV_RECT, firstLine); }
+            else                                                     { BSP_LCD_FillRect((rCount * FOV_RECT), (i == skipLines) ? 0 : tY, FOV_RECT, firstLine); }
           }
         }
         else {
