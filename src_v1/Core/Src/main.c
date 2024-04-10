@@ -395,35 +395,18 @@ uint32_t cast() {
 
       lineHeight *= LINE_VERTICAL_SCALE;
       if (lineHeight > TEXTURE_SIZE) { // if line is smaller than the shortest possible line defined by DOF, don't bother drawing it
-        uint16_t lineOffset = 0;
-        uint16_t skipLines = 0;
-        float    tY = 0;
-        float    tYStep = lineHeight / TEXTURE_SIZE;
-        float    tOffset = (lineHeight - 272) / 2;
-        float    firstLine = 0;
-        float    tx = 0;
+        uint16_t lineOffset = 0, skipLines = 0;
+        float    tX = 0, tY = 0, tYStep = lineHeight / TEXTURE_SIZE, tOffset = (lineHeight - 272) / 2, firstLine = 0;;
 
-        if (hitSide) {
-          tx = (rIntersectYV - (uint32_t)rIntersectYV) * TEXTURE_SIZE;
-        }
-        else {
-          tx = (rIntersectXH - (uint32_t)rIntersectXH) * TEXTURE_SIZE;
-        }
+        if (hitSide) { tX = (rIntersectYV - (uint32_t)rIntersectYV) * TEXTURE_SIZE; }
+        else         { tX = (rIntersectXH - (uint32_t)rIntersectXH) * TEXTURE_SIZE; }
 
         if (lineHeight > 272) {
           skipLines = tOffset / tYStep;
           firstLine = tYStep - (tOffset - skipLines * tYStep);
           tY = firstLine;
-        }
-        else {
-          lineOffset = (uint16_t)(272 - lineHeight) >> 1;
-        }
-
-        if (lineHeight > 272) {
           for (uint16_t i = skipLines; i < TEXTURE_SIZE - skipLines; i++) {
-            if (_textures[2][i * TEXTURE_SIZE + (uint16_t)(tx)]) { BSP_LCD_SetTextColor(LCD_COLOR_RED); }
-            else { BSP_LCD_SetTextColor(LCD_COLOR_BLUE); }
-            BSP_LCD_SetTextColor(dimColor(BSP_LCD_GetTextColor(), (hitSide) ? (0.85) : (1)));
+            BSP_LCD_SetTextColor(_textures[hitSide][i * TEXTURE_SIZE + (uint16_t)(tX)]);
 
             if (i == skipLines) { BSP_LCD_FillRect((rCount * FOV_RECT), 0, FOV_RECT, firstLine); }
             else if (i == TEXTURE_SIZE - skipLines - 1) { BSP_LCD_FillRect((rCount * FOV_RECT), tY, FOV_RECT, firstLine); }
@@ -431,10 +414,9 @@ uint32_t cast() {
           }
         }
         else {
+          lineOffset = (uint16_t)(272 - lineHeight) >> 1;
           for (uint16_t i = 0; i < TEXTURE_SIZE; i++) {
-            if (_textures[2][i * TEXTURE_SIZE + (uint16_t)(tx)]) { BSP_LCD_SetTextColor(LCD_COLOR_RED); }
-            else { BSP_LCD_SetTextColor(LCD_COLOR_BLUE); }
-            BSP_LCD_SetTextColor(dimColor(BSP_LCD_GetTextColor(), (hitSide) ? (0.85) : (1)));
+            BSP_LCD_SetTextColor(_textures[hitSide][i * TEXTURE_SIZE + (uint16_t)(tX)]);
 
             BSP_LCD_FillRect((rCount * FOV_RECT), lineOffset + tY, FOV_RECT, tYStep + 1);
             tY += tYStep;
