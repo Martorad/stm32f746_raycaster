@@ -406,17 +406,15 @@ uint32_t cast() {
           tY = firstLine;
           for (uint16_t i = skipLines; i < TEXTURE_SIZE - skipLines; i++) {
             BSP_LCD_SetTextColor(_textures[tTextureIndex + hitSide][i * TEXTURE_SIZE + (uint16_t)(tX)]);
-
             if (i != skipLines && i != TEXTURE_SIZE - skipLines - 1) { BSP_LCD_FillRect((rCount * FOV_RECT), tY, FOV_RECT, tYStep + 1); tY += tYStep; }
-            else if (i == skipLines) { BSP_LCD_FillRect((rCount * FOV_RECT), 0, FOV_RECT, firstLine); }
-            else { BSP_LCD_FillRect((rCount * FOV_RECT), tY, FOV_RECT, firstLine); }
+            else if (i == skipLines)                                 { BSP_LCD_FillRect((rCount * FOV_RECT),  0, FOV_RECT, firstLine); }
+            else                                                     { BSP_LCD_FillRect((rCount * FOV_RECT), tY, FOV_RECT, firstLine); }
           }
         }
         else {
           lineOffset = (uint16_t)(SCREEN_HEIGHT - lineHeight) >> 1;
           for (uint16_t i = 0; i < TEXTURE_SIZE; i++) {
             BSP_LCD_SetTextColor(_textures[tTextureIndex + hitSide][i * TEXTURE_SIZE + (uint16_t)(tX)]);
-
             BSP_LCD_FillRect((rCount * FOV_RECT), lineOffset + tY, FOV_RECT, tYStep + 1);
             tY += tYStep;
           }
