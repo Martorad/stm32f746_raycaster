@@ -311,7 +311,7 @@ uint32_t cast() {
   uint32_t pStartTime = _sysElapsedTicks;
   uint16_t rCount, rCastLimitV, rCastLimitH, mPosition = 0;
   uint8_t  mColorV, mColorH;
-  float    rIntersectX, rIntersectY, rAngle, rOffsetX, rOffsetY, rShortest, rLenV, rLenH, cTan, cRTan;
+  float    rIntersectXV, rIntersectYV, rIntersectXH, rIntersectYH, rAngle, rOffsetX, rOffsetY, rShortest, rLenV, rLenH, cTan, cRTan;
   union    { float f; uint32_t u; } sign;
 
   BSP_LCD_SelectLayer(0);
@@ -329,44 +329,43 @@ uint32_t cast() {
     // VERTICAL LINE CHECK
     rOffsetX = (rAngle < M_PI_2 || rAngle > M_3PI_2) ? 1 : -1; // looking right / left
     sign.f = rOffsetX; sign.u = sign.u >> 31; // A bit of a hack - extract sign bit from the float and use it to correct the value of rIntersect and mPosition in the array. Done to avoid floating point error when map size exceeds a power of two and to optimize above if-statement.
-    rIntersectX = (uint16_t)_pPosX + !sign.u;
-    rIntersectY = (_pPosX - rIntersectX) * cTan + _pPosY;
+    rIntersectXV = (uint16_t)_pPosX + !sign.u;
+    rIntersectYV = (_pPosX - rIntersectXV) * cTan + _pPosY;
     rOffsetY = -rOffsetX * cTan;
 
     while (rCastLimitV < DOF) {
-      mPosition = (uint16_t)rIntersectY * _mSizeX + (uint16_t)rIntersectX - sign.u;
+      mPosition = (uint16_t)rIntersectYV * _mSizeX + (uint16_t)rIntersectXV - sign.u;
 
       if (_map[mPosition]) {
-        rLenV = rayLength(_pPosX, rIntersectX, _pPosY, rIntersectY);
+        rLenV = rayLength(_pPosX, rIntersectXV, _pPosY, rIntersectYV);
         rCastLimitV = R_HIT;
       }
       else {
-        rIntersectX += rOffsetX;
-        rIntersectY += rOffsetY;
+        rIntersectXV += rOffsetX;
+        rIntersectYV += rOffsetY;
         rCastLimitV++;
       }
     }
 
-    float rIntersectYOld = rIntersectY;
     mColorV = _map[mPosition];
 
     // HORIZONTAL LINE CHECK
     rOffsetY = (rAngle < M_PI) ? -1 : 1; // looking up / down
     sign.f = rOffsetY; sign.u = sign.u >> 31;
-    rIntersectY = (uint16_t)_pPosY + !sign.u;
-    rIntersectX = (_pPosY - rIntersectY) * cRTan + _pPosX;
+    rIntersectYH = (uint16_t)_pPosY + !sign.u;
+    rIntersectXH = (_pPosY - rIntersectYH) * cRTan + _pPosX;
     rOffsetX = -rOffsetY * cRTan;
 
     while (rCastLimitH < DOF) {
-      mPosition = ((uint16_t)rIntersectY - sign.u) * _mSizeX + (uint16_t)rIntersectX;
+      mPosition = ((uint16_t)rIntersectYH - sign.u) * _mSizeX + (uint16_t)rIntersectXH;
 
       if (_map[mPosition]) {
-        rLenH = rayLength(_pPosX, rIntersectX, _pPosY, rIntersectY);
+        rLenH = rayLength(_pPosX, rIntersectXH, _pPosY, rIntersectYH);
         rCastLimitH = R_HIT;
       }
       else {
-        rIntersectX += rOffsetX;
-        rIntersectY += rOffsetY;
+        rIntersectXH += rOffsetX;
+        rIntersectYH += rOffsetY;
         rCastLimitH++;
       }
     }
@@ -405,10 +404,10 @@ uint32_t cast() {
         float    tx = 0;
 
         if (hitSide) {
-          tx = (rIntersectYOld - (uint32_t)rIntersectYOld) * TEXTURE_SIZE;
+          tx = (rIntersectYV - (uint32_t)rIntersectYV) * TEXTURE_SIZE;
         }
         else {
-          tx = (rIntersectX - (uint32_t)rIntersectX) * TEXTURE_SIZE;
+          tx = (rIntersectXH - (uint32_t)rIntersectXH) * TEXTURE_SIZE;
         }
 
         if (lineHeight > 272) {
