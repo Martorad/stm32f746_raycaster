@@ -8,7 +8,8 @@
 #ifndef INC_TEXTURES_H_
 #define INC_TEXTURES_H_
 
-#define TEXTURE_SIZE 16
+#define TEXTURE_SIZE            16
+#define TEXTURE_SIZE_RECIPROCAL 0.0625
 
 // Even textures are brightside, odd textures are darkside
 const uint32_t _textures[6][256] = {

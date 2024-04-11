@@ -394,8 +394,8 @@ uint32_t cast() {
       float lineHeight = SCREEN_HEIGHT / rShortest * LINE_VERTICAL_SCALE;
 
       if (lineHeight > SCREEN_HEIGHT / DOF) { // if line is smaller than the shortest possible line defined by DOF, don't bother drawing it
-        uint16_t lineOffset, skipLines;
-        float    tX, tY = 0, tYStep = lineHeight / TEXTURE_SIZE, tOffset = (lineHeight - SCREEN_HEIGHT) / 2, firstLine;
+        uint16_t skipLines;
+        float    tX, tY = 0, tYStep = lineHeight * TEXTURE_SIZE_RECIPROCAL, tOffset = (lineHeight - SCREEN_HEIGHT) * 0.5, firstLine;
 
         if (hitSide) { tX = (1 - (rIntersectYV - (uint32_t)rIntersectYV)) * TEXTURE_SIZE; if (rAngle < M_PI_2 || rAngle > M_3PI_2) { tX = TEXTURE_SIZE - tX; }}
         else         { tX = (1 - (rIntersectXH - (uint32_t)rIntersectXH)) * TEXTURE_SIZE; if (rAngle < M_PI)                       { tX = TEXTURE_SIZE - tX; }}
@@ -411,10 +411,10 @@ uint32_t cast() {
           }
         }
         else {
-          lineOffset = (uint16_t)(SCREEN_HEIGHT - lineHeight) >> 1;
+          tOffset *= -1; // invert value of texture offset to make it positive
           for (uint16_t i = 0; i < TEXTURE_SIZE; i++) {
             BSP_LCD_SetTextColor(_textures[tTextureIndex + hitSide][i * TEXTURE_SIZE + (uint16_t)(tX)]);
-            BSP_LCD_FillRect((rCount * FOV_RECT), lineOffset + tY, FOV_RECT, tYStep + 1);
+            BSP_LCD_FillRect((rCount * FOV_RECT), tOffset + tY, FOV_RECT, tYStep + 1);
             tY += tYStep;
           }
         }
