@@ -104,7 +104,7 @@ float _pPosX = 1.5, _pPosY = 8, _pAngle = 0 * FOV_INCR, _pDeltaX, _pDeltaY, _pMo
 
 // SYSTEM
 volatile uint32_t _sysElapsedTicks = 0; // 10K frequency, 1 tick = 100us = 0.1ms
-float _fisheyeCosLUT[FOV];
+float _fisheyeCosLUT[FOV], _tanLUT[M_TAN_S];
 
 /* USER CODE END 0 */
 
@@ -177,7 +177,8 @@ int main(void)
   BSP_LCD_SetFont(&Font16);
   BSP_LCD_SelectLayer(LTDC_FOREGROUND);
 
-  for (uint16_t i = 0; i < FOV; i++) { _fisheyeCosLUT[i] = cos((FOV_HALF - i) * FOV_INCR); } // Pre-calculate all cosine values to correct fisheye effect later
+  for (uint16_t i = 0; i < FOV; i++)     { _fisheyeCosLUT[i] = cos((FOV_HALF - i) * FOV_INCR); } // Pre-calculate all cosine values to correct fisheye effect later
+  for (uint16_t i = 0; i < M_TAN_S; i++) { _tanLUT[i] = tan(i / M_TAN_P + 0.000001); }           // Pre-calculate all tangent values to an accuracy deined in M_TAN_P
 
   HAL_TIM_Base_Start_IT(&htim7);
 
@@ -324,7 +325,7 @@ uint32_t cast() {
   for (rCount = 0; rCount < FOV; rCount++) {
     rCastLimitV = 0; rCastLimitH = 0;
     rLenV = FLT_MAX; rLenH = FLT_MAX;
-    cTan = tan(rAngle); cRTan = 1 / cTan;
+    cTan = _tanLUT[(uint16_t)(rAngle * M_TAN_P)]; cRTan = 1 / cTan;
 
     // VERTICAL LINE CHECK
     rOffsetX = (rAngle < M_PI_2 || rAngle > M_3PI_2) ? 1 : -1; // looking right / left
@@ -393,6 +394,7 @@ uint32_t cast() {
       rShortest *= _fisheyeCosLUT[rCount];
       float lineHeight = SCREEN_HEIGHT / rShortest * LINE_VERTICAL_SCALE;
 
+      // DRAW WALLS
       if (lineHeight > SCREEN_HEIGHT / DOF) { // if line is smaller than the shortest possible line defined by DOF, don't bother drawing it
         uint16_t skipLines;
         float    tX, tY = 0, tYStep = lineHeight * TEXTURE_SIZE_RECIPROCAL, tOffset = (lineHeight - SCREEN_HEIGHT) * 0.5, firstLine;
@@ -424,6 +426,9 @@ uint32_t cast() {
           }
         }
       }
+
+      // DRAW FLOOR
+
     }
 
     rAngle -= FOV_INCR;
