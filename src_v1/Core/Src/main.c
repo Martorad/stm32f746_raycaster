@@ -406,8 +406,13 @@ uint32_t cast() {
           tY = firstLine;
           for (uint16_t i = skipLines; i < TEXTURE_SIZE - skipLines; i++) {
             BSP_LCD_SetTextColor(_textures[tTextureIndex + hitSide][i * TEXTURE_SIZE + (uint16_t)(tX)]);
-            if (i != skipLines && i != TEXTURE_SIZE - skipLines - 1) { BSP_LCD_FillRect((rCount * FOV_RECT), tY, FOV_RECT, tYStep + 1); tY += tYStep; }
-            else                                                     { BSP_LCD_FillRect((rCount * FOV_RECT), (i == skipLines) ? 0 : tY, FOV_RECT, firstLine); }
+            if (i != skipLines && i != TEXTURE_SIZE - skipLines - 1) {
+              BSP_LCD_FillRect((rCount * FOV_RECT), tY, FOV_RECT, tYStep + 1);
+              tY += tYStep;
+            }
+            else {
+              BSP_LCD_FillRect((rCount * FOV_RECT), (i == skipLines) ? 0 : tY, FOV_RECT, firstLine);
+            }
           }
         }
         else {
