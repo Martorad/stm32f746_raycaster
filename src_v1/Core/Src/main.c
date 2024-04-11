@@ -44,6 +44,7 @@
 #include "../../Drivers/BSP/STM32746G-Discovery/stm32746g_discovery_lcd.h"
 #include "rc_config.h"
 #include "textures.h"
+#include "tan_lut.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -324,7 +325,7 @@ uint32_t cast() {
   for (rCount = 0; rCount < FOV; rCount++) {
     rCastLimitV = 0; rCastLimitH = 0;
     rLenV = FLT_MAX; rLenH = FLT_MAX;
-    cTan = tan(rAngle); cRTan = 1 / cTan;
+    cTan = _tanLUT[(uint16_t)(rAngle * M_TAN_P)]; cRTan = 1 / cTan;
 
     // VERTICAL LINE CHECK
     rOffsetX = (rAngle < M_PI_2 || rAngle > M_3PI_2) ? 1 : -1; // looking right / left
@@ -393,9 +394,10 @@ uint32_t cast() {
       rShortest *= _fisheyeCosLUT[rCount];
       float lineHeight = SCREEN_HEIGHT / rShortest * LINE_VERTICAL_SCALE;
 
+      // DRAW WALLS
       if (lineHeight > SCREEN_HEIGHT / DOF) { // if line is smaller than the shortest possible line defined by DOF, don't bother drawing it
-        uint16_t lineOffset, skipLines;
-        float    tX, tY = 0, tYStep = lineHeight / TEXTURE_SIZE, tOffset = (lineHeight - SCREEN_HEIGHT) / 2, firstLine;
+        uint16_t skipLines;
+        float    tX, tY = 0, tYStep = lineHeight * TEXTURE_SIZE_RECIPROCAL, tOffset = (lineHeight - SCREEN_HEIGHT) * 0.5, firstLine;
 
         if (hitSide) { tX = (1 - (rIntersectYV - (uint32_t)rIntersectYV)) * TEXTURE_SIZE; if (rAngle < M_PI_2 || rAngle > M_3PI_2) { tX = TEXTURE_SIZE - tX; }}
         else         { tX = (1 - (rIntersectXH - (uint32_t)rIntersectXH)) * TEXTURE_SIZE; if (rAngle < M_PI)                       { tX = TEXTURE_SIZE - tX; }}
@@ -406,19 +408,27 @@ uint32_t cast() {
           tY = firstLine;
           for (uint16_t i = skipLines; i < TEXTURE_SIZE - skipLines; i++) {
             BSP_LCD_SetTextColor(_textures[tTextureIndex + hitSide][i * TEXTURE_SIZE + (uint16_t)(tX)]);
-            if (i != skipLines && i != TEXTURE_SIZE - skipLines - 1) { BSP_LCD_FillRect((rCount * FOV_RECT), tY, FOV_RECT, tYStep + 1); tY += tYStep; }
-            else                                                     { BSP_LCD_FillRect((rCount * FOV_RECT), (i == skipLines) ? 0 : tY, FOV_RECT, firstLine); }
+            if (i != skipLines && i != TEXTURE_SIZE - skipLines - 1) {
+              BSP_LCD_FillRect((rCount * FOV_RECT), tY, FOV_RECT, tYStep + 1);
+              tY += tYStep;
+            }
+            else {
+              BSP_LCD_FillRect((rCount * FOV_RECT), (i == skipLines) ? 0 : tY, FOV_RECT, firstLine);
+            }
           }
         }
         else {
-          lineOffset = (uint16_t)(SCREEN_HEIGHT - lineHeight) >> 1;
+          tOffset *= -1; // invert value of texture offset to make it positive
           for (uint16_t i = 0; i < TEXTURE_SIZE; i++) {
             BSP_LCD_SetTextColor(_textures[tTextureIndex + hitSide][i * TEXTURE_SIZE + (uint16_t)(tX)]);
-            BSP_LCD_FillRect((rCount * FOV_RECT), lineOffset + tY, FOV_RECT, tYStep + 1);
+            BSP_LCD_FillRect((rCount * FOV_RECT), tOffset + tY, FOV_RECT, tYStep + 1);
             tY += tYStep;
           }
         }
       }
+
+      // DRAW FLOOR
+
     }
 
     rAngle -= FOV_INCR;

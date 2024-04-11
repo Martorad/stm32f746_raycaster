@@ -20,8 +20,8 @@
 // <------------------------ DO NOT TOUCH ------------------------>
 // INTERNAL CONFIGURATION DEFINES
 #define M_3PI_2  4.71238898038468985769
-#define R_HIT    0xAAAA
-#define L_COEFF  0.166 // Lighting coefficient, should be 1 / (DOF - FOG_OF_WAR_CUTOFF(18))
+#define R_HIT    0xAAAA // Magic value for a detected ray hit
+#define L_COEFF  0.166  // Lighting coefficient, should be 1 / (DOF - FOG_OF_WAR_CUTOFF(18))
 
 // RESOLUTION CONFIGURATION TABLES
 // FOV_RECT describes the width of each rectangle drawn on screen. Smaller width rectangles have higher fidelity, at the cost of speed. Odd width rectangles mean that symmetrical frames cannot be drawn.
