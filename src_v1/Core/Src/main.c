@@ -44,6 +44,7 @@
 #include "../../Drivers/BSP/STM32746G-Discovery/stm32746g_discovery_lcd.h"
 #include "rc_config.h"
 #include "textures.h"
+#include "tan_lut.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -104,7 +105,7 @@ float _pPosX = 1.5, _pPosY = 8, _pAngle = 0 * FOV_INCR, _pDeltaX, _pDeltaY, _pMo
 
 // SYSTEM
 volatile uint32_t _sysElapsedTicks = 0; // 10K frequency, 1 tick = 100us = 0.1ms
-float _fisheyeCosLUT[FOV], _tanLUT[M_TAN_S];
+float _fisheyeCosLUT[FOV];
 
 /* USER CODE END 0 */
 
@@ -178,7 +179,6 @@ int main(void)
   BSP_LCD_SelectLayer(LTDC_FOREGROUND);
 
   for (uint16_t i = 0; i < FOV; i++)     { _fisheyeCosLUT[i] = cos((FOV_HALF - i) * FOV_INCR); } // Pre-calculate all cosine values to correct fisheye effect later
-  for (uint16_t i = 0; i < M_TAN_S; i++) { _tanLUT[i] = tan(i / M_TAN_P + 0.000001); }           // Pre-calculate all tangent values to an accuracy deined in M_TAN_P
 
   HAL_TIM_Base_Start_IT(&htim7);
 

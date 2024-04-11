@@ -20,8 +20,6 @@
 // <------------------------ DO NOT TOUCH ------------------------>
 // INTERNAL CONFIGURATION DEFINES
 #define M_3PI_2  4.71238898038468985769
-#define M_TAN_P  1000.0 // Tangent LUT precision coefficient
-#define M_TAN_S  6284   // Tangent LUT size = Pi * 2 * M_TAN_P + 1
 #define R_HIT    0xAAAA // Magic value for a detected ray hit
 #define L_COEFF  0.166  // Lighting coefficient, should be 1 / (DOF - FOG_OF_WAR_CUTOFF(18))
 
