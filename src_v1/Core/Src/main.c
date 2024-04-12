@@ -426,13 +426,17 @@ uint32_t cast() {
           }
 
           // DRAW FLOOR
-          for (uint16_t i = tOffset + lineHeight; i < SCREEN_HEIGHT; i += FOV_RECT) {
-            float dY = i - (SCREEN_HEIGHT * 0.5), magic = 134 * TEXTURE_SIZE / dY / _fisheyeCosLUT[rCount];
-            tX = _pPosX * 0.5 + cos(rAngle) * magic;
-            tY = _pPosY * 0.5 + sin(rAngle) * magic;
-            tX = (uint16_t)tX & (TEXTURE_SIZE - 1);
-            tY = (uint16_t)tY & (TEXTURE_SIZE - 1);
-            BSP_LCD_SetTextColor(_textures[5][(uint16_t)(tY * TEXTURE_SIZE) + (uint16_t)tX]);
+          for (uint16_t i = tOffset + lineHeight; i < SCREEN_HEIGHT; i++) {
+            float dY = i - (SCREEN_HEIGHT * 0.5), magic = 186 * TEXTURE_SIZE / dY / _fisheyeCosLUT[rCount];
+            float newAng = rAngle;
+            if (newAng < 0)       { newAng += M_TWOPI; }
+            if (newAng > M_TWOPI) { newAng -= M_TWOPI; }
+
+            tX = _pPosX * 0.5 + cos(newAng) * magic;
+            tY = _pPosY * 0.5 - sin(newAng) * magic;
+            tX = (int16_t)tX & (TEXTURE_SIZE - 1);
+            tY = (int16_t)tY & (TEXTURE_SIZE - 1);
+            BSP_LCD_SetTextColor(_textures[5][(int16_t)(tY * TEXTURE_SIZE) + (int16_t)tX]);
             BSP_LCD_FillRect((rCount * FOV_RECT), i, FOV_RECT, FOV_RECT);
           }
         }
