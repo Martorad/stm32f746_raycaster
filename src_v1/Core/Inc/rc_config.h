@@ -4,7 +4,7 @@
 // PERFORMANCE SETTINGS
 #define RES_6
 
-#define DOF 24
+#define DOF 64
 
 // AESTHETIC SETTINGS
 #define LINE_VERTICAL_SCALE 1.5
