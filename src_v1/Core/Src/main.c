@@ -435,6 +435,8 @@ uint32_t cast() {
             tY = (int16_t)tY & (TEXTURE_SIZE - 1);
             BSP_LCD_SetTextColor(_textures[7][(int16_t)(tY * TEXTURE_SIZE) + (int16_t)tX]);
             BSP_LCD_FillRect((rCount * FOV_RECT), i, FOV_RECT, FOV_RECT);
+            BSP_LCD_SetTextColor(_textures[6][(int16_t)(tY * TEXTURE_SIZE) + (int16_t)tX]);
+            BSP_LCD_FillRect((rCount * FOV_RECT), SCREEN_HEIGHT - i, FOV_RECT, FOV_RECT);
           }
         }
       }
