@@ -177,6 +177,7 @@ int main(void)
   BSP_LCD_SelectLayer(LTDC_BACKGROUND);
   BSP_LCD_SetFont(&Font16);
   BSP_LCD_SelectLayer(LTDC_FOREGROUND);
+  BSP_LCD_Clear(LCD_COLOR_BLACK);
 
   for (uint16_t i = 0; i < FOV; i++) { _fisheyeCosLUT[i] = cos((FOV_HALF - i) * FOV_INCR); } // Pre-calculate all cosine values to correct fisheye effect later
 
@@ -425,7 +426,7 @@ uint32_t cast() {
             tY += tYStep;
           }
 
-          // DRAW FLOOR
+          // DRAW FLOOR AND CEILING
           for (uint16_t i = tOffset + lineHeight; i < SCREEN_HEIGHT; i++) {
             float dY = i - (SCREEN_HEIGHT * 0.5), magic = 186 * TEXTURE_SIZE / dY / _fisheyeCosLUT[rCount];
 
