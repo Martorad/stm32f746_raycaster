@@ -317,7 +317,12 @@ uint32_t cast() {
   union    { float f; uint32_t u; } sign;
 
   BSP_LCD_SelectLayer(0);
-  BSP_LCD_Clear(LCD_COLOR_BLACK);
+#ifdef SIMPLE_FLOORS_AND_CEILINGS
+  BSP_LCD_SetTextColor(0xFF383838);
+  BSP_LCD_FillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT_HALF);
+  BSP_LCD_SetTextColor(0xFF707070);
+  BSP_LCD_FillRect(0, SCREEN_HEIGHT_HALF, SCREEN_WIDTH, SCREEN_HEIGHT_HALF);
+#endif
 
   rAngle = _pAngle + FOV_HALF * FOV_INCR;
   if (rAngle < 0)       { rAngle += M_TWOPI; }
@@ -426,6 +431,7 @@ uint32_t cast() {
             tY += tYStep;
           }
 
+#ifndef SIMPLE_FLOORS_AND_CEILINGS
           // DRAW FLOOR AND CEILING
           for (uint16_t i = tOffset + lineHeight; i < SCREEN_HEIGHT; i++) {
             float dY = i - (SCREEN_HEIGHT * 0.5), magic = 186 * TEXTURE_SIZE / dY / _fisheyeCosLUT[rCount];
@@ -437,8 +443,9 @@ uint32_t cast() {
             BSP_LCD_SetTextColor(_textures[7][(int16_t)(tY * TEXTURE_SIZE) + (int16_t)tX]);
             BSP_LCD_FillRect((rCount * FOV_RECT), i, FOV_RECT, FOV_RECT);
             BSP_LCD_SetTextColor(_textures[6][(int16_t)(tY * TEXTURE_SIZE) + (int16_t)tX]);
-            BSP_LCD_FillRect((rCount * FOV_RECT), SCREEN_HEIGHT - i, FOV_RECT, FOV_RECT);
+            BSP_LCD_FillRect((rCount * FOV_RECT), (SCREEN_HEIGHT - i) - 1, FOV_RECT, FOV_RECT);
           }
+#endif
         }
       }
     }
