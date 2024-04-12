@@ -40,11 +40,11 @@
 #include <stdlib.h>
 #include <float.h>
 #include <string.h>
-#include "math.h"
+#include <math.h>
 #include "../../Drivers/BSP/STM32746G-Discovery/stm32746g_discovery_lcd.h"
 #include "rc_config.h"
 #include "textures.h"
-#include "tan_lut.h"
+#include "trig_lut.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -82,22 +82,22 @@ void MX_USB_HOST_Process(void);
 // MAP
 const uint8_t _mSizeX = 48, _mSizeY = 16;
 const uint8_t _map[] = {
-  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,5,5,5,5,1,1,1,1,1,1,1,1,1,1,1,1,1,
-  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,1,1,0,0,0,0,0,0,0,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-  1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,1,0,1,0,1,1,0,0,0,0,0,0,1,0,5,0,5,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,1,1,0,0,0,0,0,0,0,1,0,5,5,5,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-  1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-  1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,5,5,5,5,5,5,1,
-  1,0,1,1,1,1,1,1,1,1,1,1,1,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,5,0,0,0,0,5,1,
-  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,3,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,5,0,0,0,0,5,1,
-  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,3,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,5,0,0,0,0,5,1,
-  1,0,1,1,1,1,1,1,1,1,1,1,1,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,1,
-  1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,5,5,5,5,5,5,1,
-  1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-  1,1,1,1,1,1,1,1,1,1,1,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-  1,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-  1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+  5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,
+  5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,0,0,0,5,5,5,0,0,0,0,0,0,0,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,
+  5,0,0,0,0,0,0,0,0,0,0,0,0,5,5,5,0,5,0,5,0,5,5,0,0,0,0,0,0,5,0,5,0,5,0,0,0,0,0,0,0,0,0,0,0,0,0,5,
+  5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,0,0,0,5,5,5,0,0,0,0,0,0,0,5,0,5,5,5,0,0,0,0,0,0,0,0,0,0,0,0,0,5,
+  5,5,5,5,5,5,5,5,5,0,0,0,0,0,0,5,5,5,5,5,5,0,0,0,0,0,0,0,0,0,0,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,
+  5,0,0,0,0,0,0,0,5,0,0,0,0,0,0,5,0,0,0,5,0,0,0,0,0,0,0,0,0,5,0,5,0,0,0,0,0,0,0,0,0,5,5,5,5,5,5,5,
+  5,0,5,5,5,5,5,5,5,5,5,5,5,0,0,5,5,5,5,0,0,0,0,0,0,0,0,0,0,0,0,5,0,0,0,0,0,0,0,0,0,5,0,0,0,0,5,5,
+  5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,3,0,0,0,5,0,0,0,0,0,0,0,0,0,0,0,5,0,0,0,0,5,5,
+  5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,3,0,0,0,5,0,0,0,0,0,0,0,0,0,0,0,5,0,0,0,0,5,5,
+  5,0,5,5,5,5,5,5,5,5,5,5,5,0,0,5,5,5,5,0,0,0,0,0,0,0,0,0,0,0,0,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,5,
+  5,0,0,0,0,0,0,0,5,0,0,0,0,0,0,0,0,0,0,5,0,0,0,0,0,0,0,0,0,5,0,5,0,0,0,0,0,0,0,0,0,5,5,5,5,5,5,5,
+  5,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,5,0,0,0,0,0,0,0,0,0,0,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,
+  5,1,1,1,1,1,1,1,1,1,1,0,0,1,0,0,0,0,0,0,0,5,0,0,0,0,0,0,0,5,0,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,
+  5,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,5,0,0,0,0,0,0,5,0,5,5,5,0,0,0,0,0,0,0,0,0,0,0,0,0,5,
+  5,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,5,0,0,0,0,0,0,0,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,
+  5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5
 };
 
 // PLAYER
@@ -177,6 +177,7 @@ int main(void)
   BSP_LCD_SelectLayer(LTDC_BACKGROUND);
   BSP_LCD_SetFont(&Font16);
   BSP_LCD_SelectLayer(LTDC_FOREGROUND);
+  BSP_LCD_Clear(LCD_COLOR_BLACK);
 
   for (uint16_t i = 0; i < FOV; i++) { _fisheyeCosLUT[i] = cos((FOV_HALF - i) * FOV_INCR); } // Pre-calculate all cosine values to correct fisheye effect later
 
@@ -316,7 +317,12 @@ uint32_t cast() {
   union    { float f; uint32_t u; } sign;
 
   BSP_LCD_SelectLayer(0);
-  BSP_LCD_Clear(LCD_COLOR_BLACK);
+#ifdef SIMPLE_FLOORS_AND_CEILINGS
+  BSP_LCD_SetTextColor(0xFF383838);
+  BSP_LCD_FillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT_HALF);
+  BSP_LCD_SetTextColor(0xFF707070);
+  BSP_LCD_FillRect(0, SCREEN_HEIGHT_HALF, SCREEN_WIDTH, SCREEN_HEIGHT_HALF);
+#endif
 
   rAngle = _pAngle + FOV_HALF * FOV_INCR;
   if (rAngle < 0)       { rAngle += M_TWOPI; }
@@ -325,7 +331,7 @@ uint32_t cast() {
   for (rCount = 0; rCount < FOV; rCount++) {
     rCastLimitV = 0; rCastLimitH = 0;
     rLenV = FLT_MAX; rLenH = FLT_MAX;
-    cTan = _tanLUT[(uint16_t)(rAngle * M_TAN_P)]; cRTan = 1 / cTan;
+    cTan = _tanLUT[(uint16_t)(rAngle * M_LUT_P)]; cRTan = 1 / cTan;
 
     // VERTICAL LINE CHECK
     rOffsetX = (rAngle < M_PI_2 || rAngle > M_3PI_2) ? 1 : -1; // looking right / left
@@ -334,7 +340,7 @@ uint32_t cast() {
     rIntersectYV = (_pPosX - rIntersectXV) * cTan + _pPosY;
     rOffsetY = -rOffsetX * cTan;
 
-    while (rCastLimitV < DOF) {
+    while (rCastLimitV < DOF) { // TODO: Combine both while loops, idk why I haven't thought of that yet. Might be a decent idea to do it with arrays of size 2.
       mPosition = (uint16_t)rIntersectYV * _mSizeX + (uint16_t)rIntersectXV - sign.u;
 
       if (_map[mPosition]) {
@@ -424,11 +430,24 @@ uint32_t cast() {
             BSP_LCD_FillRect((rCount * FOV_RECT), tOffset + tY, FOV_RECT, tYStep + 1);
             tY += tYStep;
           }
+
+#ifndef SIMPLE_FLOORS_AND_CEILINGS
+          // DRAW FLOOR AND CEILING
+          for (uint16_t i = tOffset + lineHeight; i < SCREEN_HEIGHT; i++) {
+            float dY = i - (SCREEN_HEIGHT * 0.5), magic = 186 * TEXTURE_SIZE / dY / _fisheyeCosLUT[rCount];
+
+            tX = _pPosX * 0.5 + _cosLUT[(uint16_t)(rAngle * M_LUT_P)] * magic;
+            tY = _pPosY * 0.5 - _sinLUT[(uint16_t)(rAngle * M_LUT_P)] * magic;
+            tX = (int16_t)tX & (TEXTURE_SIZE - 1);
+            tY = (int16_t)tY & (TEXTURE_SIZE - 1);
+            BSP_LCD_SetTextColor(_textures[7][(int16_t)(tY * TEXTURE_SIZE) + (int16_t)tX]);
+            BSP_LCD_FillRect((rCount * FOV_RECT), i, FOV_RECT, FOV_RECT);
+            BSP_LCD_SetTextColor(_textures[6][(int16_t)(tY * TEXTURE_SIZE) + (int16_t)tX]);
+            BSP_LCD_FillRect((rCount * FOV_RECT), (SCREEN_HEIGHT - i) - 1, FOV_RECT, FOV_RECT);
+          }
+#endif
         }
       }
-
-      // DRAW FLOOR
-
     }
 
     rAngle -= FOV_INCR;
