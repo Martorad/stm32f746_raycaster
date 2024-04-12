@@ -44,7 +44,7 @@
 #include "../../Drivers/BSP/STM32746G-Discovery/stm32746g_discovery_lcd.h"
 #include "rc_config.h"
 #include "textures.h"
-#include "tan_lut.h"
+#include "trig_lut.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/

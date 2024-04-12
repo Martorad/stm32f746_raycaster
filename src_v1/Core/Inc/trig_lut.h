@@ -5,8 +5,8 @@
  *      Author: mkiryakov
  */
 
-#ifndef INC_TAN_LUT_H_
-#define INC_TAN_LUT_H_
+#ifndef INC_TRIG_LUT_H_
+#define INC_TRIG_LUT_H_
 
 #define M_LUT_P  1000.0 // Tangent LUT precision coefficient
 #define M_LUT_S  6284   // Tangent LUT size = Pi * 2 * M_TAN_P + 1
@@ -1911,4 +1911,4 @@ const float _cosLUT[M_LUT_S] = {
 };
 
 
-#endif /* INC_TAN_LUT_H_ */
+#endif /* INC_TRIG_LUT_H_ */
