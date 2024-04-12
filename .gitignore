@@ -4,3 +4,5 @@ Debug/
 .settings/
 *.launch
 *.mxproject
+*.exe
+tools/LUT.txt

@@ -8,8 +8,8 @@
 #ifndef INC_TAN_LUT_H_
 #define INC_TAN_LUT_H_
 
-#define M_TAN_P  1000.0 // Tangent LUT precision coefficient
-#define M_TAN_S  6284   // Tangent LUT size = Pi * 2 * M_TAN_P + 1
+#define M_LUT_P  1000.0 // Tangent LUT precision coefficient
+#define M_LUT_S  6284   // Tangent LUT size = Pi * 2 * M_TAN_P + 1
 
 const float _tanLUT[M_TAN_S] =
 {
