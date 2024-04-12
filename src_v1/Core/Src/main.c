@@ -437,15 +437,15 @@ uint32_t cast() {
 #ifdef FCD_2
           // DRAW FLOOR AND CEILING
           for (uint16_t i = tOffset + lineHeight; i < SCREEN_HEIGHT; i++) {
-            float dY = i - (SCREEN_HEIGHT * 0.5), magic = 186 * TEXTURE_SIZE / dY / _fisheyeCosLUT[rCount];
+            float dY = i - (SCREEN_HEIGHT * 0.5), magic = 268 * TEXTURE_SIZE / dY / _fisheyeCosLUT[rCount];
 
             tX = _pPosX * 0.5 + _cosLUT[(uint16_t)(rAngle * M_LUT_P)] * magic;
             tY = _pPosY * 0.5 - _sinLUT[(uint16_t)(rAngle * M_LUT_P)] * magic;
             tX = (int16_t)tX & (TEXTURE_SIZE - 1);
             tY = (int16_t)tY & (TEXTURE_SIZE - 1);
-            BSP_LCD_SetTextColor(_textures[7][(int16_t)(tY * TEXTURE_SIZE) + (int16_t)tX]);
-            BSP_LCD_FillRect((rCount * FOV_RECT), i, FOV_RECT, FOV_RECT);
             BSP_LCD_SetTextColor(_textures[6][(int16_t)(tY * TEXTURE_SIZE) + (int16_t)tX]);
+            BSP_LCD_FillRect((rCount * FOV_RECT), i, FOV_RECT, FOV_RECT);
+            BSP_LCD_SetTextColor(_textures[7][(int16_t)(tY * TEXTURE_SIZE) + (int16_t)tX]);
             BSP_LCD_FillRect((rCount * FOV_RECT), (SCREEN_HEIGHT - i) - 1, FOV_RECT, FOV_RECT);
           }
 #endif
