@@ -18,7 +18,7 @@ int main() {
         if (i != 6283) { fprintf(f, ", "); } 
         if (i % 10 == 9) { fprintf(f, "\n  "); }
     }
-    fprintf(f, "\n}\n\n");
+    fprintf(f, "\n};\n\n");
 
     fprintf(f, "// SINES\n");
     fprintf(f, "const float _sinLUT[M_LUT_S] = {\n  ");
@@ -27,7 +27,7 @@ int main() {
         if (i != 6283) { fprintf(f, ", "); } 
         if (i % 10 == 9) { fprintf(f, "\n  "); }
     }
-    fprintf(f, "\n}\n\n");
+    fprintf(f, "\n};\n\n");
 
     fprintf(f, "// COSINES\n");
     fprintf(f, "const float _cosLUT[M_LUT_S] = {\n  ");
@@ -36,7 +36,7 @@ int main() {
         if (i != 6283) { fprintf(f, ", "); } 
         if (i % 10 == 9) { fprintf(f, "\n  "); }
     }
-    fprintf(f, "\n}\n");
+    fprintf(f, "\n};\n");
 
     fclose(f);
     return 0;
