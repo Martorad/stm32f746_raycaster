@@ -40,7 +40,7 @@
 #include <stdlib.h>
 #include <float.h>
 #include <string.h>
-#include "math.h"
+#include <math.h>
 #include "../../Drivers/BSP/STM32746G-Discovery/stm32746g_discovery_lcd.h"
 #include "rc_config.h"
 #include "textures.h"
@@ -334,7 +334,7 @@ uint32_t cast() {
     rIntersectYV = (_pPosX - rIntersectXV) * cTan + _pPosY;
     rOffsetY = -rOffsetX * cTan;
 
-    while (rCastLimitV < DOF) {
+    while (rCastLimitV < DOF) { // TODO: Combine both while loops, idk why I haven't thought of that yet. Might be a decent idea to do it with arrays of size 2.
       mPosition = (uint16_t)rIntersectYV * _mSizeX + (uint16_t)rIntersectXV - sign.u;
 
       if (_map[mPosition]) {
