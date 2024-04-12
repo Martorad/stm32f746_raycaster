@@ -317,7 +317,10 @@ uint32_t cast() {
   union    { float f; uint32_t u; } sign;
 
   BSP_LCD_SelectLayer(0);
-#ifdef SIMPLE_FLOORS_AND_CEILINGS
+#ifdef FCD_0
+  BSP_LCD_Clear(LCD_COLOR_BLACK);
+#endif
+#ifdef FCD_1
   BSP_LCD_SetTextColor(0xFF383838);
   BSP_LCD_FillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT_HALF);
   BSP_LCD_SetTextColor(0xFF707070);
@@ -431,7 +434,7 @@ uint32_t cast() {
             tY += tYStep;
           }
 
-#ifndef SIMPLE_FLOORS_AND_CEILINGS
+#ifdef FCD_2
           // DRAW FLOOR AND CEILING
           for (uint16_t i = tOffset + lineHeight; i < SCREEN_HEIGHT; i++) {
             float dY = i - (SCREEN_HEIGHT * 0.5), magic = 186 * TEXTURE_SIZE / dY / _fisheyeCosLUT[rCount];

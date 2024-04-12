@@ -2,9 +2,10 @@
 #define __RC__CONFIG__H__
 
 // PERFORMANCE SETTINGS
-#define RES_6
-#define DOF 64
-#define SIMPLE_FLOORS_AND_CEILINGS
+#define RES_6  // Vertical line resolution
+#define FCD_0  // Floor and Ceiling Detail. 0 for none, 1 for simple and 2 for full textured
+
+#define DOF 64 // Ray cast limit
 
 // AESTHETIC SETTINGS
 #define LINE_VERTICAL_SCALE 1.5
