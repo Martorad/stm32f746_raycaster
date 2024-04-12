@@ -424,11 +424,19 @@ uint32_t cast() {
             BSP_LCD_FillRect((rCount * FOV_RECT), tOffset + tY, FOV_RECT, tYStep + 1);
             tY += tYStep;
           }
+
+          // DRAW FLOOR
+          for (uint16_t i = tOffset + lineHeight; i < SCREEN_HEIGHT; i += FOV_RECT) {
+            float dY = i - (SCREEN_HEIGHT * 0.5), magic = 134 * TEXTURE_SIZE / dY / _fisheyeCosLUT[rCount];
+            tX = _pPosX * 0.5 + cos(rAngle) * magic;
+            tY = _pPosY * 0.5 + sin(rAngle) * magic;
+            tX = (uint16_t)tX & (TEXTURE_SIZE - 1);
+            tY = (uint16_t)tY & (TEXTURE_SIZE - 1);
+            BSP_LCD_SetTextColor(_textures[5][(uint16_t)(tY * TEXTURE_SIZE) + (uint16_t)tX]);
+            BSP_LCD_FillRect((rCount * FOV_RECT), i, FOV_RECT, FOV_RECT);
+          }
         }
       }
-
-      // DRAW FLOOR
-
     }
 
     rAngle -= FOV_INCR;
