@@ -336,6 +336,14 @@ uint32_t cast() {
     rLenV = FLT_MAX; rLenH = FLT_MAX;
     cTan = _tanLUT[(uint16_t)(rAngle * M_LUT_P)]; cRTan = 1 / cTan;
 
+    // SKYBOX
+    uint16_t sbY = 0;
+    for (uint16_t i = 0; i < TEXTURE_SIZE; i++) {
+      BSP_LCD_SetTextColor(_skybox[i * 200 + (uint16_t)(200 - rAngle * 15.92)]);
+      BSP_LCD_FillRect((rCount * FOV_RECT), sbY, FOV_RECT, 8);
+      sbY += 8;
+    }
+
     // VERTICAL LINE CHECK
     rOffsetX = (rAngle < M_PI_2 || rAngle > M_3PI_2) ? 1 : -1; // looking right / left
     sign.f = rOffsetX; sign.u = sign.u >> 31; // A bit of a hack - extract sign bit from the float and use it to correct the value of rIntersect and mPosition in the array. Done to avoid floating point error when map size exceeds a power of two and to optimize above if-statement.
