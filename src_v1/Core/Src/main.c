@@ -321,8 +321,12 @@ uint32_t cast() {
   BSP_LCD_Clear(LCD_COLOR_BLACK);
 #endif
 #ifdef FCD_1
-//  BSP_LCD_SetTextColor(0xFF383838);
-//  BSP_LCD_FillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT_HALF);
+  BSP_LCD_SetTextColor(0xFF383838);
+  BSP_LCD_FillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT_HALF);
+  BSP_LCD_SetTextColor(0xFF707070);
+  BSP_LCD_FillRect(0, SCREEN_HEIGHT_HALF, SCREEN_WIDTH, SCREEN_HEIGHT_HALF);
+#endif
+#ifdef FCD_2
   BSP_LCD_SetTextColor(0xFF707070);
   BSP_LCD_FillRect(0, SCREEN_HEIGHT_HALF, SCREEN_WIDTH, SCREEN_HEIGHT_HALF);
 #endif
@@ -336,6 +340,7 @@ uint32_t cast() {
     rLenV = FLT_MAX; rLenH = FLT_MAX;
     cTan = _tanLUT[(uint16_t)(rAngle * M_LUT_P)]; cRTan = 1 / cTan;
 
+#ifdef FCD_2
     // SKYBOX
     uint16_t sbY = 0;
     for (uint16_t i = 0; i < 64; i++) {
@@ -343,6 +348,7 @@ uint32_t cast() {
       BSP_LCD_FillRect((rCount * FOV_RECT), sbY, FOV_RECT, 2);
       sbY += 2;
     }
+#endif
 
     // VERTICAL LINE CHECK
     rOffsetX = (rAngle < M_PI_2 || rAngle > M_3PI_2) ? 1 : -1; // looking right / left
@@ -442,7 +448,7 @@ uint32_t cast() {
             tY += tYStep;
           }
 
-#ifdef FCD_2
+#ifdef FCD_3
           // DRAW FLOOR AND CEILING
           for (uint16_t i = tOffset + lineHeight; i < SCREEN_HEIGHT; i++) {
             float dY = i - (SCREEN_HEIGHT * 0.5), magic = 268 * TEXTURE_SIZE / dY / _fisheyeCosLUT[rCount];
