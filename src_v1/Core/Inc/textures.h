@@ -11,6 +11,9 @@
 #define TEXTURE_SIZE            16
 #define TEXTURE_SIZE_RECIPROCAL 0.0625
 
+#define COLOR_SKY    0xFF55C3D9
+#define COLOR_GROUND 0xFF0A8214
+
 // Even textures are brightside, odd textures are darkside
 const uint32_t _textures[8][256] = {
   { // Checkerboard

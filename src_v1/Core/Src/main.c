@@ -317,9 +317,9 @@ uint32_t cast() {
   union    { float f; uint32_t u; } sign;
 
   BSP_LCD_SelectLayer(0);
-  BSP_LCD_SetTextColor(0xFF55C3D9);
+  BSP_LCD_SetTextColor(COLOR_SKY);
   BSP_LCD_FillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT_HALF);
-  BSP_LCD_SetTextColor(0xFF0A8214);
+  BSP_LCD_SetTextColor(COLOR_GROUND);
   BSP_LCD_FillRect(0, SCREEN_HEIGHT_HALF, SCREEN_WIDTH, SCREEN_HEIGHT_HALF);
 
   rAngle = _pAngle + FOV_HALF * FOV_INCR;
