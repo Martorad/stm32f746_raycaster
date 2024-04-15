@@ -321,9 +321,9 @@ uint32_t cast() {
   BSP_LCD_Clear(LCD_COLOR_BLACK);
 #endif
 #ifdef FCD_1
-  BSP_LCD_SetTextColor(0xFF383838);
+  BSP_LCD_SetTextColor(0xFF55C3D9);
   BSP_LCD_FillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT_HALF);
-  BSP_LCD_SetTextColor(0xFF707070);
+  BSP_LCD_SetTextColor(0xFF0A8214);
   BSP_LCD_FillRect(0, SCREEN_HEIGHT_HALF, SCREEN_WIDTH, SCREEN_HEIGHT_HALF);
 #endif
 #ifdef FCD_2
