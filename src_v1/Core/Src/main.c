@@ -342,7 +342,7 @@ uint32_t cast() {
       mPosition = (uint16_t)rIntersectYV * _mSizeX + (uint16_t)rIntersectXV - sign.u;
 
       if (_map[mPosition]) {
-        rLenV = rayLength(_pPosX, rIntersectXV, _pPosY, rIntersectYV);
+        rLenV = rayLength(_pPosX, _pPosY, rIntersectXV, rIntersectYV);
         rCastLimitV = R_HIT;
       }
       else {
@@ -365,7 +365,7 @@ uint32_t cast() {
       mPosition = ((uint16_t)rIntersectYH - sign.u) * _mSizeX + (uint16_t)rIntersectXH;
 
       if (_map[mPosition]) {
-        rLenH = rayLength(_pPosX, rIntersectXH, _pPosY, rIntersectYH);
+        rLenH = rayLength(_pPosX, _pPosY, rIntersectXH, rIntersectYH);
         rCastLimitH = R_HIT;
       }
       else {
@@ -444,7 +444,7 @@ uint32_t cast() {
 
   return frameTime;
 }
-float rayLength(float ax, float bx, float ay, float by) {
+float rayLength(float ax, float ay, float bx, float by) {
   return fsqrt((bx - ax) * (bx - ax) + (by - ay) * (by - ay));
 }
 
