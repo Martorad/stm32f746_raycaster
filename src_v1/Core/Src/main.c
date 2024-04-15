@@ -321,8 +321,8 @@ uint32_t cast() {
   BSP_LCD_Clear(LCD_COLOR_BLACK);
 #endif
 #ifdef FCD_1
-  BSP_LCD_SetTextColor(0xFF383838);
-  BSP_LCD_FillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT_HALF);
+//  BSP_LCD_SetTextColor(0xFF383838);
+//  BSP_LCD_FillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT_HALF);
   BSP_LCD_SetTextColor(0xFF707070);
   BSP_LCD_FillRect(0, SCREEN_HEIGHT_HALF, SCREEN_WIDTH, SCREEN_HEIGHT_HALF);
 #endif
@@ -338,10 +338,10 @@ uint32_t cast() {
 
     // SKYBOX
     uint16_t sbY = 0;
-    for (uint16_t i = 0; i < TEXTURE_SIZE; i++) {
-      BSP_LCD_SetTextColor(_skybox[i * 200 + (uint16_t)(200 - rAngle * 15.92)]);
-      BSP_LCD_FillRect((rCount * FOV_RECT), sbY, FOV_RECT, 8);
-      sbY += 8;
+    for (uint16_t i = 0; i < 64; i++) {
+      BSP_LCD_SetTextColor(_skybox[(i << 8) + (uint16_t)(512 - rAngle * 81.4)]);
+      BSP_LCD_FillRect((rCount * FOV_RECT), sbY, FOV_RECT, 2);
+      sbY += 2;
     }
 
     // VERTICAL LINE CHECK
