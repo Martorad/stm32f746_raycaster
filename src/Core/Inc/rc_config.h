@@ -2,7 +2,8 @@
 #define __RC__CONFIG__H__
 
 // PERFORMANCE SETTINGS
-#define RES_6  // Vertical line resolution
+#define RES_6 // Vertical line resolution
+#define SBR_0 // Skybox resolution - 0 for 16px, 1 for 32px
 
 #define DOF 64 // Ray cast limit
 
