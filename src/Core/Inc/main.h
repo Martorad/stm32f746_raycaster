@@ -57,6 +57,7 @@ uint32_t cast();
 uint32_t CLUT(uint8_t index, uint8_t hitSide);
 uint32_t dimColor(uint32_t inputColor, float dimmingFactor);
 float    rayLength(float ax, float ay, float bx, float by);
+float    rayLengthFast(float ax, float ay, float bx, float by);
 float    fsqrt(float x);
 void     showFPS(uint32_t frameTime);
 void     pageFlip();
