@@ -317,8 +317,6 @@ uint32_t cast() {
   union    { float f; uint32_t u; } sign;
 
   BSP_LCD_SelectLayer(0);
-//  BSP_LCD_SetTextColor(COLOR_SKY);
-//  BSP_LCD_FillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT_HALF);
   BSP_LCD_SetTextColor(COLOR_GROUND);
   BSP_LCD_FillRect(0, SCREEN_HEIGHT_HALF, SCREEN_WIDTH, SCREEN_HEIGHT_HALF);
 
@@ -428,7 +426,7 @@ uint32_t cast() {
           uint16_t sbY = 0, sbDrawLines = tOffset / 8, sbLastline = tOffset - sbDrawLines * 8, sbDrawHeight;
           for (uint16_t i = 0; i < sbDrawLines + 1; i++) {
             sbDrawHeight = (i % 2 == 0) ? 8 : 9;
-            BSP_LCD_SetTextColor(_skybox[(i << 8) + (uint16_t)(256 - rAngle * 40.7)]);
+            BSP_LCD_SetTextColor(_skybox[(i << 8) + (uint16_t)(SKYBOX_SIZE_X - rAngle * 40.7)]);
             BSP_LCD_FillRect((rCount * FOV_RECT), sbY, FOV_RECT, (i != sbDrawLines) ? sbDrawHeight : sbLastline);
             sbY += sbDrawHeight;
           }
