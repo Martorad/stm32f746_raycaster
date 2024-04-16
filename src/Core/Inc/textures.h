@@ -8,8 +8,7 @@
 #ifndef INC_TEXTURES_H_
 #define INC_TEXTURES_H_
 
-#define TEXTURE_SIZE            16
-#define TEXTURE_SIZE_RECIPROCAL 0.0625
+#define TEXTURE_SIZE 16
 
 #define COLOR_SKY    0xFF55C3D9
 #define COLOR_GROUND 0xFF0AAB0A
