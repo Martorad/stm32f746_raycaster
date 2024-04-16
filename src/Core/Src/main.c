@@ -397,15 +397,13 @@ uint32_t cast() {
 
       // DRAW WALLS
       if (tLineHeight > SCREEN_HEIGHT / DOF) { // if line is smaller than the shortest possible line defined by DOF, don't bother drawing it
-        uint16_t tSkipLines;
-        float    tX, tY = 0, tYStep = tLineHeight * TEXTURE_SIZE_RECIPROCAL, tOffset = (tLineHeight - SCREEN_HEIGHT) * 0.5, tFirstLine;
+        float tX, tY = 0, tYStep = tLineHeight * TEXTURE_SIZE_RECIPROCAL, tOffset = (tLineHeight - SCREEN_HEIGHT) * 0.5;
 
         if (hitSide) { tX = (1 - (rIntersectYV - (uint32_t)rIntersectYV)) * TEXTURE_SIZE; if (rAngle < M_PI_2 || rAngle > M_3PI_2) { tX = TEXTURE_SIZE - tX; }}
         else         { tX = (1 - (rIntersectXH - (uint32_t)rIntersectXH)) * TEXTURE_SIZE; if (rAngle < M_PI)                       { tX = TEXTURE_SIZE - tX; }}
 
         if (tLineHeight > SCREEN_HEIGHT) {
-          tSkipLines = tOffset / tYStep;
-          tFirstLine = tYStep - (tOffset - tSkipLines * tYStep);
+          uint16_t tSkipLines = tOffset / tYStep, tFirstLine = tYStep - (tOffset - tSkipLines * tYStep);
           tY = tFirstLine;
           for (uint16_t i = tSkipLines; i < TEXTURE_SIZE - tSkipLines; i++) {
             BSP_LCD_SetTextColor(_textures[tTextureIndex + hitSide][i * TEXTURE_SIZE + (uint16_t)(tX)]);
