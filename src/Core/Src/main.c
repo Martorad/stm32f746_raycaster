@@ -309,7 +309,7 @@ void PeriphCommonClock_Config(void)
 
 /* USER CODE BEGIN 4 */
 uint32_t cast() {
-  // Variable naming convention: r = ray, m = map, p = performance, c = calculation, t = texture
+  // Variable prefix convention: r = ray, m = map, p = performance, c = calculation, t = texture, sb = skybox
   uint32_t pStartTime = _sysElapsedTicks;
   uint16_t rCount, rCastLimitV, rCastLimitH, mPosition = 0;
   uint8_t  mTextureV, mTextureH;
@@ -317,8 +317,8 @@ uint32_t cast() {
   union    { float f; uint32_t u; } sign;
 
   BSP_LCD_SelectLayer(0);
-  BSP_LCD_SetTextColor(COLOR_SKY);
-  BSP_LCD_FillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT_HALF);
+//  BSP_LCD_SetTextColor(COLOR_SKY);
+//  BSP_LCD_FillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT_HALF);
   BSP_LCD_SetTextColor(COLOR_GROUND);
   BSP_LCD_FillRect(0, SCREEN_HEIGHT_HALF, SCREEN_WIDTH, SCREEN_HEIGHT_HALF);
 
@@ -400,29 +400,39 @@ uint32_t cast() {
 
       // DRAW WALLS
       if (lineHeight > SCREEN_HEIGHT / DOF) { // if line is smaller than the shortest possible line defined by DOF, don't bother drawing it
-        uint16_t skipLines;
-        float    tX, tY = 0, tYStep = lineHeight * TEXTURE_SIZE_RECIPROCAL, tOffset = (lineHeight - SCREEN_HEIGHT) * 0.5, firstLine;
+        uint16_t tSkipLines;
+        float    tX, tY = 0, tYStep = lineHeight * TEXTURE_SIZE_RECIPROCAL, tOffset = (lineHeight - SCREEN_HEIGHT) * 0.5, tFirstLine;
 
         if (hitSide) { tX = (1 - (rIntersectYV - (uint32_t)rIntersectYV)) * TEXTURE_SIZE; if (rAngle < M_PI_2 || rAngle > M_3PI_2) { tX = TEXTURE_SIZE - tX; }}
         else         { tX = (1 - (rIntersectXH - (uint32_t)rIntersectXH)) * TEXTURE_SIZE; if (rAngle < M_PI)                       { tX = TEXTURE_SIZE - tX; }}
 
         if (lineHeight > SCREEN_HEIGHT) {
-          skipLines = tOffset / tYStep;
-          firstLine = tYStep - (tOffset - skipLines * tYStep);
-          tY = firstLine;
-          for (uint16_t i = skipLines; i < TEXTURE_SIZE - skipLines; i++) {
+          tSkipLines = tOffset / tYStep;
+          tFirstLine = tYStep - (tOffset - tSkipLines * tYStep);
+          tY = tFirstLine;
+          for (uint16_t i = tSkipLines; i < TEXTURE_SIZE - tSkipLines; i++) {
             BSP_LCD_SetTextColor(_textures[tTextureIndex + hitSide][i * TEXTURE_SIZE + (uint16_t)(tX)]);
-            if (i != skipLines && i != TEXTURE_SIZE - skipLines - 1) {
+            if (i != tSkipLines && i != TEXTURE_SIZE - tSkipLines - 1) {
               BSP_LCD_FillRect((rCount * FOV_RECT), tY, FOV_RECT, tYStep + 1);
               tY += tYStep;
             }
             else {
-              BSP_LCD_FillRect((rCount * FOV_RECT), (i == skipLines) ? 0 : tY, FOV_RECT, firstLine);
+              BSP_LCD_FillRect((rCount * FOV_RECT), (i == tSkipLines) ? 0 : tY, FOV_RECT, tFirstLine);
             }
           }
         }
         else {
           tOffset *= -1; // invert value of texture offset to make it positive
+
+          // SKYBOX
+          uint16_t sbY = 0, sbDrawLines = tOffset / 8, sbLastline = tOffset - sbDrawLines * 8, sbDrawHeight;
+          for (uint16_t i = 0; i < sbDrawLines + 1; i++) {
+            sbDrawHeight = (i % 2 == 0) ? 8 : 9;
+            BSP_LCD_SetTextColor(_skybox[(i << 8) + (uint16_t)(256 - rAngle * 40.7)]);
+            BSP_LCD_FillRect((rCount * FOV_RECT), sbY, FOV_RECT, (i != sbDrawLines) ? sbDrawHeight : sbLastline);
+            sbY += sbDrawHeight;
+          }
+
           for (uint16_t i = 0; i < TEXTURE_SIZE; i++) {
             BSP_LCD_SetTextColor(_textures[tTextureIndex + hitSide][i * TEXTURE_SIZE + (uint16_t)(tX)]);
             BSP_LCD_FillRect((rCount * FOV_RECT), tOffset + tY, FOV_RECT, tYStep + 1);
