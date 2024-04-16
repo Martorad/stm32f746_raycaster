@@ -335,7 +335,7 @@ uint32_t cast() {
     rIntersectYV = (_pPosX - rIntersectXV) * cTan + _pPosY;
     rOffsetY = -rOffsetX * cTan;
 
-    while (rCastLimitV < DOF) { // TODO: Combine both while loops, idk why I haven't thought of that yet. Might be a decent idea to do it with arrays of size 2.
+    while (rCastLimitV < DOF) {
       mPosition = (uint16_t)rIntersectYV * _mSizeX + (uint16_t)rIntersectXV - sign.u;
 
       if (_map[mPosition]) {
@@ -348,7 +348,6 @@ uint32_t cast() {
         rCastLimitV++;
       }
     }
-
     mTextureV = _map[mPosition] - 1;
 
     // HORIZONTAL LINE CHECK
@@ -371,27 +370,26 @@ uint32_t cast() {
         rCastLimitH++;
       }
     }
-
     mTextureH = _map[mPosition] - 1;
 
     // RENDERING
     uint16_t rCastTotal;
-    if (rLenV < rLenH) { rCastTotal = rCastLimitV; }
-    else               { rCastTotal = rCastLimitH; }
+    uint8_t  tTextureIndex, rHitSide;
+
+    if (rLenV < rLenH) {
+      rCastTotal = rCastLimitV;
+      rShortest = rLenV;
+      tTextureIndex = mTextureV;
+      rHitSide = 1;
+    }
+    else {
+      rCastTotal = rCastLimitH;
+      rShortest = rLenH;
+      tTextureIndex = mTextureH;
+      rHitSide = 0;
+    }
 
     if (rCastTotal == R_HIT) {
-      uint8_t tTextureIndex, hitSide;
-      if (rLenV < rLenH) {
-        rShortest = rLenV;
-        tTextureIndex = mTextureV;
-        hitSide = 1;
-      }
-      else {
-        rShortest = rLenH;
-        tTextureIndex = mTextureH;
-        hitSide = 0;
-      }
-
       rShortest *= _fisheyeCosLUT[rCount];
       float tLineHeight = SCREEN_HEIGHT / rShortest * LINE_VERTICAL_SCALE;
 
@@ -399,14 +397,14 @@ uint32_t cast() {
       if (tLineHeight > SCREEN_HEIGHT / DOF) { // if line is smaller than the shortest possible line defined by DOF, don't bother drawing it
         float tX, tY = 0, tYStep = tLineHeight * TEXTURE_SIZE_RECIPROCAL, tOffset = (tLineHeight - SCREEN_HEIGHT) * 0.5;
 
-        if (hitSide) { tX = (1 - (rIntersectYV - (uint32_t)rIntersectYV)) * TEXTURE_SIZE; if (rAngle < M_PI_2 || rAngle > M_3PI_2) { tX = TEXTURE_SIZE - tX; }}
+        if (rHitSide) { tX = (1 - (rIntersectYV - (uint32_t)rIntersectYV)) * TEXTURE_SIZE; if (rAngle < M_PI_2 || rAngle > M_3PI_2) { tX = TEXTURE_SIZE - tX; }}
         else         { tX = (1 - (rIntersectXH - (uint32_t)rIntersectXH)) * TEXTURE_SIZE; if (rAngle < M_PI)                       { tX = TEXTURE_SIZE - tX; }}
 
         if (tLineHeight > SCREEN_HEIGHT) {
           uint16_t tSkipLines = tOffset / tYStep, tFirstLine = tYStep - (tOffset - tSkipLines * tYStep);
           tY = tFirstLine;
           for (uint16_t i = tSkipLines; i < TEXTURE_SIZE - tSkipLines; i++) {
-            BSP_LCD_SetTextColor(_textures[tTextureIndex + hitSide][i * TEXTURE_SIZE + (uint16_t)(tX)]);
+            BSP_LCD_SetTextColor(_textures[tTextureIndex + rHitSide][i * TEXTURE_SIZE + (uint16_t)(tX)]);
             if (i != tSkipLines && i != TEXTURE_SIZE - tSkipLines - 1) {
               BSP_LCD_FillRect((rCount * FOV_RECT), tY, FOV_RECT, tYStep + 1);
               tY += tYStep;
@@ -428,7 +426,7 @@ uint32_t cast() {
           }
 
           for (uint16_t i = 0; i < TEXTURE_SIZE; i++) {
-            BSP_LCD_SetTextColor(_textures[tTextureIndex + hitSide][i * TEXTURE_SIZE + (uint16_t)(tX)]);
+            BSP_LCD_SetTextColor(_textures[tTextureIndex + rHitSide][i * TEXTURE_SIZE + (uint16_t)(tX)]);
             BSP_LCD_FillRect((rCount * FOV_RECT), tOffset + tY, FOV_RECT, tYStep + 1);
             tY += tYStep;
           }
