@@ -417,7 +417,7 @@ uint32_t cast() {
         else {
           tOffset *= -1; // invert value of texture offset to make it positive
 
-          // SKYBOX
+          // DRAW SKYBOX
           uint16_t sbY = 0, sbDrawLines = tOffset / SKYBOX_TEXEL;
           for (uint16_t i = 0; i < sbDrawLines + 1; i++) { // I do a bit of overdraw here, which is not ideal but still seems to be faster than calculating how much to cull
             BSP_LCD_SetTextColor(_skybox[(i << SKYBOX_SIZE_X_BS) + (uint16_t)(SKYBOX_SIZE_X - rAngle * SKYBOX_SCALE_F)]);
@@ -438,12 +438,12 @@ uint32_t cast() {
     if (rAngle < 0) { rAngle += M_TWOPI; }
   }
 
-  uint32_t frameTime = _sysElapsedTicks - pStartTime;
+  uint32_t pFrameTime = _sysElapsedTicks - pStartTime;
 
-  _pMovSpeed = frameTime * INCR_TRANSLATION;
-  _pRotSpeed = frameTime * INCR_ROTATION;
+  _pMovSpeed = pFrameTime * INCR_TRANSLATION;
+  _pRotSpeed = pFrameTime * INCR_ROTATION;
 
-  return frameTime;
+  return pFrameTime;
 }
 float rayLength(float ax, float ay, float bx, float by) {
   return fsqrt((bx - ax) * (bx - ax) + (by - ay) * (by - ay));
