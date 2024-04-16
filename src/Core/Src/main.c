@@ -454,8 +454,7 @@ float rayLengthFast(float ax, float ay, float bx, float by) {
   return (bx - ax) * (bx - ax) + (by - ay) * (by - ay);
 }
 
-float fsqrt(float x){
-  if (x == 0) return 0;
+float fsqrt(float x) {
   float g = x / 2.0;
 
   g = 0.5 * (g + x / g);
