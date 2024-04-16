@@ -6,3 +6,5 @@ Debug/
 *.mxproject
 *.exe
 tools/*.txt
+textures
+~$*.docx
