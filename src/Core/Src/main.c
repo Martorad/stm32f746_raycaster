@@ -394,17 +394,17 @@ uint32_t cast() {
       }
 
       rShortest *= _fisheyeCosLUT[rCount];
-      float lineHeight = SCREEN_HEIGHT / rShortest * LINE_VERTICAL_SCALE;
+      float tLineHeight = SCREEN_HEIGHT / rShortest * LINE_VERTICAL_SCALE;
 
       // DRAW WALLS
-      if (lineHeight > SCREEN_HEIGHT / DOF) { // if line is smaller than the shortest possible line defined by DOF, don't bother drawing it
+      if (tLineHeight > SCREEN_HEIGHT / DOF) { // if line is smaller than the shortest possible line defined by DOF, don't bother drawing it
         uint16_t tSkipLines;
-        float    tX, tY = 0, tYStep = lineHeight * TEXTURE_SIZE_RECIPROCAL, tOffset = (lineHeight - SCREEN_HEIGHT) * 0.5, tFirstLine;
+        float    tX, tY = 0, tYStep = tLineHeight * TEXTURE_SIZE_RECIPROCAL, tOffset = (tLineHeight - SCREEN_HEIGHT) * 0.5, tFirstLine;
 
         if (hitSide) { tX = (1 - (rIntersectYV - (uint32_t)rIntersectYV)) * TEXTURE_SIZE; if (rAngle < M_PI_2 || rAngle > M_3PI_2) { tX = TEXTURE_SIZE - tX; }}
         else         { tX = (1 - (rIntersectXH - (uint32_t)rIntersectXH)) * TEXTURE_SIZE; if (rAngle < M_PI)                       { tX = TEXTURE_SIZE - tX; }}
 
-        if (lineHeight > SCREEN_HEIGHT) {
+        if (tLineHeight > SCREEN_HEIGHT) {
           tSkipLines = tOffset / tYStep;
           tFirstLine = tYStep - (tOffset - tSkipLines * tYStep);
           tY = tFirstLine;
@@ -415,7 +415,7 @@ uint32_t cast() {
               tY += tYStep;
             }
             else {
-              BSP_LCD_FillRect((rCount * FOV_RECT), (i == tSkipLines) ? 0 : tY, FOV_RECT, tFirstLine);
+              BSP_LCD_FillRect((rCount * FOV_RECT), (i == tSkipLines) ? 0 : tY, FOV_RECT, tFirstLine + 1);
             }
           }
         }
