@@ -377,15 +377,15 @@ uint32_t cast() {
     uint8_t  tTextureIndex, rHitSide;
 
     if (rLenV < rLenH) {
+      tTextureIndex = mTextureV;
       rCastTotal = rCastLimitV;
       rShortest = rLenV;
-      tTextureIndex = mTextureV;
       rHitSide = 1;
     }
     else {
+      tTextureIndex = mTextureH;
       rCastTotal = rCastLimitH;
       rShortest = rLenH;
-      tTextureIndex = mTextureH;
       rHitSide = 0;
     }
 
@@ -398,7 +398,7 @@ uint32_t cast() {
         float tX, tY = 0, tYStep = tLineHeight * TEXTURE_SIZE_RECIPROCAL, tOffset = (tLineHeight - SCREEN_HEIGHT) * 0.5;
 
         if (rHitSide) { tX = (1 - (rIntersectYV - (uint32_t)rIntersectYV)) * TEXTURE_SIZE; if (rAngle < M_PI_2 || rAngle > M_3PI_2) { tX = TEXTURE_SIZE - tX; }}
-        else         { tX = (1 - (rIntersectXH - (uint32_t)rIntersectXH)) * TEXTURE_SIZE; if (rAngle < M_PI)                       { tX = TEXTURE_SIZE - tX; }}
+        else          { tX = (1 - (rIntersectXH - (uint32_t)rIntersectXH)) * TEXTURE_SIZE; if (rAngle < M_PI)                       { tX = TEXTURE_SIZE - tX; }}
 
         if (tLineHeight > SCREEN_HEIGHT) {
           uint16_t tSkipLines = tOffset / tYStep, tFirstLine = tYStep - (tOffset - tSkipLines * tYStep);
