@@ -321,7 +321,6 @@ uint32_t cast() {
   BSP_LCD_FillRect(0, SCREEN_HEIGHT_HALF, SCREEN_WIDTH, SCREEN_HEIGHT_HALF);
 
   rAngle = _pAngle + FOV_HALF * FOV_INCR;
-  if (rAngle < 0)       { rAngle += M_TWOPI; }
   if (rAngle > M_TWOPI) { rAngle -= M_TWOPI; }
 
   for (rCount = 0; rCount < FOV; rCount++) {
@@ -440,8 +439,7 @@ uint32_t cast() {
     }
 
     rAngle -= FOV_INCR;
-    if (rAngle < 0)       { rAngle += M_TWOPI; }
-    if (rAngle > M_TWOPI) { rAngle -= M_TWOPI; }
+    if (rAngle < 0) { rAngle += M_TWOPI; }
   }
 
   uint32_t frameTime = _sysElapsedTicks - pStartTime;
