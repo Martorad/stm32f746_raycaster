@@ -422,7 +422,7 @@ uint32_t cast() {
             float    sbTexelColumn = SKYBOX_SIZE_X - rAngle * SKYBOX_SCALE_F;
             uint16_t sbY = 0, sbOffset = SKYBOX_TEXEL_X - (uint16_t)(((sbTexelColumn - (uint16_t)sbTexelColumn) * SKYBOX_TEXEL_X) + 0.1);
 
-            for (uint16_t i = 0; i < SKYBOX_SIZE_Y; i++) { // I do a bit of overdraw here, which is not ideal but still seems to be faster than calculating how much to cull
+            for (uint16_t i = 0; i < SKYBOX_SIZE_Y; i++) { // TODO: I currently overdraw the shit out of the skybox. It *may* be possible to fix that
               BSP_LCD_SetTextColor(_skybox[i * SKYBOX_SIZE_X + (uint16_t)sbTexelColumn]);
 
               switch (rCount) { // A switch seems to be marginally faster than an if here, not exactly sure why
