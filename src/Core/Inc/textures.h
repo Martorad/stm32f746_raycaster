@@ -11,7 +11,7 @@
 #define TEXTURE_SIZE 16
 
 #define COLOR_SKY    0xFF55C3D9
-#define COLOR_GROUND 0xFF0AAB0A
+#define COLOR_GROUND 0xFF138F13
 
 // Even textures are brightside, odd textures are darkside
 const uint32_t _textures[8][256] = {
