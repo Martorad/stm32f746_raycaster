@@ -418,11 +418,14 @@ uint32_t cast() {
           tOffset *= -1; // invert value of texture offset to make it positive
 
           // DRAW SKYBOX
-          uint16_t sbY = 0, sbDrawLines = tOffset / SKYBOX_TEXEL;
-          for (uint16_t i = 0; i < sbDrawLines + 1; i++) { // I do a bit of overdraw here, which is not ideal but still seems to be faster than calculating how much to cull
-            BSP_LCD_SetTextColor(_skybox[(i << SKYBOX_SIZE_X_BS) + (uint16_t)(SKYBOX_SIZE_X - rAngle * SKYBOX_SCALE_F)]);
-            BSP_LCD_FillRect((rCount * FOV_RECT), sbY, FOV_RECT, SKYBOX_TEXEL);
-            sbY += SKYBOX_TEXEL;
+          if (rCount % (SKYBOX_TEXEL_X / FOV_RECT) == 0) {
+            uint16_t sbY = 0;
+
+            for (uint16_t i = 0; i < SKYBOX_SIZE_Y; i++) { // I do a bit of overdraw here, which is not ideal but still seems to be faster than calculating how much to cull
+              BSP_LCD_SetTextColor(_skybox[i * SKYBOX_SIZE_X + (uint16_t)(SKYBOX_SIZE_X - rAngle * SKYBOX_SCALE_F)]);
+              BSP_LCD_FillRect((rCount * FOV_RECT), sbY, SKYBOX_TEXEL_X, SKYBOX_TEXEL_Y);
+              sbY += SKYBOX_TEXEL_Y;
+            }
           }
 
           for (uint16_t i = 0; i < TEXTURE_SIZE; i++) {
