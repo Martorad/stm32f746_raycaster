@@ -1382,7 +1382,6 @@ HAL_StatusTypeDef HAL_DMA2D_CLUTLoading_Resume(DMA2D_HandleTypeDef *hdma2d, uint
 HAL_StatusTypeDef HAL_DMA2D_PollForTransfer(DMA2D_HandleTypeDef *hdma2d, uint32_t Timeout)
 {
   uint32_t tickstart;
-  uint32_t layer_start;
   __IO uint32_t isrflags = 0x0U;
 
   /* Polling for DMA2D transfer */
@@ -1434,62 +1433,6 @@ HAL_StatusTypeDef HAL_DMA2D_PollForTransfer(DMA2D_HandleTypeDef *hdma2d, uint32_
       }
     }
   }
-  /* Polling for CLUT loading (foreground or background) */
-  layer_start = hdma2d->Instance->FGPFCCR & DMA2D_FGPFCCR_START;
-  layer_start |= hdma2d->Instance->BGPFCCR & DMA2D_BGPFCCR_START;
-  if (layer_start != 0U)
-  {
-    /* Get tick */
-    tickstart = HAL_GetTick();
-
-    while (__HAL_DMA2D_GET_FLAG(hdma2d, DMA2D_FLAG_CTC) == 0U)
-    {
-      isrflags = READ_REG(hdma2d->Instance->ISR);
-      if ((isrflags & (DMA2D_FLAG_CAE | DMA2D_FLAG_CE | DMA2D_FLAG_TE)) != 0U)
-      {
-        if ((isrflags & DMA2D_FLAG_CAE) != 0U)
-        {
-          hdma2d->ErrorCode |= HAL_DMA2D_ERROR_CAE;
-        }
-        if ((isrflags & DMA2D_FLAG_CE) != 0U)
-        {
-          hdma2d->ErrorCode |= HAL_DMA2D_ERROR_CE;
-        }
-        if ((isrflags & DMA2D_FLAG_TE) != 0U)
-        {
-          hdma2d->ErrorCode |= HAL_DMA2D_ERROR_TE;
-        }
-        /* Clear the CLUT Access Error, Configuration Error and Transfer Error flags */
-        __HAL_DMA2D_CLEAR_FLAG(hdma2d, DMA2D_FLAG_CAE | DMA2D_FLAG_CE | DMA2D_FLAG_TE);
-
-        /* Change DMA2D state */
-        hdma2d->State = HAL_DMA2D_STATE_ERROR;
-
-        /* Process unlocked */
-        __HAL_UNLOCK(hdma2d);
-
-        return HAL_ERROR;
-      }
-      /* Check for the Timeout */
-      if (Timeout != HAL_MAX_DELAY)
-      {
-        if (((HAL_GetTick() - tickstart) > Timeout) || (Timeout == 0U))
-        {
-          /* Update error code */
-          hdma2d->ErrorCode |= HAL_DMA2D_ERROR_TIMEOUT;
-
-          /* Change the DMA2D state */
-          hdma2d->State = HAL_DMA2D_STATE_TIMEOUT;
-
-          /* Process unlocked */
-          __HAL_UNLOCK(hdma2d);
-
-          return HAL_TIMEOUT;
-        }
-      }
-    }
-  }
-
   /* Clear the transfer complete and CLUT loading flags */
   __HAL_DMA2D_CLEAR_FLAG(hdma2d, DMA2D_FLAG_TC | DMA2D_FLAG_CTC);
 
@@ -2070,7 +2013,6 @@ static void DMA2D_SetConfig(DMA2D_HandleTypeDef *hdma2d, uint32_t pdata, uint32_
                             uint32_t Height)
 {
   uint32_t tmp;
-  uint32_t tmp1;
   uint32_t tmp2;
   uint32_t tmp3;
   uint32_t tmp4;
@@ -2082,53 +2024,17 @@ static void DMA2D_SetConfig(DMA2D_HandleTypeDef *hdma2d, uint32_t pdata, uint32_
   WRITE_REG(hdma2d->Instance->OMAR, DstAddress);
 
   /* Register to memory DMA2D mode selected */
-  if (hdma2d->Init.Mode == DMA2D_R2M)
-  {
-    tmp1 = pdata & DMA2D_OCOLR_ALPHA_1;
-    tmp2 = pdata & DMA2D_OCOLR_RED_1;
-    tmp3 = pdata & DMA2D_OCOLR_GREEN_1;
-    tmp4 = pdata & DMA2D_OCOLR_BLUE_1;
+  tmp2 = pdata & DMA2D_OCOLR_RED_1;
+  tmp3 = pdata & DMA2D_OCOLR_GREEN_1;
+  tmp4 = pdata & DMA2D_OCOLR_BLUE_1;
 
-    /* Prepare the value to be written to the OCOLR register according to the color mode */
-    if (hdma2d->Init.ColorMode == DMA2D_OUTPUT_ARGB8888)
-    {
-      tmp = (tmp3 | tmp2 | tmp1 | tmp4);
-    }
-    else if (hdma2d->Init.ColorMode == DMA2D_OUTPUT_RGB888)
-    {
-      tmp = (tmp3 | tmp2 | tmp4);
-    }
-    else if (hdma2d->Init.ColorMode == DMA2D_OUTPUT_RGB565)
-    {
-      tmp2 = (tmp2 >> 19U);
-      tmp3 = (tmp3 >> 10U);
-      tmp4 = (tmp4 >> 3U);
-      tmp  = ((tmp3 << 5U) | (tmp2 << 11U) | tmp4);
-    }
-    else if (hdma2d->Init.ColorMode == DMA2D_OUTPUT_ARGB1555)
-    {
-      tmp1 = (tmp1 >> 31U);
-      tmp2 = (tmp2 >> 19U);
-      tmp3 = (tmp3 >> 11U);
-      tmp4 = (tmp4 >> 3U);
-      tmp  = ((tmp3 << 5U) | (tmp2 << 10U) | (tmp1 << 15U) | tmp4);
-    }
-    else /* Dhdma2d->Init.ColorMode = DMA2D_OUTPUT_ARGB4444 */
-    {
-      tmp1 = (tmp1 >> 28U);
-      tmp2 = (tmp2 >> 20U);
-      tmp3 = (tmp3 >> 12U);
-      tmp4 = (tmp4 >> 4U);
-      tmp  = ((tmp3 << 4U) | (tmp2 << 8U) | (tmp1 << 12U) | tmp4);
-    }
-    /* Write to DMA2D OCOLR register */
-    WRITE_REG(hdma2d->Instance->OCOLR, tmp);
-  }
-  else /* M2M, M2M_PFC or M2M_Blending DMA2D Mode */
-  {
-    /* Configure DMA2D source address */
-    WRITE_REG(hdma2d->Instance->FGMAR, pdata);
-  }
+  /* Prepare the value to be written to the OCOLR register according to the color mode */
+  tmp2 = (tmp2 >> 19U);
+  tmp3 = (tmp3 >> 10U);
+  tmp4 = (tmp4 >> 3U);
+  tmp  = ((tmp3 << 5U) | (tmp2 << 11U) | tmp4);
+  /* Write to DMA2D OCOLR register */
+  WRITE_REG(hdma2d->Instance->OCOLR, tmp);
 }
 
 /**
