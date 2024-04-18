@@ -1328,9 +1328,7 @@ HAL_StatusTypeDef HAL_DMA2D_CLUTLoading_Resume(DMA2D_HandleTypeDef *hdma2d, uint
   return HAL_OK;
 }
 
-
 /**
-
   * @brief  Polling for transfer complete or CLUT loading.
   * @param  hdma2d Pointer to a DMA2D_HandleTypeDef structure that contains
   *                 the configuration information for the DMA2D.
@@ -1363,7 +1361,7 @@ HAL_StatusTypeDef HAL_DMA2D_PollForTransfer(DMA2D_HandleTypeDef *hdma2d, uint32_
     }
   }
   /* Clear the transfer complete and CLUT loading flags */
-  __HAL_DMA2D_CLEAR_FLAG(hdma2d, DMA2D_FLAG_TC | DMA2D_FLAG_CTC);
+  __HAL_DMA2D_CLEAR_FLAG(hdma2d, DMA2D_FLAG_TC);
 
   /* Change DMA2D state */
   hdma2d->State = HAL_DMA2D_STATE_READY;
