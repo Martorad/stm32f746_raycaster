@@ -404,7 +404,7 @@ uint32_t cast() {
 
           switch (rCount) { // A switch seems to be marginally faster than an if here, not exactly sure why
             case 0:  BSP_LCD_FillRect((rCount * FOV_RECT), sbY, sbOffset + SKYBOX_TEXEL_X, SKYBOX_TEXEL_Y); break;
-            default: BSP_LCD_FillRect((rCount * FOV_RECT) + sbOffset, sbY, (rCount == 235) ? (SKYBOX_TEXEL_X - sbOffset) : SKYBOX_TEXEL_X, SKYBOX_TEXEL_Y); break;
+            default: BSP_LCD_FillRect((rCount * FOV_RECT) + sbOffset, sbY, (rCount == FOV - (SKYBOX_TEXEL_X / FOV_RECT)) ? (SKYBOX_TEXEL_X - sbOffset) : SKYBOX_TEXEL_X, SKYBOX_TEXEL_Y); break;
           }
 
           sbY += SKYBOX_TEXEL_Y;
