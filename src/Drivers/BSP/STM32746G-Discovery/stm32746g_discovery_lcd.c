@@ -264,40 +264,6 @@ void BSP_LCD_SetYSize(uint32_t imageHeightPixels)
 }
 
 /**
-  * @brief  Initializes the LCD layer in ARGB8888 format (32 bits per pixel).
-  * @param  LayerIndex: Layer foreground or background
-  * @param  FB_Address: Layer frame buffer
-  * @retval None
-  */
-void BSP_LCD_LayerDefaultInit(uint16_t LayerIndex, uint32_t FB_Address)
-{     
-  LCD_LayerCfgTypeDef  layer_cfg;
-
-  /* Layer Init */
-  layer_cfg.WindowX0 = 0;
-  layer_cfg.WindowX1 = BSP_LCD_GetXSize();
-  layer_cfg.WindowY0 = 0;
-  layer_cfg.WindowY1 = BSP_LCD_GetYSize(); 
-  layer_cfg.PixelFormat = LTDC_PIXEL_FORMAT_ARGB8888;
-  layer_cfg.FBStartAdress = FB_Address;
-  layer_cfg.Alpha = 255;
-  layer_cfg.Alpha0 = 0;
-  layer_cfg.Backcolor.Blue = 0;
-  layer_cfg.Backcolor.Green = 0;
-  layer_cfg.Backcolor.Red = 0;
-  layer_cfg.BlendingFactor1 = LTDC_BLENDING_FACTOR1_PAxCA;
-  layer_cfg.BlendingFactor2 = LTDC_BLENDING_FACTOR2_PAxCA;
-  layer_cfg.ImageWidth = BSP_LCD_GetXSize();
-  layer_cfg.ImageHeight = BSP_LCD_GetYSize();
-  
-  HAL_LTDC_ConfigLayer(&hLtdcHandler, &layer_cfg, LayerIndex); 
-
-  DrawProp[LayerIndex].BackColor = LCD_COLOR_WHITE;
-  DrawProp[LayerIndex].pFont     = &Font24;
-  DrawProp[LayerIndex].TextColor = LCD_COLOR_BLACK; 
-}
-
-/**
   * @brief  Initializes the LCD layer in RGB565 format (16 bits per pixel).
   * @param  LayerIndex: Layer foreground or background
   * @param  FB_Address: Layer frame buffer
@@ -329,6 +295,10 @@ void BSP_LCD_LayerRgb565Init(uint16_t LayerIndex, uint32_t FB_Address)
   DrawProp[LayerIndex].BackColor = LCD_COLOR_WHITE;
   DrawProp[LayerIndex].pFont     = &Font24;
   DrawProp[LayerIndex].TextColor = LCD_COLOR_BLACK; 
+
+  hDma2dHandler.Init.ColorMode    = DMA2D_RGB565;
+  hDma2dHandler.Init.Mode         = DMA2D_R2M;
+  hDma2dHandler.Instance = DMA2D;
 }
 
 /**
@@ -1083,18 +1053,11 @@ void BSP_LCD_FillRect(uint16_t Xpos, uint16_t Ypos, uint16_t Width, uint16_t Hei
   
   /* Set the text color */
   BSP_LCD_SetTextColor(DrawProp[ActiveLayer].TextColor);
-  
-  /* Get the rectangle start address */
-  if(hLtdcHandler.LayerCfg[ActiveLayer].PixelFormat == LTDC_PIXEL_FORMAT_RGB565)
-  { /* RGB565 format */
-    x_address = (hLtdcHandler.LayerCfg[ActiveLayer].FBStartAdress) + 2*(BSP_LCD_GetXSize()*Ypos + Xpos);
-  }
-  else
-  { /* ARGB8888 format */
-    x_address = (hLtdcHandler.LayerCfg[ActiveLayer].FBStartAdress) + 4*(BSP_LCD_GetXSize()*Ypos + Xpos);
-  }
+
+  /* RGB565 format */
+  x_address = (hLtdcHandler.LayerCfg[ActiveLayer].FBStartAdress) + 2 * (hLtdcHandler.LayerCfg[ActiveLayer].ImageWidth * Ypos + Xpos);
   /* Fill the rectangle */
-  LL_FillBuffer(ActiveLayer, (uint32_t *)x_address, Width, Height, (BSP_LCD_GetXSize() - Width), DrawProp[ActiveLayer].TextColor);
+  LL_FillBuffer(ActiveLayer, (uint32_t *)x_address, Width, Height, (hLtdcHandler.LayerCfg[ActiveLayer].ImageWidth - Width), DrawProp[ActiveLayer].TextColor);
 }
 
 /**
@@ -1564,20 +1527,7 @@ static void FillTriangle(uint16_t x1, uint16_t x2, uint16_t x3, uint16_t y1, uin
   */
 static void LL_FillBuffer(uint32_t LayerIndex, void *pDst, uint32_t xSize, uint32_t ySize, uint32_t OffLine, uint32_t ColorIndex) 
 {
-  /* Register to memory mode with ARGB8888 as color Mode */ 
-  hDma2dHandler.Init.Mode         = DMA2D_R2M;
-  if(hLtdcHandler.LayerCfg[ActiveLayer].PixelFormat == LTDC_PIXEL_FORMAT_RGB565)
-  { /* RGB565 format */ 
-    hDma2dHandler.Init.ColorMode    = DMA2D_RGB565;
-  }
-  else
-  { /* ARGB8888 format */
-    hDma2dHandler.Init.ColorMode    = DMA2D_ARGB8888;
-  }
-  hDma2dHandler.Init.OutputOffset = OffLine;      
-  
-  hDma2dHandler.Instance = DMA2D;
-  
+  hDma2dHandler.Init.OutputOffset = OffLine;
   /* DMA2D Initialization */
 //  if(HAL_DMA2D_Init(&hDma2dHandler) == HAL_OK)
 //  {
