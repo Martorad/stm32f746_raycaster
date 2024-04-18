@@ -1049,11 +1049,10 @@ void BSP_LCD_DrawBitmap(uint32_t Xpos, uint32_t Ypos, uint8_t *pbmp)
   */
 void BSP_LCD_FillRect(uint16_t Xpos, uint16_t Ypos, uint16_t Width, uint16_t Height)
 {
-  uint32_t  x_address = 0;
+  uint32_t x_address = 0;
   
   /* Set the text color */
   BSP_LCD_SetTextColor(DrawProp[ActiveLayer].TextColor);
-
   /* RGB565 format */
   x_address = (hLtdcHandler.LayerCfg[ActiveLayer].FBStartAdress) + 2 * (hLtdcHandler.LayerCfg[ActiveLayer].ImageWidth * Ypos + Xpos);
   /* Fill the rectangle */
@@ -1542,7 +1541,6 @@ static void LL_FillBuffer(uint32_t LayerIndex, void *pDst, uint32_t xSize, uint3
 //  }
   HAL_StatusTypeDef status;
   do { status = HAL_DMA2D_Init(&hDma2dHandler); }                                            while (status != HAL_OK);
-  do { status = HAL_DMA2D_ConfigLayer(&hDma2dHandler, LayerIndex); }                         while (status != HAL_OK);
   do { status = HAL_DMA2D_Start(&hDma2dHandler, ColorIndex, (uint32_t)pDst, xSize, ySize); } while (status != HAL_OK);
   do { status = HAL_DMA2D_PollForTransfer(&hDma2dHandler, 10); }                             while (status != HAL_OK);
 }
