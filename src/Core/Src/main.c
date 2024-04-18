@@ -394,21 +394,20 @@ uint32_t cast() {
       float tLineHeight = SCREEN_HEIGHT / rShortest * LINE_VERTICAL_SCALE;
 
       // DRAW SKYBOX
-      if (tLineHeight < SCREEN_HEIGHT * 2) { // Do this check to avoid a ghosting issue near abrupt ends of walls with an exposed skybox in the back. TODO: Find a better way to do this
-        if (rCount % (SKYBOX_TEXEL_X / FOV_RECT) == 0) {
-          float    sbTexelColumn = SKYBOX_SIZE_X - rAngle * SKYBOX_SCALE_F;
-          uint16_t sbY = 0, sbOffset = SKYBOX_TEXEL_X - (uint16_t)(((sbTexelColumn - (uint16_t)sbTexelColumn) * SKYBOX_TEXEL_X) + 0.1);
+      //TODO: Find a better way to do this
+      if (rCount % (SKYBOX_TEXEL_X / FOV_RECT) == 0) {
+        float    sbTexelColumn = SKYBOX_SIZE_X - rAngle * SKYBOX_SCALE_F;
+        uint16_t sbY = 0, sbOffset = SKYBOX_TEXEL_X - (uint16_t)(((sbTexelColumn - (uint16_t)sbTexelColumn) * SKYBOX_TEXEL_X) + 0.1);
 
-          for (uint16_t i = 0; i < SKYBOX_SIZE_Y; i++) { // TODO: I currently overdraw the shit out of the skybox. It *may* be possible to fix that
-            BSP_LCD_SetTextColor(_skybox[i * SKYBOX_SIZE_X + (uint16_t)sbTexelColumn]);
+        for (uint16_t i = 0; i < SKYBOX_SIZE_Y; i++) { // TODO: I currently overdraw the shit out of the skybox. It *may* be possible to fix that
+          BSP_LCD_SetTextColor(_skybox[i * SKYBOX_SIZE_X + (uint16_t)sbTexelColumn]);
 
-            switch (rCount) { // A switch seems to be marginally faster than an if here, not exactly sure why
-              case 0:  BSP_LCD_FillRect((rCount * FOV_RECT), sbY, sbOffset + SKYBOX_TEXEL_X, SKYBOX_TEXEL_Y); break;
-              default: BSP_LCD_FillRect((rCount * FOV_RECT) + sbOffset, sbY, (rCount == 235) ? (SKYBOX_TEXEL_X - sbOffset) : SKYBOX_TEXEL_X, SKYBOX_TEXEL_Y); break;
-            }
-
-            sbY += SKYBOX_TEXEL_Y;
+          switch (rCount) { // A switch seems to be marginally faster than an if here, not exactly sure why
+            case 0:  BSP_LCD_FillRect((rCount * FOV_RECT), sbY, sbOffset + SKYBOX_TEXEL_X, SKYBOX_TEXEL_Y); break;
+            default: BSP_LCD_FillRect((rCount * FOV_RECT) + sbOffset, sbY, (rCount == 235) ? (SKYBOX_TEXEL_X - sbOffset) : SKYBOX_TEXEL_X, SKYBOX_TEXEL_Y); break;
           }
+
+          sbY += SKYBOX_TEXEL_Y;
         }
       }
 

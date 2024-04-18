@@ -299,6 +299,8 @@ void BSP_LCD_LayerRgb565Init(uint16_t LayerIndex, uint32_t FB_Address)
   hDma2dHandler.Init.ColorMode    = DMA2D_RGB565;
   hDma2dHandler.Init.Mode         = DMA2D_R2M;
   hDma2dHandler.Instance = DMA2D;
+
+  HAL_DMA2D_Init(&hDma2dHandler);
 }
 
 /**
@@ -1540,7 +1542,6 @@ static void LL_FillBuffer(uint32_t LayerIndex, void *pDst, uint32_t xSize, uint3
 //    }
 //  }
   HAL_StatusTypeDef status;
-  do { status = HAL_DMA2D_Init(&hDma2dHandler); }                                            while (status != HAL_OK);
   do { status = HAL_DMA2D_Start(&hDma2dHandler, ColorIndex, (uint32_t)pDst, xSize, ySize); } while (status != HAL_OK);
   do { status = HAL_DMA2D_PollForTransfer(&hDma2dHandler, 10); }                             while (status != HAL_OK);
 }

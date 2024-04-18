@@ -238,44 +238,7 @@ static void DMA2D_SetConfig(DMA2D_HandleTypeDef *hdma2d, uint32_t pdata, uint32_
 HAL_StatusTypeDef HAL_DMA2D_Init(DMA2D_HandleTypeDef *hdma2d)
 {
   /* Check the DMA2D peripheral state */
-  if (hdma2d == NULL)
-  {
-    return HAL_ERROR;
-  }
-
-  /* Check the parameters */
-  assert_param(IS_DMA2D_ALL_INSTANCE(hdma2d->Instance));
-  assert_param(IS_DMA2D_MODE(hdma2d->Init.Mode));
-  assert_param(IS_DMA2D_CMODE(hdma2d->Init.ColorMode));
-  assert_param(IS_DMA2D_OFFSET(hdma2d->Init.OutputOffset));
-#if defined (DMA2D_ALPHA_INV_RB_SWAP_SUPPORT)
-  assert_param(IS_DMA2D_ALPHA_INVERTED(hdma2d->Init.AlphaInverted));
-  assert_param(IS_DMA2D_RB_SWAP(hdma2d->Init.RedBlueSwap));
-#endif /* DMA2D_ALPHA_INV_RB_SWAP_SUPPORT */
-
-#if (USE_HAL_DMA2D_REGISTER_CALLBACKS == 1)
-  if (hdma2d->State == HAL_DMA2D_STATE_RESET)
-  {
-    /* Reset Callback pointers in HAL_DMA2D_STATE_RESET only */
-    hdma2d->LineEventCallback       = HAL_DMA2D_LineEventCallback;
-    hdma2d->CLUTLoadingCpltCallback = HAL_DMA2D_CLUTLoadingCpltCallback;
-    if (hdma2d->MspInitCallback == NULL)
-    {
-      hdma2d->MspInitCallback = HAL_DMA2D_MspInit;
-    }
-
-    /* Init the low level hardware */
-    hdma2d->MspInitCallback(hdma2d);
-  }
-#else
-  if (hdma2d->State == HAL_DMA2D_STATE_RESET)
-  {
-    /* Allocate lock resource and initialize it */
-    hdma2d->Lock = HAL_UNLOCKED;
-    /* Init the low level hardware */
-    HAL_DMA2D_MspInit(hdma2d);
-  }
-#endif /* (USE_HAL_DMA2D_REGISTER_CALLBACKS) */
+  if (hdma2d == NULL) { return HAL_ERROR; }
 
   /* Change DMA2D peripheral state */
   hdma2d->State = HAL_DMA2D_STATE_BUSY;
@@ -288,19 +251,12 @@ HAL_StatusTypeDef HAL_DMA2D_Init(DMA2D_HandleTypeDef *hdma2d)
 
   /* DMA2D OOR register configuration ------------------------------------------*/
   MODIFY_REG(hdma2d->Instance->OOR, DMA2D_OOR_LO, hdma2d->Init.OutputOffset);
-#if defined (DMA2D_ALPHA_INV_RB_SWAP_SUPPORT)
-  /* DMA2D OPFCCR AI and RBS fields setting (Output Alpha Inversion)*/
-  MODIFY_REG(hdma2d->Instance->OPFCCR, (DMA2D_OPFCCR_AI | DMA2D_OPFCCR_RBS),
-             ((hdma2d->Init.AlphaInverted << DMA2D_OPFCCR_AI_Pos) | \
-              (hdma2d->Init.RedBlueSwap << DMA2D_OPFCCR_RBS_Pos)));
-#endif /* DMA2D_ALPHA_INV_RB_SWAP_SUPPORT */
-
 
   /* Update error code */
   hdma2d->ErrorCode = HAL_DMA2D_ERROR_NONE;
 
   /* Initialize the DMA2D state*/
-  hdma2d->State  = HAL_DMA2D_STATE_READY;
+  hdma2d->State = HAL_DMA2D_STATE_READY;
 
   return HAL_OK;
 }
@@ -684,6 +640,8 @@ HAL_StatusTypeDef HAL_DMA2D_Start(DMA2D_HandleTypeDef *hdma2d, uint32_t pdata, u
 
   /* Process locked */
   __HAL_LOCK(hdma2d);
+
+  MODIFY_REG(hdma2d->Instance->OOR, DMA2D_OOR_LO, hdma2d->Init.OutputOffset); // Added to replace call of Init function
 
   /* Change DMA2D peripheral state */
   hdma2d->State = HAL_DMA2D_STATE_BUSY;
