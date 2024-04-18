@@ -1529,21 +1529,11 @@ static void FillTriangle(uint16_t x1, uint16_t x2, uint16_t x3, uint16_t y1, uin
 static void LL_FillBuffer(uint32_t LayerIndex, void *pDst, uint32_t xSize, uint32_t ySize, uint32_t OffLine, uint32_t ColorIndex) 
 {
   hDma2dHandler.Init.OutputOffset = OffLine;
-  /* DMA2D Initialization */
-//  if(HAL_DMA2D_Init(&hDma2dHandler) == HAL_OK)
-//  {
-//    if(HAL_DMA2D_ConfigLayer(&hDma2dHandler, LayerIndex) == HAL_OK)
-//    {
-//      if (HAL_DMA2D_Start(&hDma2dHandler, ColorIndex, (uint32_t)pDst, xSize, ySize) == HAL_OK)
-//      {
-//        /* Polling For DMA transfer */
-//        HAL_DMA2D_PollForTransfer(&hDma2dHandler, 100000);
-//      }
-//    }
-//  }
+
+  HAL_DMA2D_Start(&hDma2dHandler, ColorIndex, (uint32_t)pDst, xSize, ySize);
+
   HAL_StatusTypeDef status;
-  do { status = HAL_DMA2D_Start(&hDma2dHandler, ColorIndex, (uint32_t)pDst, xSize, ySize); } while (status != HAL_OK);
-  do { status = HAL_DMA2D_PollForTransfer(&hDma2dHandler, 10); }                             while (status != HAL_OK);
+  do { status = HAL_DMA2D_PollForTransfer(&hDma2dHandler, 10); } while (status != HAL_OK);
 }
 
 /**
