@@ -515,7 +515,7 @@ uint32_t dimColor(uint32_t inputColor, float dimmingFactor) {
 
 void showFPS(uint32_t frameTime) {
   uint8_t frameTimeS[8];
-  sprintf((char*)frameTimeS, "%03li", frameTime);
+  sprintf((char*)frameTimeS, "%li", frameTime);
   BSP_LCD_SetTextColor(0xFF0000FF);
   BSP_LCD_DisplayStringAt(0, 0, frameTimeS, LEFT_MODE);
 }

@@ -631,13 +631,8 @@ HAL_StatusTypeDef HAL_DMA2D_UnRegisterCallback(DMA2D_HandleTypeDef *hdma2d, HAL_
   * @param  Height     The height of data to be transferred from source to destination (expressed in number of lines).
   * @retval HAL status
   */
-HAL_StatusTypeDef HAL_DMA2D_Start(DMA2D_HandleTypeDef *hdma2d, uint32_t pdata, uint32_t DstAddress, uint32_t Width,
-                                  uint32_t Height)
+HAL_StatusTypeDef HAL_DMA2D_Start(DMA2D_HandleTypeDef *hdma2d, uint32_t pdata, uint32_t DstAddress, uint32_t Width, uint32_t Height)
 {
-  /* Check the parameters */
-  assert_param(IS_DMA2D_LINE(Height));
-  assert_param(IS_DMA2D_PIXEL(Width));
-
   /* Process locked */
   __HAL_LOCK(hdma2d);
 
@@ -1936,8 +1931,7 @@ uint32_t HAL_DMA2D_GetError(DMA2D_HandleTypeDef *hdma2d)
   * @param  Height     The height of data to be transferred from source to destination.
   * @retval HAL status
   */
-static void DMA2D_SetConfig(DMA2D_HandleTypeDef *hdma2d, uint32_t pdata, uint32_t DstAddress, uint32_t Width,
-                            uint32_t Height)
+static void DMA2D_SetConfig(DMA2D_HandleTypeDef *hdma2d, uint32_t pdata, uint32_t DstAddress, uint32_t Width, uint32_t Height)
 {
   uint32_t tmp;
   uint32_t tmp2;
