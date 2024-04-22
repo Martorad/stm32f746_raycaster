@@ -329,7 +329,7 @@ uint32_t cast() {
 
     // VERTICAL LINE CHECK
     rOffsetX = (rAngle < M_PI_2 || rAngle > M_3PI_2) ? 1 : -1; // looking right / left
-    rIntersectXV = (uint16_t)_pPosX + (rOffsetX > 0);
+    rIntersectXV = (uint16_t)_pPosX + (rOffsetX > 0); // I used to do this using a union, using it to bitshift rOffset by 31, to extract the sign bit, but in assembly, this simple conditional is identical, while being far more readable
     rIntersectYV = (_pPosX - rIntersectXV) * cTan + _pPosY;
     rOffsetY = -rOffsetX * cTan;
 
