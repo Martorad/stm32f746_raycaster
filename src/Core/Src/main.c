@@ -314,7 +314,6 @@ uint32_t cast() {
   uint16_t rCount, rCastLimitV, rCastLimitH, mPosition = 0;
   uint8_t  mTextureV, mTextureH;
   float    rIntersectXV, rIntersectYV, rIntersectXH, rIntersectYH, rAngle, rOffsetX, rOffsetY, rShortest, rLenV, rLenH, cTan, cRTan;
-  union    { float f; uint32_t u; } sign;
 
   BSP_LCD_SelectLayer(0);
   BSP_LCD_SetTextColor(COLOR_GROUND);
@@ -330,13 +329,12 @@ uint32_t cast() {
 
     // VERTICAL LINE CHECK
     rOffsetX = (rAngle < M_PI_2 || rAngle > M_3PI_2) ? 1 : -1; // looking right / left
-    sign.f = rOffsetX; sign.u = sign.u >> 31; // A bit of a hack - extract sign bit from the float and use it to correct the value of rIntersect and mPosition in the array. Done to avoid floating point error when map size exceeds a power of two and to optimize above if-statement.
-    rIntersectXV = (uint16_t)_pPosX + !sign.u;
+    rIntersectXV = (uint16_t)_pPosX + (rOffsetX > 0);
     rIntersectYV = (_pPosX - rIntersectXV) * cTan + _pPosY;
     rOffsetY = -rOffsetX * cTan;
 
     while (rCastLimitV < DOF) {
-      mPosition = (uint16_t)rIntersectYV * _mSizeX + (uint16_t)rIntersectXV - sign.u;
+      mPosition = (uint16_t)rIntersectYV * _mSizeX + (uint16_t)rIntersectXV - (rOffsetX < 0);
 
       if (_map[mPosition]) {
         rLenV = rayLengthFast(_pPosX, _pPosY, rIntersectXV, rIntersectYV);
@@ -352,13 +350,12 @@ uint32_t cast() {
 
     // HORIZONTAL LINE CHECK
     rOffsetY = (rAngle < M_PI) ? -1 : 1; // looking up / down
-    sign.f = rOffsetY; sign.u = sign.u >> 31;
-    rIntersectYH = (uint16_t)_pPosY + !sign.u;
+    rIntersectYH = (uint16_t)_pPosY + (rOffsetY > 0);
     rIntersectXH = (_pPosY - rIntersectYH) * cRTan + _pPosX;
     rOffsetX = -rOffsetY * cRTan;
 
     while (rCastLimitH < DOF) {
-      mPosition = ((uint16_t)rIntersectYH - sign.u) * _mSizeX + (uint16_t)rIntersectXH;
+      mPosition = ((uint16_t)rIntersectYH - (rOffsetY < 0)) * _mSizeX + (uint16_t)rIntersectXH;
 
       if (_map[mPosition]) {
         rLenH = rayLengthFast(_pPosX, _pPosY, rIntersectXH, rIntersectYH);
