@@ -337,16 +337,16 @@ uint32_t cast() {
       rTimeY = (mY - rIntersectY + (rVelocityY > 0)) / rVelocityY;
 
       if (rTimeX < rTimeY) { // Vertical line
-        rIntersectY += rVelocityY * rTimeX;
         mX += rStepX;
         rIntersectX = mX - (rVelocityX < 0) * rStepX;
+        rIntersectY += rVelocityY * rTimeX;
         rLength += rTimeX;
         rHitSide = 1;
       }
       else { // Horizontal line
-        rIntersectX += rVelocityX * rTimeY;
         mY += rStepY;
         rIntersectY = mY - (rVelocityY < 0) * rStepY;
+        rIntersectX += rVelocityX * rTimeY;
         rLength += rTimeY;
         rHitSide = 0;
       }
