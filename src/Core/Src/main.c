@@ -311,136 +311,16 @@ void PeriphCommonClock_Config(void)
 uint32_t cast() {
   // Variable prefix convention: r = ray, m = map, p = performance, c = calculation, t = texture, sb = skybox
   uint32_t pStartTime = _sysElapsedTicks;
-  uint16_t rCount, rCastLimitV, rCastLimitH, mPosition = 0;
-  uint8_t  mTextureV, mTextureH;
-  float    rIntersectXV, rIntersectYV, rIntersectXH, rIntersectYH, rAngle, rOffsetX, rOffsetY, rShortest, rLenV, rLenH, cTan, cRTan;
+  uint16_t rCount;
+  float    rAngle;
 
   BSP_LCD_SelectLayer(0);
-  BSP_LCD_SetTextColor(COLOR_GROUND);
-  BSP_LCD_FillRect(0, SCREEN_HEIGHT_HALF, SCREEN_WIDTH, SCREEN_HEIGHT_HALF);
+  BSP_LCD_Clear(LCD_COLOR_BLACK);
 
   rAngle = _pAngle + FOV_HALF * FOV_INCR;
   if (rAngle > M_TWOPI) { rAngle -= M_TWOPI; }
 
   for (rCount = 0; rCount < FOV; rCount++) {
-    rCastLimitV = 0; rCastLimitH = 0;
-    rLenV = FLT_MAX; rLenH = FLT_MAX;
-    cTan = _tanLUT[(uint16_t)(rAngle * M_LUT_P)]; cRTan = 1 / cTan;
-
-    // VERTICAL LINE CHECK
-    rOffsetX = (rAngle < M_PI_2 || rAngle > M_3PI_2) ? 1 : -1; // looking right / left
-    rIntersectXV = (uint16_t)_pPosX + (rOffsetX > 0); // I used to do this using a union, using it to bitshift rOffset by 31, to extract the sign bit, but in assembly, this simple conditional is identical, while being far more readable
-    rIntersectYV = (_pPosX - rIntersectXV) * cTan + _pPosY;
-    rOffsetY = -rOffsetX * cTan;
-
-    while (rCastLimitV < DOF) {
-      mPosition = (uint16_t)rIntersectYV * _mSizeX + (uint16_t)rIntersectXV - (rOffsetX < 0);
-
-      if (_map[mPosition]) {
-        rLenV = rayLengthFast(_pPosX, _pPosY, rIntersectXV, rIntersectYV);
-        rCastLimitV = R_HIT;
-      }
-      else {
-        rIntersectXV += rOffsetX;
-        rIntersectYV += rOffsetY;
-        rCastLimitV++;
-      }
-    }
-    mTextureV = _map[mPosition] - 1;
-
-    // HORIZONTAL LINE CHECK
-    rOffsetY = (rAngle < M_PI) ? -1 : 1; // looking up / down
-    rIntersectYH = (uint16_t)_pPosY + (rOffsetY > 0);
-    rIntersectXH = (_pPosY - rIntersectYH) * cRTan + _pPosX;
-    rOffsetX = -rOffsetY * cRTan;
-
-    while (rCastLimitH < DOF) {
-      mPosition = ((uint16_t)rIntersectYH - (rOffsetY < 0)) * _mSizeX + (uint16_t)rIntersectXH;
-
-      if (_map[mPosition]) {
-        rLenH = rayLengthFast(_pPosX, _pPosY, rIntersectXH, rIntersectYH);
-        rCastLimitH = R_HIT;
-      }
-      else {
-        rIntersectXH += rOffsetX;
-        rIntersectYH += rOffsetY;
-        rCastLimitH++;
-      }
-    }
-    mTextureH = _map[mPosition] - 1;
-
-    // RENDERING
-    uint16_t rCastTotal;
-    uint8_t  tTextureIndex, rHitSide;
-
-    if (rLenV < rLenH) {
-      tTextureIndex = mTextureV;
-      rCastTotal = rCastLimitV;
-      rShortest = rayLength(_pPosX, _pPosY, rIntersectXV, rIntersectYV);
-      rHitSide = 1;
-    }
-    else {
-      tTextureIndex = mTextureH;
-      rCastTotal = rCastLimitH;
-      rShortest = rayLength(_pPosX, _pPosY, rIntersectXH, rIntersectYH);
-      rHitSide = 0;
-    }
-
-    if (rCastTotal == R_HIT) {
-      rShortest *= _fisheyeCosLUT[rCount];
-      float tLineHeight = SCREEN_HEIGHT / rShortest * LINE_VERTICAL_SCALE;
-
-      // DRAW SKYBOX
-      //TODO: Find a better way to do this
-      if (rCount % (SKYBOX_TEXEL_X / FOV_RECT) == 0) {
-        float    sbTexelColumn = SKYBOX_SIZE_X - rAngle * SKYBOX_SCALE_F;
-        uint16_t sbY = 0, sbOffset = SKYBOX_TEXEL_X - (uint16_t)(((sbTexelColumn - (uint16_t)sbTexelColumn) * SKYBOX_TEXEL_X) + 0.1);
-
-        for (uint16_t i = 0; i < SKYBOX_SIZE_Y; i++) { // TODO: I currently overdraw the shit out of the skybox. It *may* be possible to fix that
-          BSP_LCD_SetTextColor(_skybox[i * SKYBOX_SIZE_X + (uint16_t)sbTexelColumn]);
-
-          switch (rCount) { // A switch seems to be marginally faster than an if here, not exactly sure why
-            case 0:  BSP_LCD_FillRect((rCount * FOV_RECT), sbY, sbOffset + SKYBOX_TEXEL_X, SKYBOX_TEXEL_Y); break;
-            default: BSP_LCD_FillRect((rCount * FOV_RECT) + sbOffset, sbY, (rCount == FOV - (SKYBOX_TEXEL_X / FOV_RECT)) ? (SKYBOX_TEXEL_X - sbOffset) : SKYBOX_TEXEL_X, SKYBOX_TEXEL_Y); break;
-          }
-
-          sbY += SKYBOX_TEXEL_Y;
-        }
-      }
-
-      // DRAW WALLS
-      if (tLineHeight > SCREEN_HEIGHT / DOF) { // if line is smaller than the shortest possible line defined by DOF, don't bother drawing it
-        float tX, tY = 0, tYStep = tLineHeight / TEXTURE_SIZE, tOffset = (tLineHeight - SCREEN_HEIGHT) * 0.5;
-
-        if (rHitSide) { tX = (1 - (rIntersectYV - (uint32_t)rIntersectYV)) * TEXTURE_SIZE; if (rAngle < M_PI_2 || rAngle > M_3PI_2) { tX = TEXTURE_SIZE - tX; }}
-        else          { tX = (1 - (rIntersectXH - (uint32_t)rIntersectXH)) * TEXTURE_SIZE; if (rAngle < M_PI)                       { tX = TEXTURE_SIZE - tX; }}
-
-        if (tLineHeight > SCREEN_HEIGHT) {
-          uint16_t tSkipLines = tOffset / tYStep, tFirstLine = tYStep - (tOffset - tSkipLines * tYStep);
-          tY = tFirstLine;
-          for (uint16_t i = tSkipLines; i < TEXTURE_SIZE - tSkipLines; i++) {
-            BSP_LCD_SetTextColor(_textures[tTextureIndex + rHitSide][i * TEXTURE_SIZE + (uint16_t)(tX)]);
-            if (i != tSkipLines && i != TEXTURE_SIZE - tSkipLines - 1) {
-              BSP_LCD_FillRect((rCount * FOV_RECT), tY, FOV_RECT, tYStep + 1);
-              tY += tYStep;
-            }
-            else {
-              BSP_LCD_FillRect((rCount * FOV_RECT), (i == tSkipLines) ? 0 : tY, FOV_RECT, tFirstLine + 2);
-            }
-          }
-        }
-        else {
-          tOffset *= -1; // invert value of texture offset to make it positive
-
-          for (uint16_t i = 0; i < TEXTURE_SIZE; i++) {
-            BSP_LCD_SetTextColor(_textures[tTextureIndex + rHitSide][i * TEXTURE_SIZE + (uint16_t)(tX)]);
-            BSP_LCD_FillRect((rCount * FOV_RECT), tOffset + tY, FOV_RECT, tYStep + 1);
-            tY += tYStep;
-          }
-        }
-      }
-    }
-
     rAngle -= FOV_INCR;
     if (rAngle < 0) { rAngle += M_TWOPI; }
   }
