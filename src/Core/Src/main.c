@@ -97,7 +97,7 @@ const uint8_t _map[] = {
   5,1,1,1,1,1,1,1,1,1,1,0,0,1,0,0,0,0,0,0,0,5,0,0,0,0,0,0,0,5,0,3,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,5,
   5,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,5,0,0,0,0,0,0,5,0,3,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,5,
   5,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,5,0,0,0,0,0,0,0,3,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,5,
-  5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,3,5,7,7,5,3,3,5,5,5,5,5,5,5,5,5,5
+  5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,3,3,3,3,3,3,3,5,5,5,5,5,5,5,5,5,5
 };
 
 // PLAYER
@@ -353,7 +353,7 @@ uint32_t cast() {
 
     // DRAW SKYBOX
     if (rCount % (SKYBOX_TEXEL_X / FOV_RECT) == 0) {
-      float    sbTexelColumn = (SKYBOX_SIZE_X - 1) - rAngle * FOV_INCR * SKYBOX_SCALE_F;
+      float    sbTexelColumn = SKYBOX_SIZE_X - (rAngle + 1) * FOV_INCR * SKYBOX_SCALE_F;
       uint16_t sbY = 0, sbOffset = SKYBOX_TEXEL_X - (uint16_t)(((sbTexelColumn - (uint16_t)sbTexelColumn) * SKYBOX_TEXEL_X) + 0.1);
 
       for (uint16_t i = 0; i < SKYBOX_SIZE_Y; i++) { // TODO: I currently overdraw the shit out of the skybox. It *may* be possible to fix that
