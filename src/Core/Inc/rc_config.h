@@ -12,7 +12,7 @@
 
 // MOVEMENT SETTINGS
 #define INCR_ROTATION    0.07  // Higher is faster
-#define INCR_TRANSLATION 0.0024  // Higher is faster
+#define INCR_TRANSLATION 0.0012  // Higher is faster
 #define P_HITBOX_SIZE    0.6     // In units of map squares
 
 // DEBUG SETTINGS

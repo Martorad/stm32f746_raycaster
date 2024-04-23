@@ -206,13 +206,13 @@ int main(void)
       showFPS(cast());
 
       if (HAL_GPIO_ReadPin(ARDUINO_D4_GPIO_Port, ARDUINO_D4_Pin)) { // RIGHT
-        _pAngle -= 4;
+        _pAngle -= 5;
         if (_pAngle < 0) { _pAngle = 1440; }
         _pDeltaX =  _cosLUT[_pAngle] * _pMovSpeed;
         _pDeltaY = -_sinLUT[_pAngle] * _pMovSpeed;
       }
       if (HAL_GPIO_ReadPin(ARDUINO_D5_GPIO_Port, ARDUINO_D5_Pin)) { // LEFT
-        _pAngle += 4;
+        _pAngle += 5;
         if (_pAngle > 1440) { _pAngle = 0; }
         _pDeltaX =  _cosLUT[_pAngle] * _pMovSpeed;
         _pDeltaY = -_sinLUT[_pAngle] * _pMovSpeed;
