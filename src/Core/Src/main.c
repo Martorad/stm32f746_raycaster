@@ -321,6 +321,43 @@ uint32_t cast() {
   if (rAngle > M_TWOPI) { rAngle -= M_TWOPI; }
 
   for (rCount = 0; rCount < FOV; rCount++) {
+    float r_vx = cos(rAngle);
+    int16_t r_ivx = (r_vx > 0) ? 1 : -1;
+    float r_vy = sin(rAngle);
+    int16_t r_ivy = (r_vx > 0) ? -1 : 1;
+
+    float r_x = _pPosX, r_y = _pPosY;
+    int16_t r_ix = (int16_t)r_x, r_iy = (int16_t)r_y;
+    float r_dist = 0;
+    float t1, t2;
+
+    for (uint16_t i = 0; i < _mSizeX * _mSizeY; i++) {
+      if (_map[r_iy * _mSizeX + r_ix] > 0) { break; }
+
+      t1 = (r_ix - r_x + (r_vx > 0)) / r_vx;
+      t2 = (r_iy - r_y + (r_vy > 0)) / r_vy;
+
+      if (t1 < t2) { // intersection with vertical line
+        r_y += r_vy * t1;
+        r_ix += r_ivx;
+        r_x = r_ix - (r_vx < 0) * r_ivx;
+        r_dist += t1;
+      }
+      else { // intersection with horizontal line
+        r_x += r_vx * t2;
+        r_iy += r_ivy;
+        r_y = r_iy - (r_vy < 0) * r_ivy;
+        r_dist += t2;
+      }
+    }
+
+    float lineHeight = SCREEN_HEIGHT / r_dist;
+    if (lineHeight > SCREEN_HEIGHT) { lineHeight = SCREEN_HEIGHT; }
+    float lineOffset = (SCREEN_HEIGHT - lineHeight) / 2;
+    BSP_LCD_SetTextColor(0xFFCCFFDD);
+    BSP_LCD_FillRect(rCount * FOV_RECT, lineOffset, FOV_RECT, lineHeight);
+
+
     rAngle -= FOV_INCR;
     if (rAngle < 0) { rAngle += M_TWOPI; }
   }
