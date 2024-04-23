@@ -44,7 +44,7 @@
 #include "../../Drivers/BSP/STM32746G-Discovery/stm32746g_discovery_lcd.h"
 #include "rc_config.h"
 #include "textures.h"
-#include "trig_lut.h"
+//#include "trig_lut.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -101,7 +101,10 @@ const uint8_t _map[] = {
 };
 
 // PLAYER
-float _pPosX = 1.5, _pPosY = 8, _pAngle = 0 * FOV_INCR, _pDeltaX, _pDeltaY, _pMovSpeed, _pRotSpeed;
+float _pPosX = 1.5, _pPosY = 8, _pDeltaX, _pDeltaY, _pMovSpeed, _pRotSpeed;
+int16_t _pAngle = 0; // Angle in increments of FOV_INCR radians
+
+float _sinLUT[1440], _cosLUT[1440];
 
 // SYSTEM
 volatile uint32_t _sysElapsedTicks = 0; // 10K frequency, 1 tick = 100us = 0.1ms
@@ -179,13 +182,15 @@ int main(void)
   BSP_LCD_SelectLayer(LTDC_FOREGROUND);
   BSP_LCD_Clear(LCD_COLOR_BLACK);
 
-  for (uint16_t i = 0; i < FOV; i++) { _fisheyeCosLUT[i] = cos((FOV_HALF - i) * FOV_INCR); } // Pre-calculate all cosine values to correct fisheye effect later
+  for (uint16_t i = 0; i < FOV; i++) { _fisheyeCosLUT[i] = 1 / cos((FOV_HALF - i) * FOV_INCR); } // Pre-calculate all cosine values to correct fisheye effect later
+  for (uint16_t i = 0; i < 1440; i++) { _sinLUT[i] = sin(i * FOV_INCR + 0.0001); }
+  for (uint16_t i = 0; i < 1440; i++) { _cosLUT[i] = cos(i * FOV_INCR + 0.0001); }
 
   HAL_TIM_Base_Start_IT(&htim7);
 
   cast();
-  _pDeltaX =  cos(_pAngle) * _pMovSpeed;
-  _pDeltaY = -sin(_pAngle) * _pMovSpeed;
+  _pDeltaX =  _cosLUT[_pAngle] * _pMovSpeed;
+  _pDeltaY = -_sinLUT[_pAngle] * _pMovSpeed;
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -202,15 +207,15 @@ int main(void)
 
       if (HAL_GPIO_ReadPin(ARDUINO_D4_GPIO_Port, ARDUINO_D4_Pin)) { // RIGHT
         _pAngle -= _pRotSpeed;
-        if (_pAngle < 0) { _pAngle = M_TWOPI; }
-        _pDeltaX =  cos(_pAngle) * _pMovSpeed;
-        _pDeltaY = -sin(_pAngle) * _pMovSpeed;
+        if (_pAngle < 0) { _pAngle = 1440; }
+        _pDeltaX =  _cosLUT[_pAngle] * _pMovSpeed;
+        _pDeltaY = -_sinLUT[_pAngle] * _pMovSpeed;
       }
       if (HAL_GPIO_ReadPin(ARDUINO_D5_GPIO_Port, ARDUINO_D5_Pin)) { // LEFT
         _pAngle += _pRotSpeed;
-        if (_pAngle > M_TWOPI) { _pAngle = 0; }
-        _pDeltaX =  cos(_pAngle) * _pMovSpeed;
-        _pDeltaY = -sin(_pAngle) * _pMovSpeed;
+        if (_pAngle > 1440) { _pAngle = 0; }
+        _pDeltaX =  _cosLUT[_pAngle] * _pMovSpeed;
+        _pDeltaY = -_sinLUT[_pAngle] * _pMovSpeed;
       }
       if (HAL_GPIO_ReadPin(ARDUINO_D2_GPIO_Port, ARDUINO_D2_Pin)) { // FORWARD
         if (_map[(uint16_t)_pPosY * _mSizeX + (uint16_t)(_pPosX + ((_pDeltaX < 0) ? -P_HITBOX_SIZE : P_HITBOX_SIZE))] == 0) { _pPosX += _pDeltaX; }
@@ -312,18 +317,18 @@ uint32_t cast() {
   // Variable prefix convention: r = ray, m = map, p = performance, c = calculation, t = texture, sb = skybox
   uint32_t pStartTime = _sysElapsedTicks;
   uint16_t rCount;
-  float    rAngle;
+  int16_t  rAngle;
 
   BSP_LCD_SelectLayer(0);
   BSP_LCD_Clear(LCD_COLOR_BLACK);
 
-  rAngle = _pAngle + FOV_HALF * FOV_INCR;
-  if (rAngle > M_TWOPI) { rAngle -= M_TWOPI; }
+  rAngle = _pAngle + FOV_HALF;
+  if (rAngle > 1440) { rAngle -= 1440; }
 
   for (rCount = 0; rCount < FOV; rCount++) {
-    float r_vx = cos(rAngle);
+    float r_vx =  _cosLUT[rAngle];
     int16_t r_ivx = (r_vx > 0) ? 1 : -1;
-    float r_vy = -sin(rAngle);
+    float r_vy = -_sinLUT[rAngle];
     int16_t r_ivy = (r_vy > 0) ? 1 : -1;
 
     float r_x = _pPosX, r_y = _pPosY;
@@ -351,15 +356,16 @@ uint32_t cast() {
       }
     }
 
-    float lineHeight = SCREEN_HEIGHT / r_dist;
+    float lineHeight = SCREEN_HEIGHT / r_dist * _fisheyeCosLUT[rCount] * LINE_VERTICAL_SCALE;
     if (lineHeight > SCREEN_HEIGHT) { lineHeight = SCREEN_HEIGHT; }
     float lineOffset = (SCREEN_HEIGHT - lineHeight) / 2;
+
     BSP_LCD_SetTextColor(0xFFCCFFDD);
     BSP_LCD_FillRect(rCount * FOV_RECT, lineOffset, FOV_RECT, lineHeight);
 
 
-    rAngle -= FOV_INCR;
-    if (rAngle < 0) { rAngle += M_TWOPI; }
+    rAngle--;;
+    if (rAngle < 0) { rAngle += 1440; }
   }
 
   uint32_t pFrameTime = _sysElapsedTicks - pStartTime;
