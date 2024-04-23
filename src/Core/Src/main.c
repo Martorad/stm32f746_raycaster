@@ -183,8 +183,8 @@ int main(void)
   BSP_LCD_Clear(LCD_COLOR_BLACK);
 
   for (uint16_t i = 0; i < FOV; i++) { _fisheyeCosLUT[i] = 1 / cos((FOV / 2 - i) * FOV_INCR); } // Pre-calculate all cosine values to correct fisheye effect later
-  for (uint16_t i = 0; i < FOV_RANGE; i++) { _sinLUT[i] = sin(i * FOV_INCR + 0.0001); }
-  for (uint16_t i = 0; i < FOV_RANGE; i++) { _cosLUT[i] = cos(i * FOV_INCR + 0.0001); }
+  for (uint16_t i = 0; i < FOV_RANGE; i++) { _sinLUT[i]  = sin(i * FOV_INCR + 0.0001); }
+  for (uint16_t i = 0; i < FOV_RANGE; i++) { _cosLUT[i]  = cos(i * FOV_INCR + 0.0001); }
 
   HAL_TIM_Base_Start_IT(&htim7);
 
@@ -338,7 +338,7 @@ uint32_t cast() {
       rTimeX = (mX - rIntersectX + (rVelocityX > 0)) / rVelocityX;
       rTimeY = (mY - rIntersectY + (rVelocityY > 0)) / rVelocityY;
 
-      if (rTimeX < rTimeY) { // Verical line
+      if (rTimeX < rTimeY) { // Vertical line
         rIntersectY += rVelocityY * rTimeX;
         mX += rStepX;
         rIntersectX = mX - (rVelocityX < 0) * rStepX;
@@ -407,7 +407,7 @@ uint32_t cast() {
       }
     }
 
-    rAngle--;;
+    rAngle--;
     if (rAngle < 0) { rAngle += FOV_RANGE; }
   }
 
