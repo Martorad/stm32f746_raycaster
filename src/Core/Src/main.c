@@ -181,14 +181,14 @@ int main(void)
   BSP_LCD_Clear(LCD_COLOR_BLACK);
 
   for (uint16_t i = 0; i < FOV; i++) { _fisheyeCosLUT[i] = 1 / cos((FOV / 2 - i) * FOV_INCR); } // Pre-calculate all cosine values to correct fisheye effect later
-  for (uint16_t i = 0; i < FOV_RANGE; i++) { _sinLUT[i]  = sin(i * FOV_INCR + 0.0001); }
-  for (uint16_t i = 0; i < FOV_RANGE; i++) { _cosLUT[i]  = cos(i * FOV_INCR + 0.0001); }
+  for (uint16_t i = 0; i < FOV_RANGE; i++) { _sinLUT[i]  = -sin(i * FOV_INCR + 0.0001); }       // Sin is inverted because I use screenspace coordinates so Y is inverted
+  for (uint16_t i = 0; i < FOV_RANGE; i++) { _cosLUT[i]  =  cos(i * FOV_INCR + 0.0001); }
 
   HAL_TIM_Base_Start_IT(&htim7);
 
   cast();
-  _pDeltaX =  _cosLUT[_pAngle] * _pMovSpeed;
-  _pDeltaY = -_sinLUT[_pAngle] * _pMovSpeed;
+  _pDeltaX = _cosLUT[_pAngle] * _pMovSpeed;
+  _pDeltaY = _sinLUT[_pAngle] * _pMovSpeed;
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -204,22 +204,22 @@ int main(void)
       showFPS(cast());
 
       if (HAL_GPIO_ReadPin(ARDUINO_D4_GPIO_Port, ARDUINO_D4_Pin)) { // RIGHT
-        _pAngle -= 5;
-        if (_pAngle < 0) { _pAngle = FOV_RANGE; }
-        _pDeltaX =  _cosLUT[_pAngle] * _pMovSpeed;
-        _pDeltaY = -_sinLUT[_pAngle] * _pMovSpeed;
+        _pAngle -= INCR_ROTATION;
+        if (_pAngle < 0) { _pAngle += FOV_RANGE; }
+        _pDeltaX = _cosLUT[_pAngle] * _pMovSpeed;
+        _pDeltaY = _sinLUT[_pAngle] * _pMovSpeed;
       }
       if (HAL_GPIO_ReadPin(ARDUINO_D5_GPIO_Port, ARDUINO_D5_Pin)) { // LEFT
-        _pAngle += 5;
-        if (_pAngle > FOV_RANGE) { _pAngle = 0; }
-        _pDeltaX =  _cosLUT[_pAngle] * _pMovSpeed;
-        _pDeltaY = -_sinLUT[_pAngle] * _pMovSpeed;
+        _pAngle += INCR_ROTATION;
+        if (_pAngle > FOV_RANGE) { _pAngle -= FOV_RANGE; }
+        _pDeltaX = _cosLUT[_pAngle] * _pMovSpeed;
+        _pDeltaY = _sinLUT[_pAngle] * _pMovSpeed;
       }
       if (HAL_GPIO_ReadPin(ARDUINO_D2_GPIO_Port, ARDUINO_D2_Pin)) { // FORWARD
         if (_map[(uint16_t)_pPosY * _mSizeX + (uint16_t)(_pPosX + ((_pDeltaX < 0) ? -P_HITBOX_SIZE : P_HITBOX_SIZE))] == 0) { _pPosX += _pDeltaX; }
         if (_map[(uint16_t)(_pPosY + ((_pDeltaY < 0) ? -P_HITBOX_SIZE : P_HITBOX_SIZE)) * _mSizeX + (uint16_t)_pPosX] == 0) { _pPosY += _pDeltaY; }
       }
-      if (HAL_GPIO_ReadPin(ARDUINO_D3_GPIO_Port, ARDUINO_D3_Pin)) { // BACKWARD
+      else if (HAL_GPIO_ReadPin(ARDUINO_D3_GPIO_Port, ARDUINO_D3_Pin)) { // BACKWARD
         if (_map[(uint16_t)_pPosY * _mSizeX + (uint16_t)(_pPosX - ((_pDeltaX < 0) ? -P_HITBOX_SIZE : P_HITBOX_SIZE))] == 0) { _pPosX -= _pDeltaX; }
         if (_map[(uint16_t)(_pPosY - ((_pDeltaY < 0) ? -P_HITBOX_SIZE : P_HITBOX_SIZE)) * _mSizeX + (uint16_t)_pPosX] == 0) { _pPosY -= _pDeltaY; }
       }
@@ -326,7 +326,7 @@ uint32_t cast() {
 
   for (rCount = 0; rCount < FOV; rCount++) {
     // This uses David Ziemkiewicz' method of velocities and times, as well as Lodev's DDA. Massive thanks to both of these legends.
-    float   rVelocityX = _cosLUT[rAngle], rVelocityY = -_sinLUT[rAngle], rIntersectX = _pPosX, rIntersectY = _pPosY, rTimeX, rTimeY, rLength = 0, tLineHeight;
+    float   rVelocityX = _cosLUT[rAngle], rVelocityY = _sinLUT[rAngle], rIntersectX = _pPosX, rIntersectY = _pPosY, rTimeX, rTimeY, rLength = 0, tLineHeight;
     int16_t mX = (int16_t)rIntersectX, mY = (int16_t)rIntersectY;
     int8_t  rStepX = (rVelocityX > 0) ? 1 : -1, rStepY = (rVelocityY > 0) ? 1 : -1, rHitSide = 0;
 
@@ -411,7 +411,7 @@ uint32_t cast() {
   uint32_t pFrameTime = _sysElapsedTicks - pStartTime;
 
   _pMovSpeed = pFrameTime * INCR_TRANSLATION;
-  _pRotSpeed = pFrameTime * INCR_ROTATION;
+//  _pRotSpeed = pFrameTime * INCR_ROTATION;
 
   return pFrameTime;
 }
