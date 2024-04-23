@@ -101,7 +101,7 @@ const uint8_t _map[] = {
 };
 
 // PLAYER
-float _pPosX = 1.5, _pPosY = 8, _pAngle = 0 * FOV_INCR, _pDeltaX, _pDeltaY, _pMovSpeed, _pRotSpeed;
+float _pPosX = 1.5, _pPosY = 8, _pAngle = 0 * FOV_INCR, _pDeltaX, _pDeltaY, _pMovSpeed, _pRotSpeed; // TODO: Implement this using a struct and fixed point angles
 
 // SYSTEM
 volatile uint32_t _sysElapsedTicks = 0; // 10K frequency, 1 tick = 100us = 0.1ms
