@@ -20,52 +20,43 @@
 
 // <------------------------ DO NOT TOUCH ------------------------>
 // INTERNAL CONFIGURATION DEFINES
-#define M_3PI_2  4.71238898038468985769
-#define R_HIT    0xAAAA // Magic value for a detected ray hit
-#define L_COEFF  0.166  // Lighting coefficient, should be 1 / (DOF - FOG_OF_WAR_CUTOFF(18))
 
 // RESOLUTION CONFIGURATION TABLES
 // FOV_RECT describes the width of each rectangle drawn on screen. Smaller width rectangles have higher fidelity, at the cost of speed. Odd width rectangles mean that symmetrical frames cannot be drawn.
-#ifdef  RES_0
-#define FOV       10
-#define FOV_RECT  48
-#define FOV_INCR  0.1047198
-#define FOV_RANGE 60
-#endif
 
 #ifdef  RES_1
 #define FOV       30
 #define FOV_RECT  16
-#define FOV_INCR  0.0349066
-#define FOV_RANGE 180
+#define FOV_INCR  (2 * M_PI) / (360 * 0.5)
+#define FOV_RANGE (360 * 0.5)
 #endif
 
 #ifdef  RES_2
 #define FOV       60
 #define FOV_RECT  8
-#define FOV_INCR  0.0174533
-#define FOV_RANGE 360
+#define FOV_INCR  (2 * M_PI) / (360 * 1)
+#define FOV_RANGE (360 * 1)
 #endif
 
 #ifdef  RES_3
 #define FOV       120
 #define FOV_RECT  4
-#define FOV_INCR  0.00872665
-#define FOV_RANGE 720
+#define FOV_INCR  (2 * M_PI) / (360 * 2)
+#define FOV_RANGE (360 * 2)
 #endif
 
 #ifdef  RES_4
 #define FOV       240
 #define FOV_RECT  2
-#define FOV_INCR  0.004363325
-#define FOV_RANGE 1440
+#define FOV_INCR  (2 * M_PI) / (360 * 4)
+#define FOV_RANGE (360 * 4)
 #endif
 
 #ifdef  RES_5
 #define FOV       480
 #define FOV_RECT  1
-#define FOV_INCR  0.0021816625
-#define FOV_RANGE 2880
+#define FOV_INCR  (2 * M_PI) / (360 * 8)
+#define FOV_RANGE (360 * 8)
 #endif
 
 #endif
