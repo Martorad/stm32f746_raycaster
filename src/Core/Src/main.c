@@ -106,7 +106,8 @@ int16_t _pAngle = 0; // Angle in increments of FOV_INCR radians
 
 // SYSTEM
 volatile uint32_t _sysElapsedTicks = 0; // 10K frequency, 1 tick = 100us = 0.1ms
-float _fisheyeCosLUT[FOV], _sinLUT[FOV_RANGE], _cosLUT[FOV_RANGE], _sbLUT[FOV_RANGE];
+float    _fisheyeCosLUT[FOV], _sinLUT[FOV_RANGE], _cosLUT[FOV_RANGE];
+uint16_t _sbLUT[FOV_RANGE];
 
 /* USER CODE END 0 */
 
@@ -181,9 +182,11 @@ int main(void)
   BSP_LCD_Clear(LCD_COLOR_BLACK);
 
   for (uint16_t i = 0; i < FOV; i++) { _fisheyeCosLUT[i] = 1 / cos((FOV / 2 - i) * FOV_INCR); } // Pre-calculate all cosine values to correct fisheye effect later
-  for (uint16_t i = 0; i < FOV_RANGE; i++) { _sinLUT[i]  = -sin(i * FOV_INCR + 0.0001); }       // Sin is inverted because I use screenspace coordinates so Y is inverted
-  for (uint16_t i = 0; i < FOV_RANGE; i++) { _cosLUT[i]  =  cos(i * FOV_INCR + 0.0001); }
-  for (uint16_t i = 0; i < FOV_RANGE; i++) { _sbLUT[i]  =  SKYBOX_SIZE_X - (i + 1) * FOV_INCR * SKYBOX_SCALE_F; }
+  for (uint16_t i = 0; i < FOV_RANGE; i++) {
+    _sinLUT[i] = -sin(i * FOV_INCR + 0.0001); // Sin is inverted because I use screenspace coordinates so Y is inverted
+    _cosLUT[i] =  cos(i * FOV_INCR + 0.0001);
+    _sbLUT[i]  =  (uint16_t)(SKYBOX_SIZE_X - (i + 1) * FOV_INCR * SKYBOX_SCALE_F);
+  }
 
   HAL_TIM_Base_Start_IT(&htim7);
 
@@ -382,8 +385,8 @@ uint32_t cast() {
         uint16_t sbY = 0, sbDrawLines = (tOffset / SKYBOX_TEXEL_Y) + 1;
         if (sbDrawLines > SKYBOX_SIZE_Y) { sbDrawLines = SKYBOX_SIZE_Y; }
 
-        for (uint16_t i = 0; i < sbDrawLines; i++) { // TODO: I currently overdraw the shit out of the skybox. It *may* be possible to fix that
-          BSP_LCD_SetTextColor(_skybox[i * SKYBOX_SIZE_X + (uint16_t)_sbLUT[rAngle]]);
+        for (uint16_t i = 0; i < sbDrawLines; i++) {
+          BSP_LCD_SetTextColor(_skybox[i * SKYBOX_SIZE_X + _sbLUT[rAngle]]);
           BSP_LCD_FillRect((rCount * FOV_RECT), sbY, FOV_RECT, SKYBOX_TEXEL_Y);
           sbY += SKYBOX_TEXEL_Y;
         }
