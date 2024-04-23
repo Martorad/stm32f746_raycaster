@@ -106,7 +106,7 @@ int16_t _pAngle = 0; // Angle in increments of FOV_INCR radians
 
 // SYSTEM
 volatile uint32_t _sysElapsedTicks = 0; // 10K frequency, 1 tick = 100us = 0.1ms
-float _fisheyeCosLUT[FOV], _sinLUT[FOV_RANGE], _cosLUT[FOV_RANGE];
+float _fisheyeCosLUT[FOV], _sinLUT[FOV_RANGE], _cosLUT[FOV_RANGE], _sbLUT[FOV_RANGE];
 
 /* USER CODE END 0 */
 
@@ -183,6 +183,7 @@ int main(void)
   for (uint16_t i = 0; i < FOV; i++) { _fisheyeCosLUT[i] = 1 / cos((FOV / 2 - i) * FOV_INCR); } // Pre-calculate all cosine values to correct fisheye effect later
   for (uint16_t i = 0; i < FOV_RANGE; i++) { _sinLUT[i]  = -sin(i * FOV_INCR + 0.0001); }       // Sin is inverted because I use screenspace coordinates so Y is inverted
   for (uint16_t i = 0; i < FOV_RANGE; i++) { _cosLUT[i]  =  cos(i * FOV_INCR + 0.0001); }
+  for (uint16_t i = 0; i < FOV_RANGE; i++) { _sbLUT[i]  =  SKYBOX_SIZE_X - (i + 1) * FOV_INCR * SKYBOX_SCALE_F; }
 
   HAL_TIM_Base_Start_IT(&htim7);
 
@@ -351,23 +352,6 @@ uint32_t cast() {
       }
     }
 
-    // DRAW SKYBOX
-    if (rCount % (SKYBOX_TEXEL_X / FOV_RECT) == 0) {
-      float    sbTexelColumn = SKYBOX_SIZE_X - (rAngle + 1) * FOV_INCR * SKYBOX_SCALE_F;
-      uint16_t sbY = 0, sbOffset = SKYBOX_TEXEL_X - (uint16_t)(((sbTexelColumn - (uint16_t)sbTexelColumn) * SKYBOX_TEXEL_X) + 0.1);
-
-      for (uint16_t i = 0; i < SKYBOX_SIZE_Y; i++) { // TODO: I currently overdraw the shit out of the skybox. It *may* be possible to fix that
-        BSP_LCD_SetTextColor(_skybox[i * SKYBOX_SIZE_X + (uint16_t)sbTexelColumn]);
-
-        switch (rCount) { // A switch seems to be marginally faster than an if here, not exactly sure why
-          case 0:  BSP_LCD_FillRect((rCount * FOV_RECT), sbY, sbOffset + SKYBOX_TEXEL_X, SKYBOX_TEXEL_Y); break;
-          default: BSP_LCD_FillRect((rCount * FOV_RECT) + sbOffset, sbY, (rCount == FOV - (SKYBOX_TEXEL_X / FOV_RECT)) ? (SKYBOX_TEXEL_X - sbOffset) : SKYBOX_TEXEL_X, SKYBOX_TEXEL_Y); break;
-        }
-
-        sbY += SKYBOX_TEXEL_Y;
-      }
-    }
-
     // DRAW WALLS
     tLineHeight = SCREEN_HEIGHT / rLength * _fisheyeCosLUT[rCount] * LINE_VERTICAL_SCALE;
 
@@ -393,6 +377,16 @@ uint32_t cast() {
       }
       else {
         tOffset *= -1; // invert value of texture offset to make it positive
+
+        // DRAW SKYBOX
+        uint16_t sbY = 0, sbDrawLines = (tOffset / SKYBOX_TEXEL_Y) + 1;
+        if (sbDrawLines > SKYBOX_SIZE_Y) { sbDrawLines = SKYBOX_SIZE_Y; }
+
+        for (uint16_t i = 0; i < sbDrawLines; i++) { // TODO: I currently overdraw the shit out of the skybox. It *may* be possible to fix that
+          BSP_LCD_SetTextColor(_skybox[i * SKYBOX_SIZE_X + (uint16_t)_sbLUT[rAngle]]);
+          BSP_LCD_FillRect((rCount * FOV_RECT), sbY, FOV_RECT, SKYBOX_TEXEL_Y);
+          sbY += SKYBOX_TEXEL_Y;
+        }
 
         for (uint16_t i = 0; i < TEXTURE_SIZE; i++) {
           BSP_LCD_SetTextColor(_textures[_map[mY * _mSizeX + mX] - 1 + rHitSide][i * TEXTURE_SIZE + (uint16_t)(tX)]);
