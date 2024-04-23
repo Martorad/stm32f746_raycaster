@@ -323,7 +323,7 @@ uint32_t cast() {
   for (rCount = 0; rCount < FOV; rCount++) {
     float r_vx = cos(rAngle);
     int16_t r_ivx = (r_vx > 0) ? 1 : -1;
-    float r_vy = sin(rAngle);
+    float r_vy = -sin(rAngle);
     int16_t r_ivy = (r_vy > 0) ? 1 : -1;
 
     float r_x = _pPosX, r_y = _pPosY;
