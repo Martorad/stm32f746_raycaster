@@ -328,7 +328,7 @@ uint32_t cast() {
 
   for (rCount = 0; rCount < FOV; rCount++) {
     // This uses David Ziemkiewicz' method of velocities and times, as well as Lodev's DDA. Massive thanks to both of these legends.
-    float   rVelocityX = _cosLUT[rAngle], rVelocityY = -_sinLUT[rAngle], rIntersectX = _pPosX, rIntersectY = _pPosY, rTimeX, rTimeY, rLength = 0;
+    float   rVelocityX = _cosLUT[rAngle], rVelocityY = -_sinLUT[rAngle], rIntersectX = _pPosX, rIntersectY = _pPosY, rTimeX, rTimeY, rLength = 0, tLineHeight;
     int16_t mX = (int16_t)rIntersectX, mY = (int16_t)rIntersectY;
     int8_t  rStepX = (rVelocityX > 0) ? 1 : -1, rStepY = (rVelocityY > 0) ? 1 : -1, rHitSide = 0;
 
@@ -354,9 +354,6 @@ uint32_t cast() {
       }
     }
 
-    float   tLineHeight = SCREEN_HEIGHT / rLength * _fisheyeCosLUT[rCount] * LINE_VERTICAL_SCALE;
-    uint8_t tTextureIndex = _map[mY * _mSizeX + mX] - 1;
-
     // DRAW SKYBOX
     //TODO: Find a better way to do this
     if (rCount % (SKYBOX_TEXEL_X / FOV_RECT) == 0) {
@@ -376,7 +373,9 @@ uint32_t cast() {
     }
 
     // DRAW WALLS
-    if (tLineHeight > SCREEN_HEIGHT / DOF) { // if line is smaller than the shortest possible line defined by DOF, don't bother drawing it
+    tLineHeight = SCREEN_HEIGHT / rLength * _fisheyeCosLUT[rCount] * LINE_VERTICAL_SCALE;
+
+    if (tLineHeight > SHORTEST_LINE) { // if line is smaller than the shortest possible line defined by DOF, don't bother drawing it
       float tX, tY = 0, tYStep = tLineHeight / TEXTURE_SIZE, tOffset = (tLineHeight - SCREEN_HEIGHT) * 0.5;
 
       if (rHitSide) { tX = (1 - (rIntersectY - (uint16_t)rIntersectY)) * TEXTURE_SIZE; if (rAngle < FOV_RANGE / 4 || rAngle > (FOV_RANGE / 4) * 3) { tX = TEXTURE_SIZE - tX; }}
@@ -386,7 +385,7 @@ uint32_t cast() {
         uint16_t tSkipLines = tOffset / tYStep, tFirstLine = tYStep - (tOffset - tSkipLines * tYStep);
         tY = tFirstLine;
         for (uint16_t i = tSkipLines; i < TEXTURE_SIZE - tSkipLines; i++) {
-          BSP_LCD_SetTextColor(_textures[tTextureIndex + rHitSide][i * TEXTURE_SIZE + (uint16_t)(tX)]);
+          BSP_LCD_SetTextColor(_textures[_map[mY * _mSizeX + mX] - 1 + rHitSide][i * TEXTURE_SIZE + (uint16_t)(tX)]);
           if (i != tSkipLines && i != TEXTURE_SIZE - tSkipLines - 1) {
             BSP_LCD_FillRect((rCount * FOV_RECT), tY, FOV_RECT, tYStep + 1);
             tY += tYStep;
@@ -400,7 +399,7 @@ uint32_t cast() {
         tOffset *= -1; // invert value of texture offset to make it positive
 
         for (uint16_t i = 0; i < TEXTURE_SIZE; i++) {
-          BSP_LCD_SetTextColor(_textures[tTextureIndex + rHitSide][i * TEXTURE_SIZE + (uint16_t)(tX)]);
+          BSP_LCD_SetTextColor(_textures[_map[mY * _mSizeX + mX] - 1 + rHitSide][i * TEXTURE_SIZE + (uint16_t)(tX)]);
           BSP_LCD_FillRect((rCount * FOV_RECT), tOffset + tY, FOV_RECT, tYStep + 1);
           tY += tYStep;
         }
@@ -419,14 +418,6 @@ uint32_t cast() {
   return pFrameTime;
 }
 
-float rayLength(float ax, float ay, float bx, float by) {
-  return fsqrt((bx - ax) * (bx - ax) + (by - ay) * (by - ay));
-}
-
-float rayLengthFast(float ax, float ay, float bx, float by) {
-  return (bx - ax) * (bx - ax) + (by - ay) * (by - ay);
-}
-
 float fsqrt(float x) {
   float g = x / 2.0;
 
@@ -441,31 +432,6 @@ void pageFlip() {
   static volatile uint8_t activeBuffer = 1;
   activeBuffer ^= 1;
   BSP_LCD_SWAP(activeBuffer);
-}
-
-uint32_t CLUT(uint8_t index, uint8_t hitSide) { // Compared to an array of const uint32_t, this is faster, as tested on Full resolution.
-  if (hitSide) { // Y side wall
-    switch (index) {
-      case 1:  return 0xFFAA0000; // red
-      case 2:  return 0xFF00AA00; // green
-      case 3:  return 0xFF0000AA; // blue
-      case 4:  return 0xFF00AAAA; // cyan
-      case 5:  return 0xFFAA00AA; // magenta
-      case 6:  return 0xFFAAAA00; // yellow
-      default: return 0xFFAAAAAA; // white
-    }
-  }
-  else { // X side wall
-    switch (index) {
-      case 1:  return 0xFFFF0000;
-      case 2:  return 0xFF00FF00;
-      case 3:  return 0xFF0000FF;
-      case 4:  return 0xFF00FFFF;
-      case 5:  return 0xFFFF00FF;
-      case 6:  return 0xFFFFFF00;
-      default: return 0xFFFFFFFF;
-    }
-  }
 }
 
 uint32_t dimColor(uint32_t inputColor, float dimmingFactor) {

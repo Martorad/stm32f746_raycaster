@@ -5,7 +5,7 @@
 #define RES_4 // Vertical line resolution
 #define SBR_0 // Skybox resolution - 0 for 16px, 1 for 32px
 
-#define DOF 64 // Ray cast limit
+#define SHORTEST_LINE 5
 
 // AESTHETIC SETTINGS
 #define LINE_VERTICAL_SCALE 1.5
