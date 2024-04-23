@@ -209,7 +209,7 @@ int main(void)
         _pDeltaX = _cosLUT[_pAngle] * _pMovSpeed;
         _pDeltaY = _sinLUT[_pAngle] * _pMovSpeed;
       }
-      if (HAL_GPIO_ReadPin(ARDUINO_D5_GPIO_Port, ARDUINO_D5_Pin)) { // LEFT
+      else if (HAL_GPIO_ReadPin(ARDUINO_D5_GPIO_Port, ARDUINO_D5_Pin)) { // LEFT
         _pAngle += INCR_ROTATION;
         if (_pAngle > FOV_RANGE) { _pAngle -= FOV_RANGE; }
         _pDeltaX = _cosLUT[_pAngle] * _pMovSpeed;
