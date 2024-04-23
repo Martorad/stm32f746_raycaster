@@ -320,7 +320,8 @@ uint32_t cast() {
   int16_t  rAngle;
 
   BSP_LCD_SelectLayer(0);
-  BSP_LCD_Clear(LCD_COLOR_BLACK);
+  BSP_LCD_SetTextColor(COLOR_GROUND);
+  BSP_LCD_FillRect(0, SCREEN_HEIGHT_HALF, SCREEN_WIDTH, SCREEN_HEIGHT_HALF);
 
   rAngle = _pAngle + FOV_HALF;
   if (rAngle > 1440) { rAngle -= 1440; }
@@ -353,13 +354,58 @@ uint32_t cast() {
       }
     }
 
-    float lineHeight = SCREEN_HEIGHT / rLength * _fisheyeCosLUT[rCount] * LINE_VERTICAL_SCALE;
-    if (lineHeight > SCREEN_HEIGHT) { lineHeight = SCREEN_HEIGHT; }
-    float lineOffset = (SCREEN_HEIGHT - lineHeight) / 2;
+    float   tLineHeight = SCREEN_HEIGHT / rLength * _fisheyeCosLUT[rCount] * LINE_VERTICAL_SCALE;
+    uint8_t tTextureIndex = _map[mY * _mSizeX + mX] - 1;
 
-    BSP_LCD_SetTextColor(0xFFCCFFDD);
-    BSP_LCD_FillRect(rCount * FOV_RECT, lineOffset, FOV_RECT, lineHeight);
+    // DRAW SKYBOX
+    //TODO: Find a better way to do this
+    if (rCount % (SKYBOX_TEXEL_X / FOV_RECT) == 0) {
+      float    sbTexelColumn = SKYBOX_SIZE_X - rAngle * FOV_INCR * SKYBOX_SCALE_F;
+      uint16_t sbY = 0, sbOffset = SKYBOX_TEXEL_X - (uint16_t)(((sbTexelColumn - (uint16_t)sbTexelColumn) * SKYBOX_TEXEL_X) + 0.1);
 
+      for (uint16_t i = 0; i < SKYBOX_SIZE_Y; i++) { // TODO: I currently overdraw the shit out of the skybox. It *may* be possible to fix that
+        BSP_LCD_SetTextColor(_skybox[i * SKYBOX_SIZE_X + (uint16_t)sbTexelColumn]);
+
+        switch (rCount) { // A switch seems to be marginally faster than an if here, not exactly sure why
+          case 0:  BSP_LCD_FillRect((rCount * FOV_RECT), sbY, sbOffset + SKYBOX_TEXEL_X, SKYBOX_TEXEL_Y); break;
+          default: BSP_LCD_FillRect((rCount * FOV_RECT) + sbOffset, sbY, (rCount == FOV - (SKYBOX_TEXEL_X / FOV_RECT)) ? (SKYBOX_TEXEL_X - sbOffset) : SKYBOX_TEXEL_X, SKYBOX_TEXEL_Y); break;
+        }
+
+        sbY += SKYBOX_TEXEL_Y;
+      }
+    }
+
+    // DRAW WALLS
+    if (tLineHeight > SCREEN_HEIGHT / DOF) { // if line is smaller than the shortest possible line defined by DOF, don't bother drawing it
+      float tX, tY = 0, tYStep = tLineHeight / TEXTURE_SIZE, tOffset = (tLineHeight - SCREEN_HEIGHT) * 0.5;
+
+      if (rHitSide) { tX = (1 - (rIntersectY - (uint16_t)rIntersectY)) * TEXTURE_SIZE; if (rAngle < 360 || rAngle > 1080) { tX = TEXTURE_SIZE - tX; }}
+      else          { tX = (1 - (rIntersectX - (uint16_t)rIntersectX)) * TEXTURE_SIZE; if (rAngle < 720)                  { tX = TEXTURE_SIZE - tX; }}
+
+      if (tLineHeight > SCREEN_HEIGHT) {
+        uint16_t tSkipLines = tOffset / tYStep, tFirstLine = tYStep - (tOffset - tSkipLines * tYStep);
+        tY = tFirstLine;
+        for (uint16_t i = tSkipLines; i < TEXTURE_SIZE - tSkipLines; i++) {
+          BSP_LCD_SetTextColor(_textures[tTextureIndex + rHitSide][i * TEXTURE_SIZE + (uint16_t)(tX)]);
+          if (i != tSkipLines && i != TEXTURE_SIZE - tSkipLines - 1) {
+            BSP_LCD_FillRect((rCount * FOV_RECT), tY, FOV_RECT, tYStep + 1);
+            tY += tYStep;
+          }
+          else {
+            BSP_LCD_FillRect((rCount * FOV_RECT), (i == tSkipLines) ? 0 : tY, FOV_RECT, tFirstLine + 2);
+          }
+        }
+      }
+      else {
+        tOffset *= -1; // invert value of texture offset to make it positive
+
+        for (uint16_t i = 0; i < TEXTURE_SIZE; i++) {
+          BSP_LCD_SetTextColor(_textures[tTextureIndex + rHitSide][i * TEXTURE_SIZE + (uint16_t)(tX)]);
+          BSP_LCD_FillRect((rCount * FOV_RECT), tOffset + tY, FOV_RECT, tYStep + 1);
+          tY += tYStep;
+        }
+      }
+    }
 
     rAngle--;;
     if (rAngle < 0) { rAngle += 1440; }
