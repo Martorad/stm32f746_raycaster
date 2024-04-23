@@ -206,13 +206,13 @@ int main(void)
       showFPS(cast());
 
       if (HAL_GPIO_ReadPin(ARDUINO_D4_GPIO_Port, ARDUINO_D4_Pin)) { // RIGHT
-        _pAngle -= _pRotSpeed;
+        _pAngle -= 4;
         if (_pAngle < 0) { _pAngle = 1440; }
         _pDeltaX =  _cosLUT[_pAngle] * _pMovSpeed;
         _pDeltaY = -_sinLUT[_pAngle] * _pMovSpeed;
       }
       if (HAL_GPIO_ReadPin(ARDUINO_D5_GPIO_Port, ARDUINO_D5_Pin)) { // LEFT
-        _pAngle += _pRotSpeed;
+        _pAngle += 4;
         if (_pAngle > 1440) { _pAngle = 0; }
         _pDeltaX =  _cosLUT[_pAngle] * _pMovSpeed;
         _pDeltaY = -_sinLUT[_pAngle] * _pMovSpeed;
@@ -326,37 +326,34 @@ uint32_t cast() {
   if (rAngle > 1440) { rAngle -= 1440; }
 
   for (rCount = 0; rCount < FOV; rCount++) {
-    float r_vx =  _cosLUT[rAngle];
-    int16_t r_ivx = (r_vx > 0) ? 1 : -1;
-    float r_vy = -_sinLUT[rAngle];
-    int16_t r_ivy = (r_vy > 0) ? 1 : -1;
-
-    float r_x = _pPosX, r_y = _pPosY;
-    int16_t r_ix = (int16_t)r_x, r_iy = (int16_t)r_y;
-    float r_dist = 0;
-    float t1, t2;
+    // This uses David Ziemkiewicz' method of velocities and times, as well as Lodev's DDA. Massive thanks to both of these legends.
+    float   rVelocityX = _cosLUT[rAngle], rVelocityY = -_sinLUT[rAngle], rIntersectX = _pPosX, rIntersectY = _pPosY, rTimeX, rTimeY, rLength = 0;
+    int16_t mX = (int16_t)rIntersectX, mY = (int16_t)rIntersectY;
+    int8_t  rStepX = (rVelocityX > 0) ? 1 : -1, rStepY = (rVelocityY > 0) ? 1 : -1, rHitSide = 0;
 
     for (uint16_t i = 0; i < _mSizeX * _mSizeY; i++) {
-      if (_map[r_iy * _mSizeX + r_ix] > 0) { break; }
+      if (_map[mY * _mSizeX + mX] > 0) { break; }
 
-      t1 = (r_ix - r_x + (r_vx > 0)) / r_vx;
-      t2 = (r_iy - r_y + (r_vy > 0)) / r_vy;
+      rTimeX = (mX - rIntersectX + (rVelocityX > 0)) / rVelocityX;
+      rTimeY = (mY - rIntersectY + (rVelocityY > 0)) / rVelocityY;
 
-      if (t1 < t2) { // intersection with vertical line
-        r_y += r_vy * t1;
-        r_ix += r_ivx;
-        r_x = r_ix - (r_vx < 0) * r_ivx;
-        r_dist += t1;
+      if (rTimeX < rTimeY) { // Verical line
+        rIntersectY += rVelocityY * rTimeX;
+        mX += rStepX;
+        rIntersectX = mX - (rVelocityX < 0) * rStepX;
+        rLength += rTimeX;
+        rHitSide = 1;
       }
-      else { // intersection with horizontal line
-        r_x += r_vx * t2;
-        r_iy += r_ivy;
-        r_y = r_iy - (r_vy < 0) * r_ivy;
-        r_dist += t2;
+      else { // Horizontal line
+        rIntersectX += rVelocityX * rTimeY;
+        mY += rStepY;
+        rIntersectY = mY - (rVelocityY < 0) * rStepY;
+        rLength += rTimeY;
+        rHitSide = 0;
       }
     }
 
-    float lineHeight = SCREEN_HEIGHT / r_dist * _fisheyeCosLUT[rCount] * LINE_VERTICAL_SCALE;
+    float lineHeight = SCREEN_HEIGHT / rLength * _fisheyeCosLUT[rCount] * LINE_VERTICAL_SCALE;
     if (lineHeight > SCREEN_HEIGHT) { lineHeight = SCREEN_HEIGHT; }
     float lineOffset = (SCREEN_HEIGHT - lineHeight) / 2;
 
