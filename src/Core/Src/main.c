@@ -314,7 +314,6 @@ void PeriphCommonClock_Config(void)
 uint32_t cast() {
   // Variable prefix convention: r = ray, m = map, p = performance, c = calculation, t = texture, sb = skybox
   uint32_t pStartTime = _sysElapsedTicks;
-  uint16_t rCount;
   int16_t  rAngle;
 
   BSP_LCD_SelectLayer(0);
@@ -324,7 +323,7 @@ uint32_t cast() {
   rAngle = _pAngle + FOV / 2;
   if (rAngle > FOV_RANGE) { rAngle -= FOV_RANGE; }
 
-  for (rCount = 0; rCount < FOV; rCount++) {
+  for (uint16_t rCount = 0; rCount < FOV; rCount++) {
     // This uses David Ziemkiewicz' method of velocities and times, as well as Lodev's DDA. Massive thanks to both of these legends.
     float   rVelocityX = _cosLUT[rAngle], rVelocityY = _sinLUT[rAngle], rIntersectX = _pPosX, rIntersectY = _pPosY, rTimeX, rTimeY, rLength = 0, tLineHeight;
     int16_t mX = (int16_t)rIntersectX, mY = (int16_t)rIntersectY;
@@ -333,27 +332,26 @@ uint32_t cast() {
     for (uint16_t i = 0; i < _mSizeX * _mSizeY; i++) {
       if (_map[mY * _mSizeX + mX] > 0) { break; }
 
-      rTimeX = (mX - rIntersectX + (rVelocityX > 0)) / rVelocityX;
-      rTimeY = (mY - rIntersectY + (rVelocityY > 0)) / rVelocityY;
+      rTimeX = (mY - rIntersectY + (rVelocityY > 0)) / rVelocityY;
+      rTimeY = (mX - rIntersectX + (rVelocityX > 0)) / rVelocityX;
 
-      if (rTimeX < rTimeY) { // Vertical line
+      if (rTimeY < rTimeX) { // Vertical line
         mX += rStepX;
         rIntersectX = mX - (rVelocityX < 0) * rStepX;
-        rIntersectY += rVelocityY * rTimeX;
-        rLength += rTimeX;
+        rIntersectY += rVelocityY * rTimeY;
+        rLength += rTimeY;
         rHitSide = 1;
       }
       else { // Horizontal line
         mY += rStepY;
         rIntersectY = mY - (rVelocityY < 0) * rStepY;
-        rIntersectX += rVelocityX * rTimeY;
-        rLength += rTimeY;
+        rIntersectX += rVelocityX * rTimeX;
+        rLength += rTimeX;
         rHitSide = 0;
       }
     }
 
     // DRAW SKYBOX
-    //TODO: Find a better way to do this
     if (rCount % (SKYBOX_TEXEL_X / FOV_RECT) == 0) {
       float    sbTexelColumn = (SKYBOX_SIZE_X - 1) - rAngle * FOV_INCR * SKYBOX_SCALE_F;
       uint16_t sbY = 0, sbOffset = SKYBOX_TEXEL_X - (uint16_t)(((sbTexelColumn - (uint16_t)sbTexelColumn) * SKYBOX_TEXEL_X) + 0.1);
