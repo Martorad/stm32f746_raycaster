@@ -104,7 +104,7 @@ const uint8_t _map[] = {
 float _pPosX = 1.5, _pPosY = 8, _pDeltaX, _pDeltaY, _pMovSpeed, _pRotSpeed;
 int16_t _pAngle = 0; // Angle in increments of FOV_INCR radians
 
-float _sinLUT[1440], _cosLUT[1440];
+float _sinLUT[FOV_RANGE], _cosLUT[FOV_RANGE];
 
 // SYSTEM
 volatile uint32_t _sysElapsedTicks = 0; // 10K frequency, 1 tick = 100us = 0.1ms
@@ -182,9 +182,9 @@ int main(void)
   BSP_LCD_SelectLayer(LTDC_FOREGROUND);
   BSP_LCD_Clear(LCD_COLOR_BLACK);
 
-  for (uint16_t i = 0; i < FOV; i++) { _fisheyeCosLUT[i] = 1 / cos((FOV_HALF - i) * FOV_INCR); } // Pre-calculate all cosine values to correct fisheye effect later
-  for (uint16_t i = 0; i < 1440; i++) { _sinLUT[i] = sin(i * FOV_INCR + 0.0001); }
-  for (uint16_t i = 0; i < 1440; i++) { _cosLUT[i] = cos(i * FOV_INCR + 0.0001); }
+  for (uint16_t i = 0; i < FOV; i++) { _fisheyeCosLUT[i] = 1 / cos((FOV / 2 - i) * FOV_INCR); } // Pre-calculate all cosine values to correct fisheye effect later
+  for (uint16_t i = 0; i < FOV_RANGE; i++) { _sinLUT[i] = sin(i * FOV_INCR + 0.0001); }
+  for (uint16_t i = 0; i < FOV_RANGE; i++) { _cosLUT[i] = cos(i * FOV_INCR + 0.0001); }
 
   HAL_TIM_Base_Start_IT(&htim7);
 
@@ -207,13 +207,13 @@ int main(void)
 
       if (HAL_GPIO_ReadPin(ARDUINO_D4_GPIO_Port, ARDUINO_D4_Pin)) { // RIGHT
         _pAngle -= 5;
-        if (_pAngle < 0) { _pAngle = 1440; }
+        if (_pAngle < 0) { _pAngle = FOV_RANGE; }
         _pDeltaX =  _cosLUT[_pAngle] * _pMovSpeed;
         _pDeltaY = -_sinLUT[_pAngle] * _pMovSpeed;
       }
       if (HAL_GPIO_ReadPin(ARDUINO_D5_GPIO_Port, ARDUINO_D5_Pin)) { // LEFT
         _pAngle += 5;
-        if (_pAngle > 1440) { _pAngle = 0; }
+        if (_pAngle > FOV_RANGE) { _pAngle = 0; }
         _pDeltaX =  _cosLUT[_pAngle] * _pMovSpeed;
         _pDeltaY = -_sinLUT[_pAngle] * _pMovSpeed;
       }
@@ -323,8 +323,8 @@ uint32_t cast() {
   BSP_LCD_SetTextColor(COLOR_GROUND);
   BSP_LCD_FillRect(0, SCREEN_HEIGHT_HALF, SCREEN_WIDTH, SCREEN_HEIGHT_HALF);
 
-  rAngle = _pAngle + FOV_HALF;
-  if (rAngle > 1440) { rAngle -= 1440; }
+  rAngle = _pAngle + FOV / 2;
+  if (rAngle > FOV_RANGE) { rAngle -= FOV_RANGE; }
 
   for (rCount = 0; rCount < FOV; rCount++) {
     // This uses David Ziemkiewicz' method of velocities and times, as well as Lodev's DDA. Massive thanks to both of these legends.
@@ -379,8 +379,8 @@ uint32_t cast() {
     if (tLineHeight > SCREEN_HEIGHT / DOF) { // if line is smaller than the shortest possible line defined by DOF, don't bother drawing it
       float tX, tY = 0, tYStep = tLineHeight / TEXTURE_SIZE, tOffset = (tLineHeight - SCREEN_HEIGHT) * 0.5;
 
-      if (rHitSide) { tX = (1 - (rIntersectY - (uint16_t)rIntersectY)) * TEXTURE_SIZE; if (rAngle < 360 || rAngle > 1080) { tX = TEXTURE_SIZE - tX; }}
-      else          { tX = (1 - (rIntersectX - (uint16_t)rIntersectX)) * TEXTURE_SIZE; if (rAngle < 720)                  { tX = TEXTURE_SIZE - tX; }}
+      if (rHitSide) { tX = (1 - (rIntersectY - (uint16_t)rIntersectY)) * TEXTURE_SIZE; if (rAngle < FOV_RANGE / 4 || rAngle > (FOV_RANGE / 4) * 3) { tX = TEXTURE_SIZE - tX; }}
+      else          { tX = (1 - (rIntersectX - (uint16_t)rIntersectX)) * TEXTURE_SIZE; if (rAngle < FOV_RANGE / 2)                                 { tX = TEXTURE_SIZE - tX; }}
 
       if (tLineHeight > SCREEN_HEIGHT) {
         uint16_t tSkipLines = tOffset / tYStep, tFirstLine = tYStep - (tOffset - tSkipLines * tYStep);
@@ -408,7 +408,7 @@ uint32_t cast() {
     }
 
     rAngle--;;
-    if (rAngle < 0) { rAngle += 1440; }
+    if (rAngle < 0) { rAngle += FOV_RANGE; }
   }
 
   uint32_t pFrameTime = _sysElapsedTicks - pStartTime;

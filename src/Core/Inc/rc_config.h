@@ -2,7 +2,7 @@
 #define __RC__CONFIG__H__
 
 // PERFORMANCE SETTINGS
-#define RES_6 // Vertical line resolution
+#define RES_3 // Vertical line resolution
 #define SBR_0 // Skybox resolution - 0 for 16px, 1 for 32px
 
 #define DOF 64 // Ray cast limit
@@ -26,67 +26,46 @@
 
 // RESOLUTION CONFIGURATION TABLES
 // FOV_RECT describes the width of each rectangle drawn on screen. Smaller width rectangles have higher fidelity, at the cost of speed. Odd width rectangles mean that symmetrical frames cannot be drawn.
-#ifdef  RES_N
-#define FOV      10
-#define FOV_HALF 5
-#define FOV_RECT 48
-#define FOV_INCR 0.1047198
-#endif
-
 #ifdef  RES_0
-#define FOV      30
-#define FOV_HALF 15
-#define FOV_RECT 16
-#define FOV_INCR 0.0349066
+#define FOV       10
+#define FOV_RECT  48
+#define FOV_INCR  0.1047198
+#define FOV_RANGE 60
 #endif
 
 #ifdef  RES_1
-#define FOV      60
-#define FOV_HALF 30
-#define FOV_RECT 8
-#define FOV_INCR 0.0174533
+#define FOV       30
+#define FOV_RECT  16
+#define FOV_INCR  0.0349066
+#define FOV_RANGE 180
 #endif
 
 #ifdef  RES_2
-#define FOV      80
-#define FOV_HALF 40
-#define FOV_RECT 6
-#define FOV_INCR 0.013089975
+#define FOV       60
+#define FOV_RECT  8
+#define FOV_INCR  0.0174533
+#define FOV_RANGE 360
 #endif
 
 #ifdef  RES_3
-#define FOV      96
-#define FOV_HALF 48
-#define FOV_RECT 5
-#define FOV_INCR 0.0109083125
+#define FOV       120
+#define FOV_RECT  4
+#define FOV_INCR  0.00872665
+#define FOV_RANGE 720
 #endif
 
 #ifdef  RES_4
-#define FOV      120
-#define FOV_HALF 60
-#define FOV_RECT 4
-#define FOV_INCR 0.00872665
+#define FOV       240
+#define FOV_RECT  2
+#define FOV_INCR  0.004363325
+#define FOV_RANGE 1440
 #endif
 
 #ifdef  RES_5
-#define FOV      160
-#define FOV_HALF 80
-#define FOV_RECT 3
-#define FOV_INCR 0.005817767
-#endif
-
-#ifdef  RES_6
-#define FOV      240
-#define FOV_HALF 120
-#define FOV_RECT 2
-#define FOV_INCR 0.004363325
-#endif
-
-#ifdef  RES_7
-#define FOV      480
-#define FOV_HALF 240
-#define FOV_RECT 1
-#define FOV_INCR 0.0021816625
+#define FOV       480
+#define FOV_RECT  1
+#define FOV_INCR  0.0021816625
+#define FOV_RANGE 2880
 #endif
 
 #endif
