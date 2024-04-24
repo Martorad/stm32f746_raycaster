@@ -108,8 +108,8 @@ const uint8_t _map[2][768] = {
     0,0,0,0,0,0,0,0,0,5,5,5,5,5,5,0,0,0,0,0,0,5,5,5,5,5,5,5,5,5,5,0,5,5,5,5,5,0,5,5,5,5,5,5,5,5,5,0,
     0,5,5,5,5,5,5,5,0,5,5,5,5,5,5,0,5,5,5,0,5,5,5,5,5,5,5,5,5,0,5,0,5,5,5,5,5,0,5,5,5,0,0,0,0,0,0,0,
     0,5,0,0,0,0,0,0,0,0,0,0,0,5,5,0,0,0,0,5,5,5,5,5,5,5,5,5,5,5,5,0,0,0,5,0,0,0,5,5,5,0,5,5,5,5,0,0,
-    0,5,5,5,5,5,7,7,7,7,5,5,5,5,5,5,5,5,5,5,5,5,5,5,0,0,5,5,5,0,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,0,0,
-    0,5,5,5,5,5,7,7,7,7,5,5,5,5,5,5,5,5,5,5,5,5,5,5,0,0,5,5,5,0,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,0,0,
+    0,5,5,5,5,5,1,7,1,7,5,5,5,5,5,5,5,5,5,5,5,5,5,5,0,0,5,5,5,0,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,0,0,
+    0,5,5,5,5,5,7,1,7,1,5,5,5,5,5,5,5,5,5,5,5,5,5,5,0,0,5,5,5,0,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,0,0,
     0,5,0,0,0,0,0,0,0,0,0,0,0,5,5,0,0,0,0,5,5,5,5,5,5,5,5,5,5,5,5,0,0,0,5,0,0,0,5,5,5,0,5,5,5,5,0,0,
     0,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,0,5,5,5,5,5,5,5,5,5,0,5,0,5,5,5,5,5,0,5,5,5,0,0,0,0,0,0,0,
     0,0,0,0,0,0,0,0,0,0,0,0,5,5,5,5,5,5,5,5,0,5,5,5,5,5,5,5,5,5,5,0,5,5,5,5,5,0,5,5,5,5,5,5,5,5,5,0,
@@ -336,13 +336,11 @@ void PeriphCommonClock_Config(void)
 
 /* USER CODE BEGIN 4 */
 uint32_t cast() {
-  // Variable prefix convention: r = ray, m = map, p = performance, c = calculation, t = texture, sb = skybox
+  // Variable prefix convention: r = ray, m = map, p = performance, c = calculation, t = texture, sb = skybox, f = floor
   uint32_t pStartTime = _sysElapsedTicks;
   int16_t  rAngle;
 
   BSP_LCD_SelectLayer(0);
-  BSP_LCD_SetTextColor(COLOR_GROUND);
-  BSP_LCD_FillRect(0, SCREEN_HEIGHT_HALF, SCREEN_WIDTH, SCREEN_HEIGHT_HALF);
 
   rAngle = _pAngle + FOV / 2;
   if (rAngle > FOV_RANGE) { rAngle -= FOV_RANGE; }
@@ -417,18 +415,12 @@ uint32_t cast() {
           tY += tYStep;
         }
 
-        float dX = _cosLUT[rAngle];
-        float dY = _sinLUT[rAngle];
         for (uint16_t i = tOffset + tLineHeight; i < SCREEN_HEIGHT; i += FOV_RECT) {
-          float dZ = (SCREEN_HEIGHT_HALF / (float)i) * _fisheyeCosLUT[rCount];
-          int16_t crdx = (int16_t)(TEXTURE_SIZE * (_pPosX + dX * dZ)) % TEXTURE_SIZE;
-          int16_t crdy = (int16_t)(TEXTURE_SIZE * (_pPosY + dY * dZ)) % TEXTURE_SIZE;
-          int16_t mcx = (int16_t)(_pPosX + dX * dZ) % _mSizeX;
-          int16_t mcy = (int16_t)(_pPosY + dY * dZ) % _mSizeY;
-          int16_t crd = crdy * TEXTURE_SIZE + crdx;
-//          crd += TEXTURE_SIZE * TEXTURE_SIZE * ((_map[1][mcy * _mSizeX + mcx] / 64) % 64);
+          float fZ = (SCREEN_HEIGHT_HALF / (float)(i - SCREEN_HEIGHT_HALF)) * _fisheyeCosLUT[rCount], fX = _pPosX + rVelocityX * fZ, fY = _pPosY + rVelocityY * fZ;
+          int16_t fTextureX = (int16_t)(TEXTURE_SIZE * fX) & (TEXTURE_SIZE - 1);
+          int16_t fTextureY = (int16_t)(TEXTURE_SIZE * fY) & (TEXTURE_SIZE - 1);
 
-          BSP_LCD_SetTextColor(_textures[_map[1][mcy * _mSizeX + mcx]][crd]);
+          BSP_LCD_SetTextColor(_textures[_map[1][(int16_t)fY * _mSizeX + (int16_t)fX]][fTextureY * TEXTURE_SIZE + fTextureX]);
           BSP_LCD_FillRect((rCount * FOV_RECT), i, FOV_RECT, FOV_RECT);
         }
       }
