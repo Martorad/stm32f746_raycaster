@@ -396,6 +396,21 @@ uint32_t cast() {
           BSP_LCD_FillRect((rCount * FOV_RECT), tOffset + tY, FOV_RECT, tYStep + 1);
           tY += tYStep;
         }
+
+        float dX = _cosLUT[rAngle];
+        float dY = _sinLUT[rAngle];
+        for (uint16_t i = tOffset + tLineHeight; i < SCREEN_HEIGHT; i += FOV_RECT) {
+          float dZ = (SCREEN_HEIGHT_HALF / (float)i) * _fisheyeCosLUT[rCount];
+          int16_t crdx = (int16_t)(TEXTURE_SIZE * 4 * (_pPosX + dX * dZ)) % TEXTURE_SIZE;
+          int16_t crdy = (int16_t)(TEXTURE_SIZE * 4 * (_pPosY + dY * dZ)) % TEXTURE_SIZE;
+//          int16_t mcx = (int16_t)(_pPosX + dX * dZ) % _mSizeX;
+//          int16_t mcy = (int16_t)(_pPosY + dY * dZ) % _mSizeY;
+          int16_t crd = crdy * TEXTURE_SIZE + crdx;
+//          crd += TEXTURE_SIZE * TEXTURE_SIZE * ((map[mcx][mcy]/256)%256);
+
+          BSP_LCD_SetTextColor(_textures[4][crd]);
+          BSP_LCD_FillRect((rCount * FOV_RECT), i, FOV_RECT, FOV_RECT);
+        }
       }
     }
 
