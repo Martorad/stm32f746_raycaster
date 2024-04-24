@@ -336,7 +336,7 @@ uint32_t cast() {
     for (uint16_t i = 0; i < _mSizeX * _mSizeY; i++) {
       if (_map[mY * _mSizeX + mX] > 0) { break; }
 
-      rTimeX = (mY - rIntersectY + (rVelocityY > 0)) / rVelocityY;
+      rTimeX = (mY - rIntersectY + (rVelocityY > 0)) / rVelocityY; // This should be treated as "time to X-side wall"
       rTimeY = (mX - rIntersectX + (rVelocityX > 0)) / rVelocityX;
 
       if (rTimeY < rTimeX) { // Vertical line
@@ -358,7 +358,7 @@ uint32_t cast() {
     // DRAW WALLS
     tLineHeight = SCREEN_HEIGHT / rLength * _fisheyeCosLUT[rCount] * LINE_VERTICAL_SCALE;
 
-    if (tLineHeight > SHORTEST_LINE) { // if line is smaller than the shortest possible line defined by DOF, don't bother drawing it
+    if (tLineHeight > SHORTEST_LINE) {
       float tX, tY = 0, tYStep = tLineHeight / TEXTURE_SIZE, tOffset = (tLineHeight - SCREEN_HEIGHT) * 0.5;
 
       if (rHitSide) { tX = (1 - (rIntersectY - (uint16_t)rIntersectY)) * TEXTURE_SIZE; if (rAngle < FOV_RANGE / 4 || rAngle > (FOV_RANGE / 4) * 3) { tX = TEXTURE_SIZE - tX; }}
@@ -379,7 +379,7 @@ uint32_t cast() {
         }
       }
       else {
-        tOffset *= -1; // invert value of texture offset to make it positive
+        tOffset *= -1;
 
         // DRAW SKYBOX
         uint16_t sbY = 0, sbDrawLines = (tOffset / SKYBOX_TEXEL_Y) + 1;
