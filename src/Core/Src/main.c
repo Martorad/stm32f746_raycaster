@@ -381,7 +381,7 @@ uint32_t cast() {
       if (tLineHeight > SCREEN_HEIGHT) { // Check if line fills up the screen, if it does, drawing the sky and floor is not necessary, so we just draw the wall
         uint16_t tSkipLines = tOffset / tYStep, tFirstLine = tYStep - (tOffset - tSkipLines * tYStep);
         tY = tFirstLine;
-        for (uint16_t i = tSkipLines; i < TEXTURE_SIZE - tSkipLines; i++) {
+        for (uint16_t i = tSkipLines; i < TEXTURE_SIZE - tSkipLines; i++) { // TODO: Try starting i from 0 to enable using a switch here
           BSP_LCD_SetTextColor(_textures[_map[0][mY * _mSizeX + mX] - 1 + rHitSide][i * TEXTURE_SIZE + (uint16_t)(tX)]);
           if (i != tSkipLines && i != TEXTURE_SIZE - tSkipLines - 1) {
             BSP_LCD_FillRect((rCount * FOV_RECT), tY, FOV_RECT, tYStep + 1);

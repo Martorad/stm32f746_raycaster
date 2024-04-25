@@ -1526,9 +1526,10 @@ static void LL_FillBuffer(uint32_t LayerIndex, void *pDst, uint32_t xSize, uint3
   hDma2dHandler.Init.OutputOffset = OffLine;
 
   HAL_DMA2D_Start(&hDma2dHandler, ColorIndex, (uint32_t)pDst, xSize, ySize);
+  HAL_DMA2D_PollForTransfer(&hDma2dHandler, 10);
 
-  HAL_StatusTypeDef status;
-  do { status = HAL_DMA2D_PollForTransfer(&hDma2dHandler, 10); } while (status != HAL_OK);
+//  HAL_StatusTypeDef status;
+//  do { status = HAL_DMA2D_PollForTransfer(&hDma2dHandler, 10); } while (status != HAL_OK);
 }
 
 /**
