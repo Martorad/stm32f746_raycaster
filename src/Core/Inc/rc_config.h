@@ -2,7 +2,7 @@
 #define __RC__CONFIG__H__
 
 // PERFORMANCE SETTINGS
-#define RES_3 // Vertical line resolution
+#define RES_4 // Vertical line resolution
 #define SBR_0 // Skybox resolution - 0 for 16px, 1 for 32px
 
 #define SHORTEST_LINE 5
@@ -46,13 +46,20 @@
 #endif
 
 #ifdef  RES_4
+#define FOV       160
+#define FOV_RECT  3
+#define FOV_INCR  (2 * M_PI) / (360 * 3)
+#define FOV_RANGE (360 * 3)
+#endif
+
+#ifdef  RES_5
 #define FOV       240
 #define FOV_RECT  2
 #define FOV_INCR  (2 * M_PI) / (360 * 4)
 #define FOV_RANGE (360 * 4)
 #endif
 
-#ifdef  RES_5
+#ifdef  RES_6
 #define FOV       480
 #define FOV_RECT  1
 #define FOV_INCR  (2 * M_PI) / (360 * 8)

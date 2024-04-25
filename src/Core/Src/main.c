@@ -126,7 +126,7 @@ int16_t _pAngle = 0; // Angle in increments of FOV_INCR radians
 
 // SYSTEM
 volatile uint32_t _sysElapsedTicks = 0; // 10K frequency, 1 tick = 100us = 0.1ms
-volatile float    _fisheyeCosLUT[FOV], _sinLUT[FOV_RANGE], _cosLUT[FOV_RANGE], _fZLUT[SCREEN_HEIGHT_HALF];
+float    _fisheyeCosLUT[FOV], _sinLUT[FOV_RANGE], _cosLUT[FOV_RANGE], _fZLUT[SCREEN_HEIGHT_HALF];
 uint16_t _sbLUT[FOV_RANGE];
 
 /* USER CODE END 0 */
@@ -415,8 +415,7 @@ uint32_t cast() {
         // DRAW FLOOR
         for (uint16_t i = tOffset + tLineHeight; i < SCREEN_HEIGHT; i += FOV_RECT) {
           float fZ = _fZLUT[i - SCREEN_HEIGHT_HALF] * _fisheyeCosLUT[rCount], fX = _pPosX + rVelocityX * fZ, fY = _pPosY + rVelocityY * fZ;
-          int16_t fTextureX = (int16_t)(TEXTURE_SIZE * fX) & (TEXTURE_SIZE - 1);
-          int16_t fTextureY = (int16_t)(TEXTURE_SIZE * fY) & (TEXTURE_SIZE - 1);
+          int16_t fTextureX = (int16_t)(TEXTURE_SIZE * fX) & (TEXTURE_SIZE - 1), fTextureY = (int16_t)(TEXTURE_SIZE * fY) & (TEXTURE_SIZE - 1);
 
           BSP_LCD_SetTextColor(_textures[_map[1][(int16_t)fY * _mSizeX + (int16_t)fX]][fTextureY * TEXTURE_SIZE + fTextureX]);
           BSP_LCD_FillRect((rCount * FOV_RECT), i, FOV_RECT, (i == SCREEN_HEIGHT - 1) ? FOV_RECT / 2 : FOV_RECT);
