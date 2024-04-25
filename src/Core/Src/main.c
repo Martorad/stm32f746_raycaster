@@ -126,7 +126,7 @@ int16_t _pAngle = 0; // Angle in increments of FOV_INCR radians
 
 // SYSTEM
 volatile uint32_t _sysElapsedTicks = 0; // 10K frequency, 1 tick = 100us = 0.1ms
-float    _fisheyeCosLUT[FOV], _sinLUT[FOV_RANGE], _cosLUT[FOV_RANGE];
+volatile float    _fisheyeCosLUT[FOV], _sinLUT[FOV_RANGE], _cosLUT[FOV_RANGE], _fZLUT[SCREEN_HEIGHT_HALF];
 uint16_t _sbLUT[FOV_RANGE];
 
 /* USER CODE END 0 */
@@ -207,6 +207,7 @@ int main(void)
     _cosLUT[i] =  cos(i * FOV_INCR + 0.0001);
     _sbLUT[i]  =  (uint16_t)(SKYBOX_SIZE_X - (i + 1) * FOV_INCR * SKYBOX_SCALE_F);
   }
+  for (uint16_t i = SCREEN_HEIGHT_HALF; i < SCREEN_HEIGHT; i++) { _fZLUT[i - SCREEN_HEIGHT_HALF] = (SCREEN_HEIGHT_HALF / (float)(i - SCREEN_HEIGHT_HALF + 1)) * LINE_VERTICAL_SCALE; }
 
   HAL_TIM_Base_Start_IT(&htim7);
   /* USER CODE END 2 */
@@ -232,7 +233,7 @@ int main(void)
       }
       else if (HAL_GPIO_ReadPin(ARDUINO_D5_GPIO_Port, ARDUINO_D5_Pin)) { // LEFT
         _pAngle += LOOK_SPEED;
-        if (_pAngle > FOV_RANGE) { _pAngle -= FOV_RANGE; }
+        if (_pAngle >= FOV_RANGE) { _pAngle -= FOV_RANGE; }
       }
       if (HAL_GPIO_ReadPin(ARDUINO_D2_GPIO_Port, ARDUINO_D2_Pin)) { // FORWARD
         if (_map[0][(uint16_t)_pPosY * _mSizeX + (uint16_t)(_pPosX + ((_pDeltaX < 0) ? -P_HITBOX_SIZE : P_HITBOX_SIZE))] == 0) { _pPosX += _pDeltaX; }
@@ -413,9 +414,7 @@ uint32_t cast() {
 
         // DRAW FLOOR
         for (uint16_t i = tOffset + tLineHeight; i < SCREEN_HEIGHT; i += FOV_RECT) {
-          float fZ = (SCREEN_HEIGHT_HALF / (float)(i - SCREEN_HEIGHT_HALF + 1)) * _fisheyeCosLUT[rCount],\
-            fX = _pPosX + rVelocityX * fZ * LINE_VERTICAL_SCALE,\
-            fY = _pPosY + rVelocityY * fZ * LINE_VERTICAL_SCALE;
+          float fZ = _fZLUT[i - SCREEN_HEIGHT_HALF] * _fisheyeCosLUT[rCount], fX = _pPosX + rVelocityX * fZ, fY = _pPosY + rVelocityY * fZ;
           int16_t fTextureX = (int16_t)(TEXTURE_SIZE * fX) & (TEXTURE_SIZE - 1);
           int16_t fTextureY = (int16_t)(TEXTURE_SIZE * fY) & (TEXTURE_SIZE - 1);
 
