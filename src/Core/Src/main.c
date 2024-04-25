@@ -121,7 +121,7 @@ const uint8_t _map[2][768] = {
 };
 
 // PLAYER
-float   _pPosX = 1.5, _pPosY = 8, _pDeltaX, _pDeltaY, _pMovSpeed, _pRotSpeed;
+float   _pPosX = 1.5, _pPosY = 8, _pDeltaX, _pDeltaY;
 int16_t _pAngle = 0; // Angle in increments of FOV_INCR radians
 
 // SYSTEM
@@ -209,10 +209,6 @@ int main(void)
   }
 
   HAL_TIM_Base_Start_IT(&htim7);
-
-  cast();
-  _pDeltaX = _cosLUT[_pAngle] * _pMovSpeed;
-  _pDeltaY = _sinLUT[_pAngle] * _pMovSpeed;
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -227,17 +223,16 @@ int main(void)
       pageFlip();
       showFPS(cast());
 
+      _pDeltaX = _cosLUT[_pAngle] * MOVE_SPEED;
+      _pDeltaY = _sinLUT[_pAngle] * MOVE_SPEED;
+
       if (HAL_GPIO_ReadPin(ARDUINO_D4_GPIO_Port, ARDUINO_D4_Pin)) { // RIGHT
-        _pAngle -= INCR_ROTATION;
+        _pAngle -= LOOK_SPEED;
         if (_pAngle < 0) { _pAngle += FOV_RANGE; }
-        _pDeltaX = _cosLUT[_pAngle] * _pMovSpeed;
-        _pDeltaY = _sinLUT[_pAngle] * _pMovSpeed;
       }
       else if (HAL_GPIO_ReadPin(ARDUINO_D5_GPIO_Port, ARDUINO_D5_Pin)) { // LEFT
-        _pAngle += INCR_ROTATION;
+        _pAngle += LOOK_SPEED;
         if (_pAngle > FOV_RANGE) { _pAngle -= FOV_RANGE; }
-        _pDeltaX = _cosLUT[_pAngle] * _pMovSpeed;
-        _pDeltaY = _sinLUT[_pAngle] * _pMovSpeed;
       }
       if (HAL_GPIO_ReadPin(ARDUINO_D2_GPIO_Port, ARDUINO_D2_Pin)) { // FORWARD
         if (_map[0][(uint16_t)_pPosY * _mSizeX + (uint16_t)(_pPosX + ((_pDeltaX < 0) ? -P_HITBOX_SIZE : P_HITBOX_SIZE))] == 0) { _pPosX += _pDeltaX; }
@@ -373,7 +368,7 @@ uint32_t cast() {
       }
     }
 
-    // DRAW WALLS
+    // RENDERING
     tLineHeight = SCREEN_HEIGHT / rLength * _fisheyeCosLUT[rCount] * LINE_VERTICAL_SCALE;
 
     if (tLineHeight > SHORTEST_LINE) {
@@ -382,7 +377,7 @@ uint32_t cast() {
       if (rHitSide) { tX = (1 - (rIntersectY - (uint16_t)rIntersectY)) * TEXTURE_SIZE; if (rAngle < FOV_RANGE / 4 || rAngle > (FOV_RANGE / 4) * 3) { tX = TEXTURE_SIZE - tX; }}
       else          { tX = (1 - (rIntersectX - (uint16_t)rIntersectX)) * TEXTURE_SIZE; if (rAngle < FOV_RANGE / 2)                                 { tX = TEXTURE_SIZE - tX; }}
 
-      if (tLineHeight > SCREEN_HEIGHT) {
+      if (tLineHeight > SCREEN_HEIGHT) { // Check if line fills up the screen, if it does, drawing the sky and floor is not necessary, so we just draw the wall
         uint16_t tSkipLines = tOffset / tYStep, tFirstLine = tYStep - (tOffset - tSkipLines * tYStep);
         tY = tFirstLine;
         for (uint16_t i = tSkipLines; i < TEXTURE_SIZE - tSkipLines; i++) {
@@ -409,12 +404,14 @@ uint32_t cast() {
           sbY += SKYBOX_TEXEL_Y;
         }
 
+        // DRAW WALLS
         for (uint16_t i = 0; i < TEXTURE_SIZE; i++) {
           BSP_LCD_SetTextColor(_textures[_map[0][mY * _mSizeX + mX] - 1 + rHitSide][i * TEXTURE_SIZE + (uint16_t)(tX)]);
           BSP_LCD_FillRect((rCount * FOV_RECT), tOffset + tY, FOV_RECT, tYStep + 1);
           tY += tYStep;
         }
 
+        // DRAW FLOOR
         for (uint16_t i = tOffset + tLineHeight; i < SCREEN_HEIGHT; i += FOV_RECT) {
           float fZ = (SCREEN_HEIGHT_HALF / (float)(i - SCREEN_HEIGHT_HALF + 1)) * _fisheyeCosLUT[rCount],\
             fX = _pPosX + rVelocityX * fZ * LINE_VERTICAL_SCALE,\
@@ -432,12 +429,7 @@ uint32_t cast() {
     if (rAngle < 0) { rAngle += FOV_RANGE; }
   }
 
-  uint32_t pFrameTime = _sysElapsedTicks - pStartTime;
-
-  _pMovSpeed = pFrameTime * INCR_TRANSLATION;
-//  _pRotSpeed = pFrameTime * INCR_ROTATION;
-
-  return pFrameTime;
+  return _sysElapsedTicks - pStartTime;
 }
 
 float fsqrt(float x) {
