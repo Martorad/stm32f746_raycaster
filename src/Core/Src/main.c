@@ -416,7 +416,9 @@ uint32_t cast() {
         }
 
         for (uint16_t i = tOffset + tLineHeight; i < SCREEN_HEIGHT; i += FOV_RECT) {
-          float fZ = (SCREEN_HEIGHT_HALF / (float)(i - SCREEN_HEIGHT_HALF + 1)) * _fisheyeCosLUT[rCount], fX = _pPosX + rVelocityX * fZ * LINE_VERTICAL_SCALE, fY = _pPosY + rVelocityY * fZ * LINE_VERTICAL_SCALE;
+          float fZ = (SCREEN_HEIGHT_HALF / (float)(i - SCREEN_HEIGHT_HALF + 1)) * _fisheyeCosLUT[rCount],\
+            fX = _pPosX + rVelocityX * fZ * LINE_VERTICAL_SCALE,\
+            fY = _pPosY + rVelocityY * fZ * LINE_VERTICAL_SCALE;
           int16_t fTextureX = (int16_t)(TEXTURE_SIZE * fX) & (TEXTURE_SIZE - 1);
           int16_t fTextureY = (int16_t)(TEXTURE_SIZE * fY) & (TEXTURE_SIZE - 1);
 
