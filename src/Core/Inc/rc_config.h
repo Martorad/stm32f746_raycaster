@@ -2,7 +2,7 @@
 #define __RC__CONFIG__H__
 
 // PERFORMANCE SETTINGS
-#define RES_4 // Vertical line resolution
+#define RES_5 // Vertical line resolution
 #define SBR_0 // Skybox resolution - 0 for 16px, 1 for 32px
 
 #define SHORTEST_LINE 5
@@ -11,9 +11,9 @@
 #define LINE_VERTICAL_SCALE 1.5
 
 // MOVEMENT SETTINGS
-#define INCR_ROTATION    4      // Higher is faster
-#define INCR_TRANSLATION 0.0012 // Higher is faster
-#define P_HITBOX_SIZE    0.6    // In units of map squares
+#define LOOK_SPEED    5   // Higher is faster
+#define MOVE_SPEED    0.1 // Higher is faster
+#define P_HITBOX_SIZE 0.6 // In units of map squares
 
 // DEBUG SETTINGS
 //#define DEBUG_FULLBRIGHT
@@ -46,13 +46,20 @@
 #endif
 
 #ifdef  RES_4
+#define FOV       160
+#define FOV_RECT  3
+#define FOV_INCR  (2 * M_PI) / (360 * 3)
+#define FOV_RANGE (360 * 3)
+#endif
+
+#ifdef  RES_5
 #define FOV       240
 #define FOV_RECT  2
 #define FOV_INCR  (2 * M_PI) / (360 * 4)
 #define FOV_RANGE (360 * 4)
 #endif
 
-#ifdef  RES_5
+#ifdef  RES_6
 #define FOV       480
 #define FOV_RECT  1
 #define FOV_INCR  (2 * M_PI) / (360 * 8)

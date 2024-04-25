@@ -81,32 +81,52 @@ void MX_USB_HOST_Process(void);
 /* USER CODE BEGIN 0 */
 // MAP
 const uint8_t _mSizeX = 48, _mSizeY = 16;
-const uint8_t _map[] = {
-  5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,7,7,7,7,7,7,7,7,7,5,5,5,5,5,5,5,5,
-  5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,0,0,0,5,5,5,0,0,0,0,0,0,0,7,0,0,0,0,0,7,0,0,0,0,0,0,0,0,0,5,
-  5,0,0,0,0,0,0,0,0,0,0,0,0,5,5,5,0,5,0,5,0,5,5,0,0,0,0,0,0,5,0,7,0,0,0,0,0,7,0,0,0,0,0,0,0,0,0,5,
-  5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,0,0,0,5,5,5,0,0,0,0,0,0,0,5,0,7,0,0,5,0,0,7,0,0,0,0,0,0,0,0,0,5,
-  5,5,5,5,5,5,5,5,5,0,0,0,0,0,0,5,5,5,5,5,5,0,0,0,0,0,0,0,0,0,0,7,0,0,0,0,0,7,0,0,0,0,0,0,0,0,0,5,
-  5,0,0,0,0,0,0,0,5,0,0,0,0,0,0,5,0,0,0,5,0,0,0,0,0,0,0,0,0,5,0,7,0,0,0,0,0,7,0,0,0,7,5,5,5,5,7,5,
-  5,0,5,5,5,5,5,5,5,5,5,5,5,0,0,5,5,5,5,0,0,0,0,0,0,0,0,0,0,0,0,7,7,7,0,7,7,7,0,0,0,5,0,0,0,0,5,5,
-  5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,7,0,0,0,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,5,
-  5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,7,0,0,0,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,5,
-  5,0,5,5,5,5,5,5,5,5,5,5,5,0,0,5,5,5,5,0,0,0,0,0,0,0,0,0,0,0,0,3,3,3,0,3,3,3,0,0,0,5,0,0,0,0,5,5,
-  5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,0,0,0,0,0,0,0,0,0,5,0,3,0,0,0,0,0,3,0,0,0,7,5,5,5,5,7,5,
-  5,3,3,3,3,3,3,3,3,3,3,3,0,0,0,0,0,0,0,0,5,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,5,
-  5,1,1,1,1,1,1,1,1,1,1,0,0,1,0,0,0,0,0,0,0,5,0,0,0,0,0,0,0,5,0,3,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,5,
-  5,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,5,0,0,0,0,0,0,5,0,3,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,5,
-  5,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,5,0,0,0,0,0,0,0,3,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,5,
-  5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,3,3,3,3,3,3,3,5,5,5,5,5,5,5,5,5,5
+const uint8_t _map[2][768] = {
+  { // Walls
+    5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,7,7,7,7,7,7,7,7,7,5,5,5,5,5,5,5,5,
+    5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,0,0,0,5,5,5,0,0,0,0,0,0,0,7,0,0,0,0,0,7,0,0,0,0,0,0,0,0,0,5,
+    5,0,0,0,0,0,0,0,0,0,0,0,0,5,5,5,0,5,0,5,0,5,5,0,0,0,0,0,0,5,0,7,0,0,0,0,0,7,0,0,0,0,0,0,0,0,0,5,
+    5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,0,0,0,5,5,5,0,0,0,0,0,0,0,5,0,7,0,0,5,0,0,7,0,0,0,0,0,0,0,0,0,5,
+    5,5,5,5,5,5,5,5,5,0,0,0,0,0,0,5,5,5,5,5,5,0,0,0,0,0,0,0,0,0,0,7,0,0,0,0,0,7,0,0,0,0,0,0,0,0,0,5,
+    5,0,0,0,0,0,0,0,5,0,0,0,0,0,0,5,0,0,0,5,0,0,0,0,0,0,0,0,0,5,0,7,0,0,0,0,0,7,0,0,0,7,5,5,5,5,7,5,
+    5,0,5,5,5,5,5,5,5,5,5,5,5,0,0,5,5,5,5,0,0,0,0,0,0,0,0,0,0,0,0,7,7,7,0,7,7,7,0,0,0,5,0,0,0,0,5,5,
+    5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,7,0,0,0,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,5,
+    5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,7,0,0,0,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,5,
+    5,0,5,5,5,5,5,5,5,5,5,5,5,0,0,5,5,5,5,0,0,0,0,0,0,0,0,0,0,0,0,3,3,3,0,3,3,3,0,0,0,5,0,0,0,0,5,5,
+    5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,0,0,0,0,0,0,0,0,0,5,0,3,0,0,0,0,0,3,0,0,0,7,5,5,5,5,7,5,
+    5,3,3,3,3,3,3,3,3,3,3,3,0,0,0,0,0,0,0,0,5,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,5,
+    5,1,1,1,1,1,1,1,1,1,1,0,0,1,0,0,0,0,0,0,0,5,0,0,0,0,0,0,0,5,0,3,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,5,
+    5,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,5,0,0,0,0,0,0,5,0,3,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,5,
+    5,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,5,0,0,0,0,0,0,0,3,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,5,
+    5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,3,3,3,3,3,3,3,5,5,5,5,5,5,5,5,5,5
+  },
+  { // Floors
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+    0,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,0,3,3,3,0,0,0,5,3,5,3,5,3,3,0,3,3,3,3,3,0,3,3,3,3,3,3,3,3,3,0,
+    0,3,3,3,3,3,3,3,3,3,3,3,3,0,0,0,3,0,3,0,3,0,0,5,3,5,3,5,3,0,3,0,3,3,3,3,3,0,3,3,3,3,3,3,3,3,3,0,
+    0,3,3,3,3,3,3,3,3,3,3,3,3,3,3,0,3,3,3,0,0,0,5,3,5,3,5,3,5,0,5,0,3,3,0,3,3,0,3,3,3,3,3,3,3,3,3,0,
+    0,0,0,0,0,0,0,0,0,3,3,3,3,3,3,0,0,0,0,0,0,5,3,5,3,5,3,5,3,5,3,0,3,3,3,3,3,0,3,3,3,3,3,3,3,3,3,0,
+    0,3,3,3,3,3,3,3,0,3,3,3,3,3,3,0,3,3,3,0,5,3,5,3,5,3,5,3,5,0,5,0,3,3,3,3,3,0,3,3,3,0,0,0,0,0,0,0,
+    0,3,0,0,0,0,0,0,0,0,0,0,0,3,3,0,0,0,0,5,3,5,3,5,3,5,3,5,3,5,3,0,0,0,3,0,0,0,3,3,3,0,7,7,7,7,0,0,
+    0,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,5,3,5,3,0,0,5,3,5,0,5,3,3,3,3,3,3,3,3,3,3,3,7,7,7,7,0,0,
+    0,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,5,3,5,3,5,0,0,3,5,3,0,5,3,3,3,3,3,3,3,3,3,3,3,7,7,7,7,0,0,
+    0,3,0,0,0,0,0,0,0,0,0,0,0,3,3,0,0,0,0,3,5,3,5,3,5,3,5,3,5,3,3,0,0,0,3,0,0,0,3,3,3,0,7,7,7,7,0,0,
+    0,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,0,3,5,3,5,3,5,3,5,3,0,3,0,5,5,5,5,5,0,3,3,3,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,3,3,3,3,3,3,3,3,0,3,5,3,5,3,5,3,5,3,3,0,5,5,5,5,5,0,3,3,3,3,3,3,3,3,3,0,
+    0,0,0,0,0,0,0,0,0,0,0,3,3,0,3,3,3,3,3,3,3,0,3,5,3,5,3,5,3,0,3,0,5,5,5,5,5,0,3,3,3,3,3,3,3,3,3,0,
+    0,0,3,3,3,3,3,3,3,3,3,3,3,0,3,3,3,3,3,3,3,3,0,3,5,3,5,3,5,0,3,0,5,5,5,5,5,0,3,3,3,3,3,3,3,3,3,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,3,3,3,3,3,3,3,3,0,3,5,3,5,3,5,3,0,5,5,5,5,5,0,3,3,3,3,3,3,3,3,3,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+  }
 };
 
 // PLAYER
-float   _pPosX = 1.5, _pPosY = 8, _pDeltaX, _pDeltaY, _pMovSpeed, _pRotSpeed;
+float   _pPosX = 1.5, _pPosY = 8, _pDeltaX, _pDeltaY;
 int16_t _pAngle = 0; // Angle in increments of FOV_INCR radians
 
 // SYSTEM
 volatile uint32_t _sysElapsedTicks = 0; // 10K frequency, 1 tick = 100us = 0.1ms
-float    _fisheyeCosLUT[FOV], _sinLUT[FOV_RANGE], _cosLUT[FOV_RANGE];
+float    _fisheyeCosLUT[FOV], _sinLUT[FOV_RANGE], _cosLUT[FOV_RANGE], _fZLUT[SCREEN_HEIGHT_HALF];
 uint16_t _sbLUT[FOV_RANGE];
 
 /* USER CODE END 0 */
@@ -187,12 +207,9 @@ int main(void)
     _cosLUT[i] =  cos(i * FOV_INCR + 0.0001);
     _sbLUT[i]  =  (uint16_t)(SKYBOX_SIZE_X - (i + 1) * FOV_INCR * SKYBOX_SCALE_F);
   }
+  for (uint16_t i = SCREEN_HEIGHT_HALF; i < SCREEN_HEIGHT; i++) { _fZLUT[i - SCREEN_HEIGHT_HALF] = (SCREEN_HEIGHT_HALF / (float)(i - SCREEN_HEIGHT_HALF + 1)) * LINE_VERTICAL_SCALE; }
 
   HAL_TIM_Base_Start_IT(&htim7);
-
-  cast();
-  _pDeltaX = _cosLUT[_pAngle] * _pMovSpeed;
-  _pDeltaY = _sinLUT[_pAngle] * _pMovSpeed;
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -207,25 +224,24 @@ int main(void)
       pageFlip();
       showFPS(cast());
 
+      _pDeltaX = _cosLUT[_pAngle] * MOVE_SPEED;
+      _pDeltaY = _sinLUT[_pAngle] * MOVE_SPEED;
+
       if (HAL_GPIO_ReadPin(ARDUINO_D4_GPIO_Port, ARDUINO_D4_Pin)) { // RIGHT
-        _pAngle -= INCR_ROTATION;
+        _pAngle -= LOOK_SPEED;
         if (_pAngle < 0) { _pAngle += FOV_RANGE; }
-        _pDeltaX = _cosLUT[_pAngle] * _pMovSpeed;
-        _pDeltaY = _sinLUT[_pAngle] * _pMovSpeed;
       }
       else if (HAL_GPIO_ReadPin(ARDUINO_D5_GPIO_Port, ARDUINO_D5_Pin)) { // LEFT
-        _pAngle += INCR_ROTATION;
-        if (_pAngle > FOV_RANGE) { _pAngle -= FOV_RANGE; }
-        _pDeltaX = _cosLUT[_pAngle] * _pMovSpeed;
-        _pDeltaY = _sinLUT[_pAngle] * _pMovSpeed;
+        _pAngle += LOOK_SPEED;
+        if (_pAngle >= FOV_RANGE) { _pAngle -= FOV_RANGE; }
       }
       if (HAL_GPIO_ReadPin(ARDUINO_D2_GPIO_Port, ARDUINO_D2_Pin)) { // FORWARD
-        if (_map[(uint16_t)_pPosY * _mSizeX + (uint16_t)(_pPosX + ((_pDeltaX < 0) ? -P_HITBOX_SIZE : P_HITBOX_SIZE))] == 0) { _pPosX += _pDeltaX; }
-        if (_map[(uint16_t)(_pPosY + ((_pDeltaY < 0) ? -P_HITBOX_SIZE : P_HITBOX_SIZE)) * _mSizeX + (uint16_t)_pPosX] == 0) { _pPosY += _pDeltaY; }
+        if (_map[0][(uint16_t)_pPosY * _mSizeX + (uint16_t)(_pPosX + ((_pDeltaX < 0) ? -P_HITBOX_SIZE : P_HITBOX_SIZE))] == 0) { _pPosX += _pDeltaX; }
+        if (_map[0][(uint16_t)(_pPosY + ((_pDeltaY < 0) ? -P_HITBOX_SIZE : P_HITBOX_SIZE)) * _mSizeX + (uint16_t)_pPosX] == 0) { _pPosY += _pDeltaY; }
       }
       else if (HAL_GPIO_ReadPin(ARDUINO_D3_GPIO_Port, ARDUINO_D3_Pin)) { // BACKWARD
-        if (_map[(uint16_t)_pPosY * _mSizeX + (uint16_t)(_pPosX - ((_pDeltaX < 0) ? -P_HITBOX_SIZE : P_HITBOX_SIZE))] == 0) { _pPosX -= _pDeltaX; }
-        if (_map[(uint16_t)(_pPosY - ((_pDeltaY < 0) ? -P_HITBOX_SIZE : P_HITBOX_SIZE)) * _mSizeX + (uint16_t)_pPosX] == 0) { _pPosY -= _pDeltaY; }
+        if (_map[0][(uint16_t)_pPosY * _mSizeX + (uint16_t)(_pPosX - ((_pDeltaX < 0) ? -P_HITBOX_SIZE : P_HITBOX_SIZE))] == 0) { _pPosX -= _pDeltaX; }
+        if (_map[0][(uint16_t)(_pPosY - ((_pDeltaY < 0) ? -P_HITBOX_SIZE : P_HITBOX_SIZE)) * _mSizeX + (uint16_t)_pPosX] == 0) { _pPosY -= _pDeltaY; }
       }
     }
   }
@@ -316,46 +332,44 @@ void PeriphCommonClock_Config(void)
 
 /* USER CODE BEGIN 4 */
 uint32_t cast() {
-  // Variable prefix convention: r = ray, m = map, p = performance, c = calculation, t = texture, sb = skybox
+  // Variable prefix convention: r = ray, m = map, p = performance, c = calculation, t = texture, sb = skybox, f = floor
   uint32_t pStartTime = _sysElapsedTicks;
   int16_t  rAngle;
 
   BSP_LCD_SelectLayer(0);
-  BSP_LCD_SetTextColor(COLOR_GROUND);
-  BSP_LCD_FillRect(0, SCREEN_HEIGHT_HALF, SCREEN_WIDTH, SCREEN_HEIGHT_HALF);
 
   rAngle = _pAngle + FOV / 2;
-  if (rAngle > FOV_RANGE) { rAngle -= FOV_RANGE; }
+  if (rAngle >= FOV_RANGE) { rAngle -= FOV_RANGE; }
 
   for (uint16_t rCount = 0; rCount < FOV; rCount++) {
     // This uses David Ziemkiewicz' method of velocities and times, as well as Lodev's DDA. Massive thanks to both of these legends.
     float   rVelocityX = _cosLUT[rAngle], rVelocityY = _sinLUT[rAngle], rIntersectX = _pPosX, rIntersectY = _pPosY, rTimeX, rTimeY, rLength = 0, tLineHeight;
     int16_t mX = (int16_t)rIntersectX, mY = (int16_t)rIntersectY;
-    int8_t  rStepX = (rVelocityX > 0) ? 1 : -1, rStepY = (rVelocityY > 0) ? 1 : -1, rHitSide = 0;
+    int8_t  rVelPosX = (rVelocityX > 0), rVelPosY = (rVelocityY > 0), rStepX = (rVelocityX > 0) ? 1 : -1, rStepY = (rVelocityY > 0) ? 1 : -1, rHitSide = 0;
 
     for (uint16_t i = 0; i < _mSizeX * _mSizeY; i++) {
-      if (_map[mY * _mSizeX + mX] > 0) { break; }
+      if (_map[0][mY * _mSizeX + mX] > 0) { break; }
 
-      rTimeX = (mY - rIntersectY + (rVelocityY > 0)) / rVelocityY; // This should be treated as "time to X-side wall"
-      rTimeY = (mX - rIntersectX + (rVelocityX > 0)) / rVelocityX;
+      rTimeX = (mY - rIntersectY + rVelPosY) / rVelocityY; // This should be treated as "time to X-side wall"
+      rTimeY = (mX - rIntersectX + rVelPosX) / rVelocityX;
 
       if (rTimeY < rTimeX) { // Vertical line
         mX += rStepX;
-        rIntersectX = mX - (rVelocityX < 0) * rStepX;
+        rIntersectX = mX - !rVelPosX * rStepX;
         rIntersectY += rVelocityY * rTimeY;
         rLength += rTimeY;
         rHitSide = 1;
       }
       else { // Horizontal line
         mY += rStepY;
-        rIntersectY = mY - (rVelocityY < 0) * rStepY;
+        rIntersectY = mY - !rVelPosY * rStepY;
         rIntersectX += rVelocityX * rTimeX;
         rLength += rTimeX;
         rHitSide = 0;
       }
     }
 
-    // DRAW WALLS
+    // RENDERING
     tLineHeight = SCREEN_HEIGHT / rLength * _fisheyeCosLUT[rCount] * LINE_VERTICAL_SCALE;
 
     if (tLineHeight > SHORTEST_LINE) {
@@ -364,37 +378,51 @@ uint32_t cast() {
       if (rHitSide) { tX = (1 - (rIntersectY - (uint16_t)rIntersectY)) * TEXTURE_SIZE; if (rAngle < FOV_RANGE / 4 || rAngle > (FOV_RANGE / 4) * 3) { tX = TEXTURE_SIZE - tX; }}
       else          { tX = (1 - (rIntersectX - (uint16_t)rIntersectX)) * TEXTURE_SIZE; if (rAngle < FOV_RANGE / 2)                                 { tX = TEXTURE_SIZE - tX; }}
 
-      if (tLineHeight > SCREEN_HEIGHT) {
-        uint16_t tSkipLines = tOffset / tYStep, tFirstLine = tYStep - (tOffset - tSkipLines * tYStep);
-        tY = tFirstLine;
-        for (uint16_t i = tSkipLines; i < TEXTURE_SIZE - tSkipLines; i++) {
-          BSP_LCD_SetTextColor(_textures[_map[mY * _mSizeX + mX] - 1 + rHitSide][i * TEXTURE_SIZE + (uint16_t)(tX)]);
-          if (i != tSkipLines && i != TEXTURE_SIZE - tSkipLines - 1) {
-            BSP_LCD_FillRect((rCount * FOV_RECT), tY, FOV_RECT, tYStep + 1);
-            tY += tYStep;
-          }
-          else {
-            BSP_LCD_FillRect((rCount * FOV_RECT), (i == tSkipLines) ? 0 : tY, FOV_RECT, tFirstLine + 2);
+      if (tLineHeight > SCREEN_HEIGHT) { // Check if line fills up the screen, if it does, drawing the sky and floor is not necessary, so we just draw the wall
+        if (rCount % 2 == 0) {
+          uint16_t tSkipLines = tOffset / tYStep, tFirstLine = tYStep - (tOffset - tSkipLines * tYStep);
+          tY = tFirstLine;
+          for (uint16_t i = tSkipLines; i < TEXTURE_SIZE - tSkipLines; i++) { // TODO: Try starting i from 0 to enable using a switch here
+            BSP_LCD_SetTextColor(_textures[_map[0][mY * _mSizeX + mX] - 1 + rHitSide][i * TEXTURE_SIZE + (uint16_t)(tX)]);
+            if (i != tSkipLines && i != TEXTURE_SIZE - tSkipLines - 1) {
+              BSP_LCD_FillRect((rCount * FOV_RECT), tY, FOV_RECT * 2, tYStep + 1);
+              tY += tYStep;
+            }
+            else {
+              BSP_LCD_FillRect((rCount * FOV_RECT), (i == tSkipLines) ? 0 : tY, FOV_RECT * 2, tFirstLine + 2);
+            }
           }
         }
       }
       else {
         tOffset *= -1;
 
-        // DRAW SKYBOX
-        uint16_t sbY = 0, sbDrawLines = (tOffset / SKYBOX_TEXEL_Y) + 1;
-        if (sbDrawLines > SKYBOX_SIZE_Y) { sbDrawLines = SKYBOX_SIZE_Y; }
+        if (rCount % 2 == 0) {
+          // DRAW SKYBOX
+          uint16_t sbY = 0, sbDrawLines = (tOffset / SKYBOX_TEXEL_Y) + 1;
+          if (sbDrawLines > SKYBOX_SIZE_Y) { sbDrawLines = SKYBOX_SIZE_Y; }
 
-        for (uint16_t i = 0; i < sbDrawLines; i++) {
-          BSP_LCD_SetTextColor(_skybox[i * SKYBOX_SIZE_X + _sbLUT[rAngle]]);
-          BSP_LCD_FillRect((rCount * FOV_RECT), sbY, FOV_RECT, SKYBOX_TEXEL_Y);
-          sbY += SKYBOX_TEXEL_Y;
+          for (uint16_t i = 0; i < sbDrawLines; i++) {
+            BSP_LCD_SetTextColor(_skybox[i * SKYBOX_SIZE_X + _sbLUT[rAngle]]);
+            BSP_LCD_FillRect((rCount * FOV_RECT), sbY, FOV_RECT * 2, SKYBOX_TEXEL_Y);
+            sbY += SKYBOX_TEXEL_Y;
+          }
+
+          // DRAW WALLS
+          for (uint16_t i = 0; i < TEXTURE_SIZE; i++) {
+            BSP_LCD_SetTextColor(_textures[_map[0][mY * _mSizeX + mX] - 1 + rHitSide][i * TEXTURE_SIZE + (uint16_t)(tX)]);
+            BSP_LCD_FillRect((rCount * FOV_RECT), tOffset + tY, FOV_RECT * 2, tYStep + 1);
+            tY += tYStep;
+          }
         }
 
-        for (uint16_t i = 0; i < TEXTURE_SIZE; i++) {
-          BSP_LCD_SetTextColor(_textures[_map[mY * _mSizeX + mX] - 1 + rHitSide][i * TEXTURE_SIZE + (uint16_t)(tX)]);
-          BSP_LCD_FillRect((rCount * FOV_RECT), tOffset + tY, FOV_RECT, tYStep + 1);
-          tY += tYStep;
+        // DRAW FLOOR
+        for (uint16_t i = tOffset + tLineHeight; i < SCREEN_HEIGHT; i += FOV_RECT) {
+          float fZ = _fZLUT[i - SCREEN_HEIGHT_HALF] * _fisheyeCosLUT[rCount], fX = _pPosX + rVelocityX * fZ, fY = _pPosY + rVelocityY * fZ;
+          int16_t fTextureX = (int16_t)(TEXTURE_SIZE * fX) & (TEXTURE_SIZE - 1), fTextureY = (int16_t)(TEXTURE_SIZE * fY) & (TEXTURE_SIZE - 1);
+
+          BSP_LCD_SetTextColor(_textures[_map[1][(int16_t)fY * _mSizeX + (int16_t)fX]][fTextureY * TEXTURE_SIZE + fTextureX]);
+          BSP_LCD_FillRect((rCount * FOV_RECT), i, FOV_RECT, (i == SCREEN_HEIGHT - 1) ? FOV_RECT / 2 : FOV_RECT);
         }
       }
     }
@@ -403,12 +431,7 @@ uint32_t cast() {
     if (rAngle < 0) { rAngle += FOV_RANGE; }
   }
 
-  uint32_t pFrameTime = _sysElapsedTicks - pStartTime;
-
-  _pMovSpeed = pFrameTime * INCR_TRANSLATION;
-//  _pRotSpeed = pFrameTime * INCR_ROTATION;
-
-  return pFrameTime;
+  return _sysElapsedTicks - pStartTime;
 }
 
 float fsqrt(float x) {
@@ -437,7 +460,7 @@ uint32_t dimColor(uint32_t inputColor, float dimmingFactor) {
 
 void showFPS(uint32_t frameTime) {
   uint8_t frameTimeS[8];
-  sprintf((char*)frameTimeS, "%li", frameTime);
+  sprintf((char*)frameTimeS, "%03li", frameTime);
   BSP_LCD_SetTextColor(0xFF0000FF);
   BSP_LCD_DisplayStringAt(0, 0, frameTimeS, LEFT_MODE);
 }
