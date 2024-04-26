@@ -1051,9 +1051,10 @@ void BSP_LCD_DrawBitmap(uint32_t Xpos, uint32_t Ypos, uint8_t *pbmp)
   */
 void BSP_LCD_FillRect(uint16_t Xpos, uint16_t Ypos, uint16_t Width, uint16_t Height)
 {
-  uint32_t x_address = (hLtdcHandler.LayerCfg[ActiveLayer].FBStartAdress) + 2 * (hLtdcHandler.LayerCfg[ActiveLayer].ImageWidth * Ypos + Xpos);
-  /* Fill the rectangle */
-  LL_FillBuffer(ActiveLayer, (uint32_t *)x_address, Width, Height, (hLtdcHandler.LayerCfg[ActiveLayer].ImageWidth - Width), DrawProp[ActiveLayer].TextColor);
+  hDma2dHandler.Init.OutputOffset = (hLtdcHandler.LayerCfg[ActiveLayer].ImageWidth - Width);
+
+  HAL_DMA2D_Start(&hDma2dHandler, DrawProp[ActiveLayer].TextColor, (hLtdcHandler.LayerCfg[ActiveLayer].FBStartAdress) + 2 * (hLtdcHandler.LayerCfg[ActiveLayer].ImageWidth * Ypos + Xpos), Width, Height);
+  HAL_DMA2D_PollForTransfer(&hDma2dHandler, 10);
 }
 
 /**
