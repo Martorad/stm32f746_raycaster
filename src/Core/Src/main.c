@@ -80,8 +80,8 @@ void MX_USB_HOST_Process(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 // MAP
-const uint8_t _mSizeX = 48, _mSizeY = 16;
-const uint8_t _map[2][768] = {
+static const uint8_t _mSizeX = 48, _mSizeY = 16;
+static const uint8_t _map[2][768] = {
   { // Walls
     5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,7,7,7,7,7,7,7,7,7,5,5,5,5,5,5,5,5,
     5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,0,0,0,5,5,5,0,0,0,0,0,0,0,7,0,0,0,0,0,7,0,0,0,0,0,0,0,0,0,5,
@@ -121,13 +121,13 @@ const uint8_t _map[2][768] = {
 };
 
 // PLAYER
-float   _pPosX = 1.5, _pPosY = 8, _pDeltaX, _pDeltaY;
-int16_t _pAngle = 0; // Angle in increments of FOV_INCR radians
+static float   _pPosX = 1.5, _pPosY = 8, _pDeltaX, _pDeltaY;
+static int16_t _pAngle = 0; // Angle in increments of FOV_INCR radians
 
 // SYSTEM
-volatile uint32_t _sysElapsedTicks = 0; // 10K frequency, 1 tick = 100us = 0.1ms
-float    _fisheyeCosLUT[FOV], _sinLUT[FOV_RANGE], _cosLUT[FOV_RANGE], _fZLUT[SCREEN_HEIGHT_HALF];
-uint16_t _sbLUT[FOV_RANGE];
+static volatile uint32_t _sysElapsedTicks = 0; // 10K frequency, 1 tick = 100us = 0.1ms
+static float             _fisheyeCosLUT[FOV], _sinLUT[FOV_RANGE], _cosLUT[FOV_RANGE], _fZLUT[SCREEN_HEIGHT_HALF];
+static uint16_t          _sbLUT[FOV_RANGE];
 
 /* USER CODE END 0 */
 
