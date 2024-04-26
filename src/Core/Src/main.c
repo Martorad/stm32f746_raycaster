@@ -126,7 +126,7 @@ static int16_t     _pAngle = 0; // Angle in increments of FOV_INCR radians
 static const float _pAccel = 0.01, _pFriction = 0.08;
 
 // SYSTEM
-static volatile uint32_t _sysElapsedTicks = 0; // 20K frequency, 1 tick = 50us = 0.05ms
+static volatile uint32_t _sysElapsedTicks = 0; // 10K frequency, 1 tick = 100us = 0.1ms
 
 // LOOKUP TABLES
 static float    _fisheyeCosLUT[FOV], _sinLUT[FOV_RANGE], _cosLUT[FOV_RANGE], _fZLUT[SCREEN_HEIGHT_HALF];
@@ -200,7 +200,7 @@ int main(void)
   BSP_LCD_SetLayerVisible(LTDC_BACKGROUND, DISABLE);
   BSP_LCD_DisplayOn();
   BSP_LCD_SelectLayer(LTDC_BACKGROUND);
-  BSP_LCD_SetFont(&Font16);
+  BSP_LCD_SetFont(&Font12);
   BSP_LCD_SelectLayer(LTDC_FOREGROUND);
   BSP_LCD_Clear(LCD_COLOR_BLACK);
 
@@ -469,9 +469,8 @@ uint32_t dimColor(uint32_t inputColor, float dimmingFactor) {
 }
 
 void showFPS(uint32_t frameTime) {
-  frameTime *= 5;
   uint8_t frameTimeS[16];
-  sprintf((char*)frameTimeS, "%li.%02lims", frameTime / 100, frameTime % 100);
+  sprintf((char*)frameTimeS, "%02li.%lims", frameTime / 10, frameTime % 10);
   BSP_LCD_SetTextColor(0xFF0000FF);
   BSP_LCD_DisplayStringAt(0, 0, frameTimeS, LEFT_MODE);
 }
