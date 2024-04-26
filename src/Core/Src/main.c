@@ -126,7 +126,7 @@ static int16_t     _pAngle = 0; // Angle in increments of FOV_INCR radians
 static const float _pAccel = 0.01, _pFriction = 0.08;
 
 // SYSTEM
-static volatile uint32_t _sysElapsedTicks = 0; // 10K frequency, 1 tick = 100us = 0.1ms
+static volatile uint32_t _sysElapsedTicks = 0; // 20K frequency, 1 tick = 50us = 0.05ms
 
 // LOOKUP TABLES
 static float    _fisheyeCosLUT[FOV], _sinLUT[FOV_RANGE], _cosLUT[FOV_RANGE], _fZLUT[SCREEN_HEIGHT_HALF];
