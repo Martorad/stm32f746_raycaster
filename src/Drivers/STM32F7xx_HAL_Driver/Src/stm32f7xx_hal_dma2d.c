@@ -641,8 +641,14 @@ HAL_StatusTypeDef HAL_DMA2D_Start(DMA2D_HandleTypeDef *hdma2d, uint32_t pdata, u
   /* Change DMA2D peripheral state */
   hdma2d->State = HAL_DMA2D_STATE_BUSY;
 
-  /* Configure the source, destination address and the data size */
-  DMA2D_SetConfig(hdma2d, pdata, DstAddress, Width, Height);
+  /* Configure DMA2D data size */
+  MODIFY_REG(hdma2d->Instance->NLR, (DMA2D_NLR_NL | DMA2D_NLR_PL), (Height | (Width << DMA2D_NLR_PL_Pos)));
+
+  /* Configure DMA2D destination address */
+  WRITE_REG(hdma2d->Instance->OMAR, DstAddress);
+
+  /* Write to DMA2D OCOLR register */
+  WRITE_REG(hdma2d->Instance->OCOLR, pdata);
 
   /* Enable the Peripheral */
   __HAL_DMA2D_ENABLE(hdma2d);
@@ -1933,29 +1939,14 @@ uint32_t HAL_DMA2D_GetError(DMA2D_HandleTypeDef *hdma2d)
   */
 static void DMA2D_SetConfig(DMA2D_HandleTypeDef *hdma2d, uint32_t pdata, uint32_t DstAddress, uint32_t Width, uint32_t Height)
 {
-  uint32_t tmp;
-  uint32_t tmp2;
-  uint32_t tmp3;
-  uint32_t tmp4;
-
   /* Configure DMA2D data size */
   MODIFY_REG(hdma2d->Instance->NLR, (DMA2D_NLR_NL | DMA2D_NLR_PL), (Height | (Width << DMA2D_NLR_PL_Pos)));
 
   /* Configure DMA2D destination address */
   WRITE_REG(hdma2d->Instance->OMAR, DstAddress);
 
-  /* Register to memory DMA2D mode selected */
-  tmp2 = pdata & DMA2D_OCOLR_RED_1;
-  tmp3 = pdata & DMA2D_OCOLR_GREEN_1;
-  tmp4 = pdata & DMA2D_OCOLR_BLUE_1;
-
-  /* Prepare the value to be written to the OCOLR register according to the color mode */
-  tmp2 = (tmp2 >> 19U);
-  tmp3 = (tmp3 >> 10U);
-  tmp4 = (tmp4 >> 3U);
-  tmp  = ((tmp3 << 5U) | (tmp2 << 11U) | tmp4);
   /* Write to DMA2D OCOLR register */
-  WRITE_REG(hdma2d->Instance->OCOLR, tmp);
+  WRITE_REG(hdma2d->Instance->OCOLR, pdata);
 }
 
 /**
