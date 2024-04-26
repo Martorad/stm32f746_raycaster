@@ -121,8 +121,9 @@ static const uint8_t _map[2][768] = {
 };
 
 // PLAYER
-static float   _pPosX = 1.5, _pPosY = 8, _pDeltaX, _pDeltaY;
-static int16_t _pAngle = 0; // Angle in increments of FOV_INCR radians
+static float       _pPosX = 1.5, _pPosY = 8, _pDeltaX, _pDeltaY, _pVelocityX = 0, _pVelocityY = 0;
+static int16_t     _pAngle = 0; // Angle in increments of FOV_INCR radians
+static const float _pAccel = 0.01, _pFriction = 0.1;
 
 // SYSTEM
 static volatile uint32_t _sysElapsedTicks = 0; // 10K frequency, 1 tick = 100us = 0.1ms
@@ -224,8 +225,8 @@ int main(void)
       pageFlip();
       showFPS(cast());
 
-      _pDeltaX = _cosLUT[_pAngle] * MOVE_SPEED;
-      _pDeltaY = _sinLUT[_pAngle] * MOVE_SPEED;
+      _pDeltaX = _cosLUT[_pAngle] * _pAccel;
+      _pDeltaY = _sinLUT[_pAngle] * _pAccel;
 
       if (HAL_GPIO_ReadPin(ARDUINO_D4_GPIO_Port, ARDUINO_D4_Pin)) { // RIGHT
         _pAngle -= LOOK_SPEED;
@@ -236,13 +237,19 @@ int main(void)
         if (_pAngle >= FOV_RANGE) { _pAngle -= FOV_RANGE; }
       }
       if (HAL_GPIO_ReadPin(ARDUINO_D2_GPIO_Port, ARDUINO_D2_Pin)) { // FORWARD
-        if (_map[0][(uint16_t)_pPosY * _mSizeX + (uint16_t)(_pPosX + ((_pDeltaX < 0) ? -P_HITBOX_SIZE : P_HITBOX_SIZE))] == 0) { _pPosX += _pDeltaX; }
-        if (_map[0][(uint16_t)(_pPosY + ((_pDeltaY < 0) ? -P_HITBOX_SIZE : P_HITBOX_SIZE)) * _mSizeX + (uint16_t)_pPosX] == 0) { _pPosY += _pDeltaY; }
+        _pVelocityX += _pDeltaX;
+        _pVelocityY += _pDeltaY;
       }
       else if (HAL_GPIO_ReadPin(ARDUINO_D3_GPIO_Port, ARDUINO_D3_Pin)) { // BACKWARD
-        if (_map[0][(uint16_t)_pPosY * _mSizeX + (uint16_t)(_pPosX - ((_pDeltaX < 0) ? -P_HITBOX_SIZE : P_HITBOX_SIZE))] == 0) { _pPosX -= _pDeltaX; }
-        if (_map[0][(uint16_t)(_pPosY - ((_pDeltaY < 0) ? -P_HITBOX_SIZE : P_HITBOX_SIZE)) * _mSizeX + (uint16_t)_pPosX] == 0) { _pPosY -= _pDeltaY; }
+        _pVelocityX -= _pDeltaX;
+        _pVelocityY -= _pDeltaY;
       }
+
+      if (_map[0][(uint16_t)_pPosY * _mSizeX + (uint16_t)(_pPosX + ((_pVelocityX < 0) ? -P_HITBOX_SIZE : P_HITBOX_SIZE))] == 0) { _pPosX += _pVelocityX; }
+      if (_map[0][(uint16_t)(_pPosY + ((_pVelocityY < 0) ? -P_HITBOX_SIZE : P_HITBOX_SIZE)) * _mSizeX + (uint16_t)_pPosX] == 0) { _pPosY += _pVelocityY; }
+
+      _pVelocityX *= (1 - _pFriction);
+      _pVelocityY *= (1 - _pFriction);
     }
   }
   /* USER CODE END 3 */
