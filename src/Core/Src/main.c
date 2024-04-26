@@ -427,7 +427,7 @@ uint32_t cast(void) {
 
         // DRAW FLOOR
         for (uint16_t i = tOffset + tLineHeight; i < SCREEN_HEIGHT; i += FOV_RECT) {
-          float fZ = _fZLUT[i - SCREEN_HEIGHT_HALF] * _fisheyeCosLUT[rCount], fX = _pPosX + rVelocityX * fZ, fY = _pPosY + rVelocityY * fZ;
+          float   fZ = _fZLUT[i - SCREEN_HEIGHT_HALF] * _fisheyeCosLUT[rCount], fX = _pPosX + rVelocityX * fZ, fY = _pPosY + rVelocityY * fZ;
           int16_t fTextureX = (int16_t)(TEXTURE_SIZE * fX) & (TEXTURE_SIZE - 1), fTextureY = (int16_t)(TEXTURE_SIZE * fY) & (TEXTURE_SIZE - 1);
 
           BSP_LCD_SetTextColor(_textures[_map[1][(int16_t)fY * _mSizeX + (int16_t)fX] - 1][fTextureY * TEXTURE_SIZE + fTextureX]);
