@@ -345,7 +345,7 @@ uint32_t cast(void) {
   uint32_t pStartTime = _sysElapsedTicks;
   int16_t  rAngle;
 
-  BSP_LCD_SelectLayer(0);
+  BSP_LCD_SelectLayer(LTDC_BACKGROUND);
 
   rAngle = _pAngle + FOV / 2;
   if (rAngle >= FOV_RANGE) { rAngle -= FOV_RANGE; }
