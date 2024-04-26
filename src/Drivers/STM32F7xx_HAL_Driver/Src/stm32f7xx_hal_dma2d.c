@@ -641,8 +641,14 @@ HAL_StatusTypeDef HAL_DMA2D_Start(DMA2D_HandleTypeDef *hdma2d, uint32_t pdata, u
   /* Change DMA2D peripheral state */
   hdma2d->State = HAL_DMA2D_STATE_BUSY;
 
-  /* Configure the source, destination address and the data size */
-  DMA2D_SetConfig(hdma2d, pdata, DstAddress, Width, Height);
+  /* Configure DMA2D data size */
+  MODIFY_REG(hdma2d->Instance->NLR, (DMA2D_NLR_NL | DMA2D_NLR_PL), (Height | (Width << DMA2D_NLR_PL_Pos)));
+
+  /* Configure DMA2D destination address */
+  WRITE_REG(hdma2d->Instance->OMAR, DstAddress);
+
+  /* Write to DMA2D OCOLR register */
+  WRITE_REG(hdma2d->Instance->OCOLR, pdata);
 
   /* Enable the Peripheral */
   __HAL_DMA2D_ENABLE(hdma2d);
