@@ -2,7 +2,7 @@
 #define __RC__CONFIG__H__
 
 // PERFORMANCE SETTINGS
-#define RES_5 // Vertical line resolution
+#define RES_4 // Vertical line resolution
 #define SBR_0 // Skybox resolution - 0 for 16px, 1 for 32px
 
 #define SHORTEST_LINE 5
@@ -11,7 +11,7 @@
 #define LINE_VERTICAL_SCALE 1.5
 
 // MOVEMENT SETTINGS
-#define LOOK_SPEED    5   // Higher is faster
+#define LOOK_SPEED    4   // Higher is faster
 #define MOVE_SPEED    0.1 // Higher is faster
 #define P_HITBOX_SIZE 0.6 // In units of map squares
 

@@ -81,7 +81,7 @@ void MX_USB_HOST_Process(void);
 /* USER CODE BEGIN 0 */
 // MAP
 const uint8_t _mSizeX = 48, _mSizeY = 16;
-const uint8_t _map[2][768] = {
+const uint8_t _map[3][768] = {
   { // Walls
     5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,7,7,7,7,7,7,7,7,7,5,5,5,5,5,5,5,5,
     5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,0,0,0,5,5,5,0,0,0,0,0,0,0,7,0,0,0,0,0,7,0,0,0,0,0,0,0,0,0,5,
@@ -116,6 +116,24 @@ const uint8_t _map[2][768] = {
     0,0,0,0,0,0,0,0,0,0,0,3,3,0,3,3,3,3,3,3,3,0,3,5,3,5,3,5,3,0,3,0,5,5,5,5,5,0,3,3,3,3,3,3,3,3,3,0,
     0,0,3,3,3,3,3,3,3,3,3,3,3,0,3,3,3,3,3,3,3,3,0,3,5,3,5,3,5,0,3,0,5,5,5,5,5,0,3,3,3,3,3,3,3,3,3,0,
     0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,3,3,3,3,3,3,3,3,0,3,5,3,5,3,5,3,0,5,5,5,5,5,0,3,3,3,3,3,3,3,3,3,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+  },
+  { // Ceilings
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+    0,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,0,5,5,5,0,0,0,7,5,7,5,7,5,5,0,5,5,5,5,5,0,5,5,5,5,5,5,5,5,5,0,
+    0,5,5,5,5,5,5,5,5,5,5,5,5,0,0,0,5,0,5,0,5,0,0,7,5,7,5,7,5,0,5,0,5,5,5,5,5,0,5,5,5,5,5,5,5,5,5,0,
+    0,5,5,5,5,5,5,5,5,5,5,5,5,5,5,0,5,5,5,0,0,0,7,5,7,5,7,5,7,0,7,0,5,5,0,5,5,0,5,5,5,5,5,5,5,5,5,0,
+    0,0,0,0,0,0,0,0,0,5,5,5,5,5,5,0,0,0,0,0,0,7,5,7,5,7,5,7,5,7,5,0,5,5,5,5,5,0,5,5,5,5,5,5,5,5,5,0,
+    0,5,5,5,5,5,5,5,0,5,5,5,5,5,5,0,5,5,5,0,7,5,7,5,7,5,7,5,7,0,7,0,5,5,5,5,5,0,5,5,5,0,0,0,0,0,0,0,
+    0,5,0,0,0,0,0,0,0,0,0,0,0,5,5,0,0,0,0,7,5,7,5,7,5,7,5,7,5,7,5,0,0,0,5,0,0,0,5,5,5,0,7,7,7,7,0,0,
+    0,5,5,5,5,5,5,0,0,0,0,5,5,5,5,5,5,5,5,5,7,5,7,5,0,0,7,5,7,0,7,5,5,5,5,5,5,5,5,5,5,5,7,7,7,7,0,0,
+    0,5,5,5,5,5,5,0,0,0,0,5,5,5,5,5,5,5,5,7,5,7,5,7,0,0,5,7,5,0,7,5,5,5,5,5,5,5,5,5,5,5,7,7,7,7,0,0,
+    0,5,0,0,0,0,0,0,0,0,0,0,0,5,5,0,0,0,0,5,7,5,7,5,7,5,7,5,7,5,5,0,0,0,5,0,0,0,5,5,5,0,7,7,7,7,0,0,
+    0,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,0,5,7,5,7,5,7,5,7,5,0,5,0,7,7,7,7,7,0,5,5,5,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,5,5,5,5,5,5,5,5,0,5,7,5,7,5,7,5,7,5,5,0,7,7,7,7,7,0,5,5,5,5,5,5,5,5,5,0,
+    0,0,0,0,0,0,0,0,0,0,0,5,5,0,5,5,5,5,5,5,5,0,5,7,5,7,5,7,5,0,5,0,7,7,7,7,7,0,5,5,5,5,5,5,5,5,5,0,
+    0,0,5,5,5,5,5,5,5,5,5,5,5,0,5,5,5,5,5,5,5,5,0,5,7,5,7,5,7,0,5,0,7,7,7,7,7,0,5,5,5,5,5,5,5,5,5,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,5,5,5,5,5,5,5,5,0,5,7,5,7,5,7,5,0,7,7,7,7,7,0,5,5,5,5,5,5,5,5,5,0,
     0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
   }
 };
@@ -379,42 +397,21 @@ uint32_t cast() {
       else          { tX = (1 - (rIntersectX - (uint16_t)rIntersectX)) * TEXTURE_SIZE; if (rAngle < FOV_RANGE / 2)                                 { tX = TEXTURE_SIZE - tX; }}
 
       if (tLineHeight > SCREEN_HEIGHT) { // Check if line fills up the screen, if it does, drawing the sky and floor is not necessary, so we just draw the wall
-        if (rCount % 2 == 0) {
-          uint16_t tSkipLines = tOffset / tYStep, tFirstLine = tYStep - (tOffset - tSkipLines * tYStep);
-          tY = tFirstLine;
-          for (uint16_t i = tSkipLines; i < TEXTURE_SIZE - tSkipLines; i++) { // TODO: Try starting i from 0 to enable using a switch here
-            BSP_LCD_SetTextColor(_textures[_map[0][mY * _mSizeX + mX] - 1 + rHitSide][i * TEXTURE_SIZE + (uint16_t)(tX)]);
-            if (i != tSkipLines && i != TEXTURE_SIZE - tSkipLines - 1) {
-              BSP_LCD_FillRect((rCount * FOV_RECT), tY, FOV_RECT * 2, tYStep + 1);
-              tY += tYStep;
-            }
-            else {
-              BSP_LCD_FillRect((rCount * FOV_RECT), (i == tSkipLines) ? 0 : tY, FOV_RECT * 2, tFirstLine + 2);
-            }
+        uint16_t tSkipLines = tOffset / tYStep, tFirstLine = tYStep - (tOffset - tSkipLines * tYStep);
+        tY = tFirstLine;
+        for (uint16_t i = tSkipLines; i < TEXTURE_SIZE - tSkipLines; i++) { // TODO: Try starting i from 0 to enable using a switch here
+          BSP_LCD_SetTextColor(_textures[_map[0][mY * _mSizeX + mX] - 1 + rHitSide][i * TEXTURE_SIZE + (uint16_t)(tX)]);
+          if (i != tSkipLines && i != TEXTURE_SIZE - tSkipLines - 1) {
+            BSP_LCD_FillRect((rCount * FOV_RECT), tY, FOV_RECT, tYStep + 1);
+            tY += tYStep;
+          }
+          else {
+            BSP_LCD_FillRect((rCount * FOV_RECT), (i == tSkipLines) ? 0 : tY, FOV_RECT, tFirstLine + 2);
           }
         }
       }
       else {
         tOffset *= -1;
-
-        if (rCount % 2 == 0) {
-          // DRAW SKYBOX
-          uint16_t sbY = 0, sbDrawLines = (tOffset / SKYBOX_TEXEL_Y) + 1;
-          if (sbDrawLines > SKYBOX_SIZE_Y) { sbDrawLines = SKYBOX_SIZE_Y; }
-
-          for (uint16_t i = 0; i < sbDrawLines; i++) {
-            BSP_LCD_SetTextColor(_skybox[i * SKYBOX_SIZE_X + _sbLUT[rAngle]]);
-            BSP_LCD_FillRect((rCount * FOV_RECT), sbY, FOV_RECT * 2, SKYBOX_TEXEL_Y);
-            sbY += SKYBOX_TEXEL_Y;
-          }
-
-          // DRAW WALLS
-          for (uint16_t i = 0; i < TEXTURE_SIZE; i++) {
-            BSP_LCD_SetTextColor(_textures[_map[0][mY * _mSizeX + mX] - 1 + rHitSide][i * TEXTURE_SIZE + (uint16_t)(tX)]);
-            BSP_LCD_FillRect((rCount * FOV_RECT), tOffset + tY, FOV_RECT * 2, tYStep + 1);
-            tY += tYStep;
-          }
-        }
 
         // DRAW FLOOR
         for (uint16_t i = tOffset + tLineHeight; i < SCREEN_HEIGHT; i += FOV_RECT) {
@@ -423,7 +420,32 @@ uint32_t cast() {
 
           BSP_LCD_SetTextColor(_textures[_map[1][(int16_t)fY * _mSizeX + (int16_t)fX]][fTextureY * TEXTURE_SIZE + fTextureX]);
           BSP_LCD_FillRect((rCount * FOV_RECT), i, FOV_RECT, (i == SCREEN_HEIGHT - 1) ? FOV_RECT / 2 : FOV_RECT);
-//          BSP_LCD_FillRect((rCount * FOV_RECT), SCREEN_HEIGHT - i - 1, FOV_RECT, FOV_RECT); // DRAW CEILING
+
+          uint16_t cTexture = _map[2][(int16_t)fY * _mSizeX + (int16_t)fX];
+          switch (cTexture) {
+            case 0: {
+              // DRAW SKYBOX
+              uint16_t sbY = 0, sbDrawLines = (tOffset / SKYBOX_TEXEL_Y) + 1;
+              if (sbDrawLines > SKYBOX_SIZE_Y) { sbDrawLines = SKYBOX_SIZE_Y; }
+
+              for (uint16_t i = 0; i < sbDrawLines; i++) {
+                BSP_LCD_SetTextColor(_skybox[i * SKYBOX_SIZE_X + _sbLUT[rAngle]]);
+                BSP_LCD_FillRect((rCount * FOV_RECT), sbY, FOV_RECT, SKYBOX_TEXEL_Y);
+                sbY += SKYBOX_TEXEL_Y;
+              }
+            }
+            default: {
+              BSP_LCD_SetTextColor(_textures[cTexture][fTextureY * TEXTURE_SIZE + fTextureX]);
+              BSP_LCD_FillRect((rCount * FOV_RECT), SCREEN_HEIGHT - i - 2, FOV_RECT, FOV_RECT); // DRAW CEILING
+            }
+          }
+        }
+
+        // DRAW WALLS
+        for (uint16_t i = 0; i < TEXTURE_SIZE; i++) {
+          BSP_LCD_SetTextColor(_textures[_map[0][mY * _mSizeX + mX] - 1 + rHitSide][i * TEXTURE_SIZE + (uint16_t)(tX)]);
+          BSP_LCD_FillRect((rCount * FOV_RECT), tOffset + tY, FOV_RECT, tYStep + 1);
+          tY += tYStep;
         }
       }
     }
