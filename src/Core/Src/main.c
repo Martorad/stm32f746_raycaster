@@ -408,8 +408,7 @@ uint32_t cast(void) {
 
         if (rCount % 2 == 0) {
           // DRAW SKYBOX
-          uint16_t sbY = 0, sbDrawLines = (tOffset / SKYBOX_TEXEL_Y) + 1;
-          if (sbDrawLines > SKYBOX_SIZE_Y) { sbDrawLines = SKYBOX_SIZE_Y; }
+          uint16_t sbY = 0, sbDrawLines = ((uint16_t)(tOffset / SKYBOX_TEXEL_Y) + 1) & (TEXTURE_SIZE - 1);
 
           for (uint16_t i = 0; i < sbDrawLines; i++) {
             BSP_LCD_SetTextColor(_skybox[i * SKYBOX_SIZE_X + _sbLUT[rAngle]]);
