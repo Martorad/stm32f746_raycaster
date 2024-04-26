@@ -127,8 +127,10 @@ static const float _pAccel = 0.01, _pFriction = 0.1;
 
 // SYSTEM
 static volatile uint32_t _sysElapsedTicks = 0; // 10K frequency, 1 tick = 100us = 0.1ms
-static float             _fisheyeCosLUT[FOV], _sinLUT[FOV_RANGE], _cosLUT[FOV_RANGE], _fZLUT[SCREEN_HEIGHT_HALF];
-static uint16_t          _sbLUT[FOV_RANGE];
+
+// LOOKUP TABLES
+static float    _fisheyeCosLUT[FOV], _sinLUT[FOV_RANGE], _cosLUT[FOV_RANGE], _fZLUT[SCREEN_HEIGHT_HALF];
+static uint16_t _sbLUT[FOV_RANGE];
 
 /* USER CODE END 0 */
 
