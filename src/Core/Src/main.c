@@ -123,7 +123,7 @@ static const uint8_t _map[2][768] = {
 // PLAYER
 static float       _pPosX = 1.5, _pPosY = 8, _pDeltaX, _pDeltaY, _pVelocityX = 0, _pVelocityY = 0;
 static int16_t     _pAngle = 0; // Angle in increments of FOV_INCR radians
-static const float _pAccel = 0.01, _pFriction = 0.1;
+static const float _pAccel = 0.01, _pFriction = 0.08;
 
 // SYSTEM
 static volatile uint32_t _sysElapsedTicks = 0; // 10K frequency, 1 tick = 100us = 0.1ms
