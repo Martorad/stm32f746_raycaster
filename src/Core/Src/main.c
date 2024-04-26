@@ -340,7 +340,7 @@ void PeriphCommonClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-uint32_t cast() {
+uint32_t cast(void) {
   // Variable prefix convention: r = ray, m = map, p = performance, c = calculation, t = texture, sb = skybox, f = floor
   uint32_t pStartTime = _sysElapsedTicks;
   int16_t  rAngle;
@@ -454,7 +454,7 @@ float fsqrt(float x) {
   return g;
 }
 
-void pageFlip() {
+void pageFlip(void) {
   static volatile uint8_t activeBuffer = 1;
   activeBuffer ^= 1;
   BSP_LCD_SWAP(activeBuffer);
