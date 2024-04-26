@@ -473,7 +473,7 @@ void showFPS(uint32_t frameTime) {
   uint8_t frameRateS[10];
   sprintf((char*)frameTimeS, "%02li.%lims", frameTime / 10, frameTime % 10);
   sprintf((char*)frameRateS, "%03lifps", 10000 / frameTime);
-  BSP_LCD_SetTextColor(0xFF0000FF);
+  BSP_LCD_SetTextColor(0x001F);
   BSP_LCD_DisplayStringAt(0,  0, frameTimeS, LEFT_MODE);
   BSP_LCD_DisplayStringAt(0, 12, frameRateS, LEFT_MODE);
 }
