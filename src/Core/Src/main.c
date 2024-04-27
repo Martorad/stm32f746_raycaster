@@ -354,24 +354,24 @@ uint32_t cast(void) {
     // This uses David Ziemkiewicz' method of velocities and times, as well as Lodev's DDA. Massive thanks to both of these legends.
     float   rVelocityX = _cosLUT[rAngle], rVelocityY = _sinLUT[rAngle], rIntersectX = _pPosX, rIntersectY = _pPosY, rTimeX, rTimeY, rLength = 0, tLineHeight;
     int16_t mX = (int16_t)rIntersectX, mY = (int16_t)rIntersectY;
-    int8_t  rVelPosX = (rVelocityX > 0), rVelPosY = (rVelocityY > 0), rStepX = (rVelocityX > 0) ? 1 : -1, rStepY = (rVelocityY > 0) ? 1 : -1, rHitSide = 0;
+    int8_t  rVelSignX = (rVelocityX > 0), rVelSignY = (rVelocityY > 0), rStepX = rVelSignX ? 1 : -1, rStepY = rVelSignY ? 1 : -1, rHitSide = 0;
 
     for (uint16_t i = 0; i < _mSizeX * _mSizeY; i++) {
       if (_map[0][mY * _mSizeX + mX] > 0) { break; }
 
-      rTimeX = (mY - rIntersectY + rVelPosY) / rVelocityY; // This should be treated as "time to X-side wall"
-      rTimeY = (mX - rIntersectX + rVelPosX) / rVelocityX;
+      rTimeX = (mY - rIntersectY + rVelSignY) / rVelocityY; // This should be treated as "time to X-side wall"
+      rTimeY = (mX - rIntersectX + rVelSignX) / rVelocityX;
 
       if (rTimeY < rTimeX) { // Vertical line
         mX += rStepX;
-        rIntersectX = mX - !rVelPosX * rStepX;
+        rIntersectX = mX - !rVelSignX * rStepX;
         rIntersectY += rVelocityY * rTimeY;
         rLength += rTimeY;
         rHitSide = 1;
       }
       else { // Horizontal line
         mY += rStepY;
-        rIntersectY = mY - !rVelPosY * rStepY;
+        rIntersectY = mY - !rVelSignY * rStepY;
         rIntersectX += rVelocityX * rTimeX;
         rLength += rTimeX;
         rHitSide = 0;
