@@ -11,9 +11,10 @@
 #define LINE_VERTICAL_SCALE 1.5
 
 // MOVEMENT SETTINGS
-#define LOOK_SPEED    5   // Higher is faster
-#define MOVE_SPEED    0.1 // Higher is faster
-#define P_HITBOX_SIZE 0.6 // In units of map squares
+#define P_LOOK_SPEED  5    // Higher is faster
+#define P_HITBOX_SIZE 0.6  // In units of map squares
+#define P_ACCEL       0.01
+#define P_FRICTION    0.08
 
 // DEBUG SETTINGS
 //#define DEBUG_FULLBRIGHT

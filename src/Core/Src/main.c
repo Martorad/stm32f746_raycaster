@@ -43,6 +43,7 @@
 #include <math.h>
 #include "../../Drivers/BSP/STM32746G-Discovery/stm32746g_discovery_lcd.h"
 #include "rc_config.h"
+#include "map.h"
 #include "textures.h"
 //#include "trig_lut.h"
 /* USER CODE END Includes */
@@ -79,51 +80,9 @@ void MX_USB_HOST_Process(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-// MAP
-static const uint8_t _mSizeX = 48, _mSizeY = 16;
-static const uint8_t _map[2][768] = {
-  { // Walls
-    5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,7,7,7,7,7,7,7,7,7,5,5,5,5,5,5,5,5,
-    5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,0,0,0,5,5,5,0,0,0,0,0,0,0,7,0,0,0,0,0,7,0,0,0,0,0,0,0,0,0,5,
-    5,0,0,0,0,0,0,0,0,0,0,0,0,5,5,5,0,5,0,5,0,5,5,0,0,0,0,0,0,5,0,7,0,0,0,0,0,7,0,0,0,0,0,0,0,0,0,5,
-    5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,0,0,0,5,5,5,0,0,0,0,0,0,0,5,0,7,0,0,5,0,0,7,0,0,0,0,0,0,0,0,0,5,
-    5,5,5,5,5,5,5,5,5,0,0,0,0,0,0,5,5,5,5,5,5,0,0,0,0,0,0,0,0,0,0,7,0,0,0,0,0,7,0,0,0,0,0,0,0,0,0,5,
-    5,0,0,0,0,0,0,0,5,0,0,0,0,0,0,5,0,0,0,5,0,0,0,0,0,0,0,0,0,5,0,7,0,0,0,0,0,7,0,0,0,7,5,5,5,5,7,5,
-    5,0,5,5,5,5,5,5,5,5,5,5,5,0,0,5,5,5,5,0,0,0,0,0,0,0,0,0,0,0,0,7,7,7,0,7,7,7,0,0,0,5,0,0,0,0,5,5,
-    5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,7,0,0,0,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,5,
-    5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,7,0,0,0,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,5,
-    5,0,5,5,5,5,5,5,5,5,5,5,5,0,0,5,5,5,5,0,0,0,0,0,0,0,0,0,0,0,0,3,3,3,0,3,3,3,0,0,0,5,0,0,0,0,5,5,
-    5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,0,0,0,0,0,0,0,0,0,5,0,3,0,0,0,0,0,3,0,0,0,7,5,5,5,5,7,5,
-    5,3,3,3,3,3,3,3,3,1,1,1,0,0,0,0,0,0,0,0,5,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,5,
-    5,1,1,1,1,1,1,1,1,1,1,0,0,1,0,0,0,0,0,0,0,5,0,0,0,0,0,0,0,5,0,3,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,5,
-    5,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,5,0,0,0,0,0,0,5,0,3,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,5,
-    5,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,5,0,0,0,0,0,0,0,3,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,5,
-    5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,3,3,3,3,3,3,3,5,5,5,5,5,5,5,5,5,5
-  },
-  { // Floors
-    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-    0,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,0,3,3,3,0,0,0,5,3,5,3,5,3,3,0,3,3,3,3,3,0,3,3,3,3,3,3,3,3,3,0,
-    0,3,3,3,3,3,3,3,3,3,3,3,3,0,0,0,3,0,3,0,3,0,0,5,3,5,3,5,3,0,3,0,3,3,3,3,3,0,3,3,3,3,3,3,3,3,3,0,
-    0,3,3,3,3,3,3,3,3,3,3,3,3,3,3,0,3,3,3,0,0,0,5,3,5,3,5,3,5,0,5,0,3,3,0,3,3,0,3,3,3,3,3,3,3,3,3,0,
-    0,0,0,0,0,0,0,0,0,3,3,3,3,3,3,0,0,0,0,0,0,5,3,5,3,5,3,5,3,5,3,0,3,3,3,3,3,0,3,3,3,3,3,3,3,3,3,0,
-    0,3,3,3,3,3,3,3,0,3,3,3,3,3,3,0,3,3,3,0,5,3,5,3,5,3,5,3,5,0,5,0,3,3,3,3,3,0,3,3,3,0,0,0,0,0,0,0,
-    0,3,0,0,0,0,0,0,0,0,0,0,0,3,3,0,0,0,0,5,3,5,3,5,3,5,3,5,3,5,3,0,0,0,3,0,0,0,3,3,3,0,7,7,7,7,0,0,
-    0,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,5,3,5,3,0,0,5,3,5,0,5,3,3,3,3,3,3,3,3,3,3,3,7,7,7,7,0,0,
-    0,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,5,3,5,3,5,0,0,3,5,3,0,5,3,3,3,3,3,3,3,3,3,3,3,7,7,7,7,0,0,
-    0,3,0,0,0,0,0,0,0,0,0,0,0,3,3,0,0,0,0,3,5,3,5,3,5,3,5,3,5,3,3,0,0,0,3,0,0,0,3,3,3,0,7,7,7,7,0,0,
-    0,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,0,3,5,3,5,3,5,3,5,3,0,3,0,5,5,5,5,5,0,3,3,3,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,0,0,0,0,3,3,3,3,3,3,3,3,0,3,5,3,5,3,5,3,5,3,3,0,5,5,5,5,5,0,3,3,3,3,3,3,3,3,3,0,
-    0,0,0,0,0,0,0,0,0,0,0,1,1,0,3,3,3,3,3,3,3,0,3,5,3,5,3,5,3,0,3,0,5,5,5,5,5,0,3,3,3,3,3,3,3,3,3,0,
-    0,0,1,1,1,1,1,1,1,1,1,1,1,0,3,3,3,3,3,3,3,3,0,3,5,3,5,3,5,0,3,0,5,5,5,5,5,0,3,3,3,3,3,3,3,3,3,0,
-    0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,3,3,3,3,3,3,3,3,0,3,5,3,5,3,5,3,0,5,5,5,5,5,0,3,3,3,3,3,3,3,3,3,0,
-    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-  }
-};
-
 // PLAYER
-static float       _pPosX = 1.5, _pPosY = 8, _pDeltaX, _pDeltaY, _pVelocityX = 0, _pVelocityY = 0;
-static int32_t     _pAngle = 0; // Angle in increments of FOV_INCR radians
-static const float _pAccel = 0.01, _pFriction = 0.08;
+static float   _pPosX = 1.5, _pPosY = 8, _pDeltaX, _pDeltaY, _pVelocityX = 0, _pVelocityY = 0;
+static int32_t _pAngle = 0; // Angle in increments of FOV_INCR radians
 
 // SYSTEM
 static volatile uint32_t _sysElapsedTicks = 0; // 10K frequency, 1 tick = 100us = 0.1ms
@@ -227,15 +186,15 @@ int main(void)
       pageFlip();
       showFPS(cast());
 
-      _pDeltaX = _cosLUT[_pAngle] * _pAccel;
-      _pDeltaY = _sinLUT[_pAngle] * _pAccel;
+      _pDeltaX = _cosLUT[_pAngle] * P_ACCEL;
+      _pDeltaY = _sinLUT[_pAngle] * P_ACCEL;
 
       if (HAL_GPIO_ReadPin(ARDUINO_D4_GPIO_Port, ARDUINO_D4_Pin)) { // RIGHT
-        _pAngle -= LOOK_SPEED;
+        _pAngle -= P_LOOK_SPEED;
         if (_pAngle < 0) { _pAngle += FOV_RANGE; }
       }
       else if (HAL_GPIO_ReadPin(ARDUINO_D5_GPIO_Port, ARDUINO_D5_Pin)) { // LEFT
-        _pAngle += LOOK_SPEED;
+        _pAngle += P_LOOK_SPEED;
         if (_pAngle >= FOV_RANGE) { _pAngle -= FOV_RANGE; }
       }
       if (HAL_GPIO_ReadPin(ARDUINO_D2_GPIO_Port, ARDUINO_D2_Pin)) { // FORWARD
@@ -247,11 +206,11 @@ int main(void)
         _pVelocityY -= _pDeltaY;
       }
 
-      if (_map[0][(uint32_t)_pPosY * _mSizeX + (uint32_t)(_pPosX + ((_pVelocityX < 0) ? -P_HITBOX_SIZE : P_HITBOX_SIZE))] == 0) { _pPosX += _pVelocityX; }
-      if (_map[0][(uint32_t)(_pPosY + ((_pVelocityY < 0) ? -P_HITBOX_SIZE : P_HITBOX_SIZE)) * _mSizeX + (uint32_t)_pPosX] == 0) { _pPosY += _pVelocityY; }
+      if (_map[0][(uint32_t)_pPosY * MAP_SIZE_X + (uint32_t)(_pPosX + ((_pVelocityX < 0) ? -P_HITBOX_SIZE : P_HITBOX_SIZE))] == 0) { _pPosX += _pVelocityX; }
+      if (_map[0][(uint32_t)(_pPosY + ((_pVelocityY < 0) ? -P_HITBOX_SIZE : P_HITBOX_SIZE)) * MAP_SIZE_X + (uint32_t)_pPosX] == 0) { _pPosY += _pVelocityY; }
 
-      _pVelocityX *= (1 - _pFriction);
-      _pVelocityY *= (1 - _pFriction);
+      _pVelocityX *= (1 - P_FRICTION);
+      _pVelocityY *= (1 - P_FRICTION);
     }
   }
   /* USER CODE END 3 */
@@ -356,8 +315,8 @@ uint32_t cast(void) {
     int32_t mX = (int16_t)rIntersectX, mY = (int16_t)rIntersectY; // Casting to int16_t instead of int32_t is faster for some unknown reason.
     int8_t  rVelSignX = (rVelocityX > 0), rVelSignY = (rVelocityY > 0), rStepX = rVelSignX ? 1 : -1, rStepY = rVelSignY ? 1 : -1, rHitSide = 0;
 
-    for (uint32_t i = 0; i < _mSizeX * _mSizeY; i++) {
-      if (_map[0][mY * _mSizeX + mX] > 0) { break; }
+    for (uint32_t i = 0; i < MAP_SIZE_X * MAP_SIZE_Y; i++) {
+      if (_map[0][mY * MAP_SIZE_X + mX] > 0) { break; }
 
       rTimeX = (mY - rIntersectY + rVelSignY) / rVelocityY; // This should be treated as "time to X-side wall"
       rTimeY = (mX - rIntersectX + rVelSignX) / rVelocityX;
@@ -392,7 +351,7 @@ uint32_t cast(void) {
           int32_t tSkipLines = tOffset / tYStep, tFirstLine = tYStep - (tOffset - tSkipLines * tYStep);
           tY = tFirstLine;
           for (int32_t i = tSkipLines; i < TEXTURE_SIZE - tSkipLines; i++) {
-            BSP_LCD_SetTextColor(_textures[_map[0][mY * _mSizeX + mX] - 1 + rHitSide][i * TEXTURE_SIZE + (int32_t)(tX)]);
+            BSP_LCD_SetTextColor(_textures[_map[0][mY * MAP_SIZE_X + mX] - 1 + rHitSide][i * TEXTURE_SIZE + (int32_t)(tX)]);
             if (i != tSkipLines && i != TEXTURE_SIZE - tSkipLines - 1) {
               BSP_LCD_FillRect((rCount * FOV_RECT), tY, FOV_RECT * 2, tYStep + 1);
               tY += tYStep;
@@ -418,7 +377,7 @@ uint32_t cast(void) {
 
           // DRAW WALLS
           for (uint32_t i = 0; i < TEXTURE_SIZE; i++) {
-            BSP_LCD_SetTextColor(_textures[_map[0][mY * _mSizeX + mX] - 1 + rHitSide][i * TEXTURE_SIZE + (uint32_t)(tX)]);
+            BSP_LCD_SetTextColor(_textures[_map[0][mY * MAP_SIZE_X + mX] - 1 + rHitSide][i * TEXTURE_SIZE + (uint32_t)(tX)]);
             BSP_LCD_FillRect((rCount * FOV_RECT), tOffset + tY, FOV_RECT * 2, tYStep + 1);
             tY += tYStep;
           }
@@ -429,7 +388,7 @@ uint32_t cast(void) {
           float   fZ = _fZLUT[i - SCREEN_HEIGHT_HALF] * _fisheyeCosLUT[rCount], fX = _pPosX + rVelocityX * fZ, fY = _pPosY + rVelocityY * fZ;
           int32_t fTextureX = (int32_t)(TEXTURE_SIZE * fX) & (TEXTURE_SIZE - 1), fTextureY = (int32_t)(TEXTURE_SIZE * fY) & (TEXTURE_SIZE - 1);
 
-          BSP_LCD_SetTextColor(_textures[_map[1][(int32_t)fY * _mSizeX + (int32_t)fX] - 1][fTextureY * TEXTURE_SIZE + fTextureX]);
+          BSP_LCD_SetTextColor(_textures[_map[1][(int32_t)fY * MAP_SIZE_X + (int32_t)fX] - 1][fTextureY * TEXTURE_SIZE + fTextureX]);
           BSP_LCD_FillRect((rCount * FOV_RECT), i, FOV_RECT, FOV_RECT);
 //          BSP_LCD_FillRect((rCount * FOV_RECT), SCREEN_HEIGHT - i - 1, FOV_RECT, FOV_RECT); // DRAW CEILING
         }
