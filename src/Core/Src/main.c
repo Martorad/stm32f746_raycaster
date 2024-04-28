@@ -343,8 +343,8 @@ uint32_t cast(void) {
     if (tLineHeight > SHORTEST_LINE) {
       float tX, tY = 0, tYStep = tLineHeight / TEXTURE_SIZE, tOffset = (tLineHeight - SCREEN_HEIGHT) * 0.5;
 
-      if (rHitSide) { tX = (1 - (rIntersectY - (uint32_t)rIntersectY)) * TEXTURE_SIZE; if (rAngle < FOV_RANGE / 4 || rAngle > (FOV_RANGE / 4) * 3) { tX = TEXTURE_SIZE - tX; }}
-      else          { tX = (1 - (rIntersectX - (uint32_t)rIntersectX)) * TEXTURE_SIZE; if (rAngle < FOV_RANGE / 2)                                 { tX = TEXTURE_SIZE - tX; }}
+      if (rHitSide) { tX = (1 - (rIntersectY - (int32_t)rIntersectY)) * TEXTURE_SIZE; if (rAngle < FOV_RANGE / 4 || rAngle > (FOV_RANGE / 4) * 3) { tX = TEXTURE_SIZE - tX; }}
+      else          { tX = (1 - (rIntersectX - (int32_t)rIntersectX)) * TEXTURE_SIZE; if (rAngle < FOV_RANGE / 2)                                 { tX = TEXTURE_SIZE - tX; }}
 
       if (tLineHeight > SCREEN_HEIGHT) { // Check if line fills up the screen, if it does, drawing the sky and floor is not necessary, so we just draw the wall
         if (rCount % 2 == 0) {
@@ -377,7 +377,7 @@ uint32_t cast(void) {
 
           // DRAW WALLS
           for (uint32_t i = 0; i < TEXTURE_SIZE; i++) {
-            BSP_LCD_SetTextColor(_textures[_map[0][mY * MAP_SIZE_X + mX] - 1 + rHitSide][i * TEXTURE_SIZE + (uint32_t)(tX)]);
+            BSP_LCD_SetTextColor(_textures[_map[0][mY * MAP_SIZE_X + mX] - 1 + rHitSide][i * TEXTURE_SIZE + (int32_t)(tX)]);
             BSP_LCD_FillRect((rCount * FOV_RECT), tOffset + tY, FOV_RECT * 2, tYStep + 1);
             tY += tYStep;
           }
