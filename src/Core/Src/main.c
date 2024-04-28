@@ -353,7 +353,7 @@ uint32_t cast(void) {
   for (uint32_t rCount = 0; rCount < FOV; rCount++) {
     // This uses David Ziemkiewicz' method of velocities and times, as well as Lodev's DDA. Massive thanks to both of these legends.
     float   rVelocityX = _cosLUT[rAngle], rVelocityY = _sinLUT[rAngle], rIntersectX = _pPosX, rIntersectY = _pPosY, rTimeX, rTimeY, rLength = 0, tLineHeight;
-    int32_t mX = (int32_t)rIntersectX, mY = (int32_t)rIntersectY;
+    int32_t mX = (int16_t)rIntersectX, mY = (int16_t)rIntersectY; // Casting to int16_t instead of int32_t is faster for some unknown reason.
     int8_t  rVelSignX = (rVelocityX > 0), rVelSignY = (rVelocityY > 0), rStepX = rVelSignX ? 1 : -1, rStepY = rVelSignY ? 1 : -1, rHitSide = 0;
 
     for (uint32_t i = 0; i < _mSizeX * _mSizeY; i++) {
