@@ -206,8 +206,8 @@ int main(void)
         _pVelocityY -= _pDeltaY;
       }
 
-      if (_map[0][(uint32_t)_pPosY * MAP_SIZE_X + (uint32_t)(_pPosX + ((_pVelocityX < 0) ? -P_HITBOX_SIZE : P_HITBOX_SIZE))] == 0) { _pPosX += _pVelocityX; }
-      if (_map[0][(uint32_t)(_pPosY + ((_pVelocityY < 0) ? -P_HITBOX_SIZE : P_HITBOX_SIZE)) * MAP_SIZE_X + (uint32_t)_pPosX] == 0) { _pPosY += _pVelocityY; }
+      if (_map[0][(int32_t)_pPosY * MAP_SIZE_X + (int32_t)(_pPosX + ((_pVelocityX < 0) ? -P_HITBOX_SIZE : P_HITBOX_SIZE))] == 0) { _pPosX += _pVelocityX; }
+      if (_map[0][(int32_t)(_pPosY + ((_pVelocityY < 0) ? -P_HITBOX_SIZE : P_HITBOX_SIZE)) * MAP_SIZE_X + (int32_t)_pPosX] == 0) { _pPosY += _pVelocityY; }
 
       _pVelocityX *= (1 - P_FRICTION);
       _pVelocityY *= (1 - P_FRICTION);
