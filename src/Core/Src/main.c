@@ -313,33 +313,33 @@ uint32_t cast(void) {
   for (uint32_t rCount = 0; rCount < FOV; rCount++) {
     // This uses David Ziemkiewicz' method of velocities and times, as well as Lodev's DDA. Massive thanks to both of these legends.
     float   tLineHeight;
-    int32_t rVelocityX = _cosLUT[rAngle], rVelocityY = _sinLUT[rAngle], rIntersectX = _pPosX, rIntersectY = _pPosY, rTimeX, rTimeY, rLength = 0;
-    int32_t mX = F_VAL(rIntersectX), mY = F_VAL(rIntersectY);
-    int8_t  rVelSignX = (rVelocityX > 0), rVelSignY = (rVelocityY > 0), rStepX = rVelSignX ? 1 : -1, rStepY = rVelSignY ? 1 : -1, rHitSide = 0;
+    int64_t rVelocityX = _cosLUT[rAngle], rVelocityY = _sinLUT[rAngle], rIntersectX = _pPosX, rIntersectY = _pPosY, rTimeX, rTimeY, rLength = 0;
+    int64_t mX = rIntersectX, mY = rIntersectY;
+    int64_t rVelSignX = (rVelocityX > 0), rVelSignY = (rVelocityY > 0), rStepX = rVelSignX ? F_PRECISION : -F_PRECISION, rStepY = rVelSignY ? F_PRECISION : -F_PRECISION;
 
     for (uint32_t i = 0; i < MAP_SIZE_X * MAP_SIZE_Y; i++) {
-      if (_map[0][mY * MAP_SIZE_X + mX] > 0) { break; }
+      if (_map[0][F_VAL(mY) * MAP_SIZE_X + F_VAL(mX)] > 0) { break; }
 
       rTimeX = (mY - rIntersectY + rVelSignY) / rVelocityY; // This should be treated as "time to X-side wall"
       rTimeY = (mX - rIntersectX + rVelSignX) / rVelocityX;
 
       if (rTimeY < rTimeX) { // Vertical line
         mX += rStepX;
-        rIntersectX = mX - !rVelSignX * rStepX;
+        rIntersectX = mX - ((rVelocityX < 0) ? 0 : F_PRECISION) * rStepX;
         rIntersectY += rVelocityY * rTimeY;
         rLength += rTimeY;
-        rHitSide = 1;
+//        rHitSide = 1;
       }
       else { // Horizontal line
         mY += rStepY;
-        rIntersectY = mY - !rVelSignY * rStepY;
+        rIntersectY = mY - ((rVelocityY < 0) ? 0 : F_PRECISION) * rStepY;
         rIntersectX += rVelocityX * rTimeX;
         rLength += rTimeX;
-        rHitSide = 0;
+//        rHitSide = 0;
       }
     }
 
-    tLineHeight = SCREEN_HEIGHT / F_VAL((int32_t)(rLength * _fisheyeCosLUT[rCount] * LINE_VERTICAL_SCALE));
+    tLineHeight = F_VAL(SCREEN_HEIGHT / (int32_t)(rLength * _fisheyeCosLUT[rCount] * LINE_VERTICAL_SCALE));
     float tOffset = -(tLineHeight - SCREEN_HEIGHT) * 0.5;
     BSP_LCD_SetTextColor(0xC77E);
     BSP_LCD_FillRect(rCount * FOV_RECT, tOffset, FOV_RECT, tLineHeight);
@@ -474,9 +474,7 @@ void Error_Handler(void)
   /* User can add his own implementation to report the HAL error return state */
   HAL_GPIO_WritePin(ARDUINO_SCK_D13_GPIO_Port, ARDUINO_SCK_D13_Pin, GPIO_PIN_SET);
   __disable_irq();
-  while (1)
-  {
-  }
+  while (1) {}
   /* USER CODE END Error_Handler_Debug */
 }
 
