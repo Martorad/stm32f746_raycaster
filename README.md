@@ -9,6 +9,7 @@ This is a simple raycasting engine, designed on the STM32F746G-DISCO board. This
 ## 2. Features
 
 - 480x272, 16-bit color graphics
-- 16x16 texture mapping to walls
+- 16x16 texture mapping to walls and floors
 - 288x16 skybox texturing
 - Fisheye-corrected wall projection, with collision detection
+- Fisheye-corrected floor projection
