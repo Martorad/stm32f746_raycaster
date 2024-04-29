@@ -395,8 +395,8 @@ void     pageFlip(void);
 #define SCREEN_HEIGHT      272
 #define SCREEN_HEIGHT_HALF 136
 
-#define F_PRECISION (1 << 16)
-#define F_VAL(x) (x >> 16)
+#define F_PRECISION (1 << 11)
+#define F_VAL(x) (x >> 11)
 
 /* USER CODE END Private defines */
 

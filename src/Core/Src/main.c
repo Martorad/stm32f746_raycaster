@@ -315,7 +315,7 @@ uint32_t cast(void) {
     float   tLineHeight;
     int64_t rVelocityX = _cosLUT[rAngle], rVelocityY = _sinLUT[rAngle], rIntersectX = _pPosX, rIntersectY = _pPosY, rTimeX, rTimeY, rLength = 0;
     int64_t mX = rIntersectX, mY = rIntersectY;
-    int64_t rVelSignX = (rVelocityX > 0), rVelSignY = (rVelocityY > 0), rStepX = rVelSignX ? F_PRECISION : -F_PRECISION, rStepY = rVelSignY ? F_PRECISION : -F_PRECISION;
+    int64_t rVelSignX = (rVelocityX > 0) ? F_PRECISION : 0, rVelSignY = (rVelocityY > 0) ? F_PRECISION : 0, rStepX = rVelSignX ? F_PRECISION : -F_PRECISION, rStepY = rVelSignY ? F_PRECISION : -F_PRECISION;
 
     for (uint32_t i = 0; i < MAP_SIZE_X * MAP_SIZE_Y; i++) {
       if (_map[0][F_VAL(mY) * MAP_SIZE_X + F_VAL(mX)] > 0) { break; }
@@ -325,21 +325,22 @@ uint32_t cast(void) {
 
       if (rTimeY < rTimeX) { // Vertical line
         mX += rStepX;
-        rIntersectX = mX - ((rVelocityX < 0) ? 0 : F_PRECISION) * rStepX;
+        rIntersectX = mX - ((rVelocityX < 0) ? F_PRECISION : 0) * rStepX;
         rIntersectY += rVelocityY * rTimeY;
         rLength += rTimeY;
 //        rHitSide = 1;
       }
       else { // Horizontal line
         mY += rStepY;
-        rIntersectY = mY - ((rVelocityY < 0) ? 0 : F_PRECISION) * rStepY;
+        rIntersectY = mY - ((rVelocityY < 0) ? F_PRECISION : 0) * rStepY;
         rIntersectX += rVelocityX * rTimeX;
         rLength += rTimeX;
 //        rHitSide = 0;
       }
     }
 
-    tLineHeight = F_VAL(SCREEN_HEIGHT / (int32_t)(rLength * _fisheyeCosLUT[rCount] * LINE_VERTICAL_SCALE));
+    tLineHeight = SCREEN_HEIGHT / F_VAL((int32_t)(rLength * _fisheyeCosLUT[rCount] * LINE_VERTICAL_SCALE));
+    if (tLineHeight > SCREEN_HEIGHT) { tLineHeight = SCREEN_HEIGHT; }
     float tOffset = -(tLineHeight - SCREEN_HEIGHT) * 0.5;
     BSP_LCD_SetTextColor(0xC77E);
     BSP_LCD_FillRect(rCount * FOV_RECT, tOffset, FOV_RECT, tLineHeight);
