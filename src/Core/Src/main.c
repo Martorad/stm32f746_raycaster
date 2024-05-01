@@ -378,10 +378,21 @@ uint32_t cast(void) {
           // DRAW WALLS
           for (uint32_t i = 0; i < TEXTURE_SIZE; i++) {
             uint16_t color = _textures[_map[0][mY * MAP_SIZE_X + mX] - 1/* + rHitSide*/][i * TEXTURE_SIZE + (int32_t)(tX)];
-            float    bumpX = tX;
-            float    normal = -1.0 / 128 * (_bump[0][i * TEXTURE_SIZE + (int32_t)(bumpX)] - 128);
+            int8_t   normal = _bump[0][i * TEXTURE_SIZE + (int32_t)(tX)];
+            float    dimmingFactor = 0;
+//            float    dimmingFactor = rHitSide ? (fabs(rVelocityX) + rVelocityY * normal) : (fabs(rVelocityY) + rVelocityX * normal);
+            switch (normal) {
+              case -128:
+                dimmingFactor = -_cosLUT[rHitSide ? rAngle : 720 - rAngle];
+                break;
+              case 1: break;
+              case 127:
+                dimmingFactor = _cosLUT[rHitSide ? rAngle : 720 - rAngle];;
+                break;
+              default: break;
+            }
 
-            BSP_LCD_SetTextColor(dimColor(color, normal));
+            BSP_LCD_SetTextColor(dimColor(color, dimmingFactor));
             BSP_LCD_FillRect((rCount * FOV_RECT), tOffset + tY, FOV_RECT * 2, tYStep + 1);
             tY += tYStep;
           }
@@ -406,6 +417,23 @@ uint32_t cast(void) {
   return _sysElapsedTicks - pStartTime;
 }
 
+uint16_t dimColor(uint16_t inputColor, float dimF) {
+  if (dimF == 0)  { return inputColor; }
+  if (dimF > 1.4) { dimF = 1.4; }
+  if (dimF < 0.5) { dimF = 0.5; }
+
+  uint16_t r = (inputColor & 0b1111100000000000) >> 11;
+  uint16_t g = (inputColor & 0b0000011111100000) >> 5;
+  uint16_t b = inputColor & 0b0000000000011111;
+
+  r *= dimF;
+  g *= dimF;
+  b *= dimF;
+
+  uint16_t outputColor = r << 11 | g << 5 | b;
+  return outputColor;
+}
+
 float fsqrt(float x) {
   float g = x / 2.0;
 
@@ -420,22 +448,6 @@ void pageFlip(void) {
   static volatile uint8_t activeBuffer = 1;
   activeBuffer ^= 1;
   BSP_LCD_SWAP(activeBuffer);
-}
-
-uint16_t dimColor(uint16_t inputColor, float dimF) {
-  if (dimF > 1.4) { dimF = 1.4; }
-  if (dimF < 0.5) { dimF = 0.5; }
-
-  uint16_t r = (inputColor & 0b1111100000000000) >> 11;
-  uint16_t g = (inputColor & 0b0000011111100000) >> 5;
-  uint16_t b = inputColor & 0b0000000000011111;
-
-  r *= dimF;
-  g *= dimF;
-  b *= dimF;
-
-  uint16_t outputColor = r << 11 | g << 5 | b;
-  return outputColor;
 }
 
 void showFPS(uint32_t frameTime) {
