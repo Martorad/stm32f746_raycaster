@@ -88,7 +88,7 @@ static int32_t _pAngle = 0; // Angle in increments of FOV_INCR radians
 static volatile uint32_t _sysElapsedTicks = 0; // 10K frequency, 1 tick = 100us = 0.1ms
 
 // LOOKUP TABLES
-static float    _fisheyeCosLUT[FOV], _sinLUT[FOV_RANGE], _cosLUT[FOV_RANGE], _fZLUT[SCREEN_HEIGHT_HALF];
+static float    _fisheyeCosLUT[FOV], _sinLUT[FOV_RANGE], _cosLUT[FOV_RANGE], _fZLUT[SCREEN_HEIGHT / 2];
 static uint32_t _sbLUT[FOV_RANGE];
 
 /* USER CODE END 0 */
@@ -169,7 +169,7 @@ int main(void)
     _cosLUT[i] =  cos(i * FOV_INCR + 0.0001);
     _sbLUT[i]  =  (uint16_t)(SKYBOX_SIZE_X - (i + 1) * FOV_INCR * SKYBOX_SCALE_F);
   }
-  for (uint16_t i = SCREEN_HEIGHT_HALF; i < SCREEN_HEIGHT; i++) { _fZLUT[i - SCREEN_HEIGHT_HALF] = (SCREEN_HEIGHT_HALF / (float)(i - SCREEN_HEIGHT_HALF + 1)) * LINE_VERTICAL_SCALE; }
+  for (uint16_t i = SCREEN_HEIGHT / 2; i < SCREEN_HEIGHT; i++) { _fZLUT[i - SCREEN_HEIGHT / 2] = (SCREEN_HEIGHT / 2 / (float)(i - SCREEN_HEIGHT / 2 + 1)) * LINE_VERTICAL_SCALE; }
 
   HAL_TIM_Base_Start_IT(&htim7);
   /* USER CODE END 2 */
@@ -384,7 +384,7 @@ uint32_t cast(void) {
 
         // DRAW FLOOR
         for (uint32_t i = tOffset + tLineHeight; i < SCREEN_HEIGHT; i += FOV_RECT) {
-          float   fZ = _fZLUT[i - SCREEN_HEIGHT_HALF] * _fisheyeCosLUT[rCount], fX = _pPosX + rVelocityX * fZ, fY = _pPosY + rVelocityY * fZ;
+          float   fZ = _fZLUT[i - SCREEN_HEIGHT / 2] * _fisheyeCosLUT[rCount], fX = _pPosX + rVelocityX * fZ, fY = _pPosY + rVelocityY * fZ;
           int32_t fTextureX = (int32_t)(TEXTURE_SIZE * fX) & (TEXTURE_SIZE - 1), fTextureY = (int32_t)(TEXTURE_SIZE * fY) & (TEXTURE_SIZE - 1);
           BSP_LCD_SetTextColor(_textures[_map[MAP_FLOOR][(int32_t)fY * MAP_SIZE_X + (int32_t)fX] - 1][fTextureY * TEXTURE_SIZE + fTextureX]);
           BSP_LCD_FillRect((rCount * FOV_RECT), i, FOV_RECT, FOV_RECT);

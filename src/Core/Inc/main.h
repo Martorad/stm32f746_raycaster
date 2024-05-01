@@ -390,10 +390,7 @@ void     pageFlip(void);
 
 /* USER CODE BEGIN Private defines */
 #define SCREEN_WIDTH       480
-#define SCREEN_WIDTH_HALF  240
-
 #define SCREEN_HEIGHT      272
-#define SCREEN_HEIGHT_HALF 136
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus
