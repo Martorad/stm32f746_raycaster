@@ -382,11 +382,11 @@ uint32_t cast(void) {
             float    dimmingFactor = 0;
             switch (normal) {
               case -128:
-                dimmingFactor = rHitSide ? _sinLUT[rAngle] : _cosLUT[rAngle];
+                dimmingFactor = _cosLUT[rHitSide ? 360 - rAngle : rAngle];
                 break;
               case 1: break;
               case 127:
-                dimmingFactor = -(rHitSide ? _sinLUT[rAngle] : _cosLUT[rAngle]);
+                dimmingFactor = -_cosLUT[rHitSide ? 360 - rAngle : rAngle];
                 break;
               default: break;
             }
