@@ -13,7 +13,23 @@
 | Procedurally generated levels.                      |    Could     |      0%      |
 | Touchscreen integration.                            |    Could     |      0%      |
 
-## 2. Hardware
+## 2. Game engine and game mechanics
+
+| Requirement                                                      | MoSCoW level | Completion % |
+| ---------------------------------------------------------------- |:------------:|:------------:|
+| Cast textured walls with at least 16x16 textures.                |     Must     |     100%     |
+| Cast textured floors with at least 16x16 textures.               |     Must     |     100%     |
+| Cast textured ceilings with at least 16x16 textures OR a skybox. |     Must     |     100%     |
+| Create smooth movement with acceleration and friction.           |     Must     |     100%     |
+| Draw sprites.                                                    |     Must     |      0%      |
+| Be able to shoot a weapon at enemies.                            |     Must     |      0%      |
+| Enemies should have simple AI to attack the player.              |     Must     |      0%      |
+| Several kinds of enemies.                                        |    Should    |      0%      |
+| Several kinds of weapons.                                        |    Should    |      0%      |
+| Pickups                                                          |    Should    |      0%      |
+
+
+## 3. Hardware
 
 | Requirement                                              | MoSCoW level | Completion % |
 | -------------------------------------------------------- | :----------: | :----------: |
