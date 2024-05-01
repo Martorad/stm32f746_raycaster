@@ -380,19 +380,18 @@ uint32_t cast(void) {
             uint16_t color = _textures[_map[0][mY * MAP_SIZE_X + mX] - 1/* + rHitSide*/][i * TEXTURE_SIZE + (int32_t)(tX)];
             int8_t   normal = _bump[0][i * TEXTURE_SIZE + (int32_t)(tX)];
             float    dimmingFactor = 0;
-//            float    dimmingFactor = rHitSide ? (fabs(rVelocityX) + rVelocityY * normal) : (fabs(rVelocityY) + rVelocityX * normal);
             switch (normal) {
               case -128:
-                dimmingFactor = -_cosLUT[rHitSide ? rAngle : 720 - rAngle];
+                dimmingFactor = _cosLUT[rHitSide ? 360 - rAngle : rAngle];
                 break;
               case 1: break;
               case 127:
-                dimmingFactor = _cosLUT[rHitSide ? rAngle : 720 - rAngle];;
+                dimmingFactor = -_cosLUT[rHitSide ? 360 - rAngle : rAngle];
                 break;
               default: break;
             }
 
-            BSP_LCD_SetTextColor(dimColor(color, dimmingFactor));
+            BSP_LCD_SetTextColor(dimColor(color, 1 + dimmingFactor));
             BSP_LCD_FillRect((rCount * FOV_RECT), tOffset + tY, FOV_RECT * 2, tYStep + 1);
             tY += tYStep;
           }
