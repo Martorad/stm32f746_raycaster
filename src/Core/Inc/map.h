@@ -10,6 +10,8 @@
 
 #define MAP_SIZE_X 48
 #define MAP_SIZE_Y 16
+#define MAP_WALLS  0
+#define MAP_FLOOR  1
 
 // MAP
 static const uint8_t _map[2][MAP_SIZE_X * MAP_SIZE_Y] = {

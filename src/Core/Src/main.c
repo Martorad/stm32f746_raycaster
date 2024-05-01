@@ -206,8 +206,8 @@ int main(void)
         _pVelocityY -= _pDeltaY;
       }
 
-      if (_map[0][(int32_t)_pPosY * MAP_SIZE_X + (int32_t)(_pPosX + ((_pVelocityX < 0) ? -P_HITBOX_SIZE : P_HITBOX_SIZE))] == 0) { _pPosX += _pVelocityX; }
-      if (_map[0][(int32_t)(_pPosY + ((_pVelocityY < 0) ? -P_HITBOX_SIZE : P_HITBOX_SIZE)) * MAP_SIZE_X + (int32_t)_pPosX] == 0) { _pPosY += _pVelocityY; }
+      if (_map[MAP_WALLS][(int32_t)_pPosY * MAP_SIZE_X + (int32_t)(_pPosX + ((_pVelocityX < 0) ? -P_HITBOX_SIZE : P_HITBOX_SIZE))] == 0) { _pPosX += _pVelocityX; }
+      if (_map[MAP_WALLS][(int32_t)(_pPosY + ((_pVelocityY < 0) ? -P_HITBOX_SIZE : P_HITBOX_SIZE)) * MAP_SIZE_X + (int32_t)_pPosX] == 0) { _pPosY += _pVelocityY; }
 
       _pVelocityX *= (1 - P_FRICTION);
       _pVelocityY *= (1 - P_FRICTION);
@@ -316,7 +316,7 @@ uint32_t cast(void) {
     int8_t  rVelSignX = (rVelocityX > 0), rVelSignY = (rVelocityY > 0), rStepX = rVelSignX ? 1 : -1, rStepY = rVelSignY ? 1 : -1, rHitSide = 0;
 
     for (uint32_t i = 0; i < MAP_SIZE_X * MAP_SIZE_Y; i++) {
-      if (_map[0][mY * MAP_SIZE_X + mX] > 0) { break; }
+      if (_map[MAP_WALLS][mY * MAP_SIZE_X + mX] > 0) { break; }
 
       rTimeX = (mY - rIntersectY + rVelSignY) / rVelocityY; // This should be treated as "time to X-side wall"
       rTimeY = (mX - rIntersectX + rVelSignX) / rVelocityX;
@@ -351,7 +351,7 @@ uint32_t cast(void) {
           int32_t tSkipLines = tOffset / tYStep, tFirstLine = tYStep - (tOffset - tSkipLines * tYStep);
           tY = tFirstLine;
           for (uint32_t i = tSkipLines; i < TEXTURE_SIZE - tSkipLines; i++) {
-            BSP_LCD_SetTextColor(_textures[_map[0][mY * MAP_SIZE_X + mX] - 1 + rHitSide][i * TEXTURE_SIZE + (int32_t)(tX)]);
+            BSP_LCD_SetTextColor(_textures[_map[MAP_WALLS][mY * MAP_SIZE_X + mX] - 1 + rHitSide][i * TEXTURE_SIZE + (int32_t)(tX)]);
             if (i != tSkipLines && i != TEXTURE_SIZE - tSkipLines - 1) {
               BSP_LCD_FillRect((rCount * FOV_RECT), tY, FOV_RECT * 2, tYStep + 1);
               tY += tYStep;
@@ -368,7 +368,6 @@ uint32_t cast(void) {
         if (rCount % 2 == 0) {
           // DRAW SKYBOX
           int32_t sbY = 0, sbDrawLines = ((int32_t)(tOffset / SKYBOX_TEXEL_Y) + 1) & (TEXTURE_SIZE - 1);
-
           for (uint32_t i = 0; i < sbDrawLines; i++) {
             BSP_LCD_SetTextColor(_skybox[i * SKYBOX_SIZE_X + _sbLUT[rAngle]]);
             BSP_LCD_FillRect((rCount * FOV_RECT), sbY, FOV_RECT * 2, SKYBOX_TEXEL_Y);
@@ -377,7 +376,7 @@ uint32_t cast(void) {
 
           // DRAW WALLS
           for (uint32_t i = 0; i < TEXTURE_SIZE; i++) {
-            BSP_LCD_SetTextColor(_textures[_map[0][mY * MAP_SIZE_X + mX] - 1 + rHitSide][i * TEXTURE_SIZE + (int32_t)(tX)]);
+            BSP_LCD_SetTextColor(_textures[_map[MAP_WALLS][mY * MAP_SIZE_X + mX] - 1 + rHitSide][i * TEXTURE_SIZE + (int32_t)(tX)]);
             BSP_LCD_FillRect((rCount * FOV_RECT), tOffset + tY, FOV_RECT * 2, tYStep + 1);
             tY += tYStep;
           }
@@ -387,8 +386,7 @@ uint32_t cast(void) {
         for (uint32_t i = tOffset + tLineHeight; i < SCREEN_HEIGHT; i += FOV_RECT) {
           float   fZ = _fZLUT[i - SCREEN_HEIGHT_HALF] * _fisheyeCosLUT[rCount], fX = _pPosX + rVelocityX * fZ, fY = _pPosY + rVelocityY * fZ;
           int32_t fTextureX = (int32_t)(TEXTURE_SIZE * fX) & (TEXTURE_SIZE - 1), fTextureY = (int32_t)(TEXTURE_SIZE * fY) & (TEXTURE_SIZE - 1);
-
-          BSP_LCD_SetTextColor(_textures[_map[1][(int32_t)fY * MAP_SIZE_X + (int32_t)fX] - 1][fTextureY * TEXTURE_SIZE + fTextureX]);
+          BSP_LCD_SetTextColor(_textures[_map[MAP_FLOOR][(int32_t)fY * MAP_SIZE_X + (int32_t)fX] - 1][fTextureY * TEXTURE_SIZE + fTextureX]);
           BSP_LCD_FillRect((rCount * FOV_RECT), i, FOV_RECT, FOV_RECT);
 //          BSP_LCD_FillRect((rCount * FOV_RECT), SCREEN_HEIGHT - i - 1, FOV_RECT, FOV_RECT); // DRAW CEILING
         }
