@@ -36,12 +36,7 @@ extern "C" {
 
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
-typedef struct __attribute__((aligned(4))) {
-  float    x;       // X position
-  float    y;       // Y position
-  unsigned int tID; // Texture ID
-  signed char en;   // Enabled (flag)
-} sprite_typedef;
+
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
@@ -58,12 +53,9 @@ typedef struct __attribute__((aligned(4))) {
 void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
-int      cast(void);
-int      drawSprites(void);
-uint32_t dimColor(uint32_t inputColor, float dimmingFactor);
-float    fsqrt(float x);
-void     showFPS(uint32_t frameTime);
-void     pageFlip(void);
+int  cast(void);
+void showFPS(uint32_t frameTime);
+void pageFlip(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/

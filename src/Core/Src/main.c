@@ -84,15 +84,8 @@ void MX_USB_HOST_Process(void);
 static float _pPosX = 1.5, _pPosY = 8.0, _pDeltaX, _pDeltaY, _pVelocityX = 0, _pVelocityY = 0;
 static int   _pAngle = 0; // Angle in increments of FOV_INCR radians
 
-// SPRITES
-static sprite_typedef _sprites[1] = {
-// X | Y | tID | en
-  {10.5, 8.0, 0, 1}
-};
-
 // SYSTEM
 static volatile unsigned int _sysElapsedTicks = 0; // 10K frequency, 1 tick = 100us = 0.1ms
-static float _zBuffer[RAYS];
 
 // LOOKUP TABLES
 static float        _fisheyeCosLUT[RAYS], _sinLUT[ANG_RANGE], _cosLUT[ANG_RANGE], _fZLUT[SCREEN_HEIGHT / 2];
@@ -399,8 +392,6 @@ int cast(void) {
         }
       }
     }
-
-    _zBuffer[rCount] = rLength;
     rAngle--;
     if (rAngle < 0) { rAngle += ANG_RANGE; }
   }
@@ -408,50 +399,10 @@ int cast(void) {
   return _sysElapsedTicks - pStartTime;
 }
 
-int drawSprites(void) {
-  float dX, dY, pDX, pDY, dot, det, dAng, dist, scale;
-  int   column;
-
-  for (int s = 0; s < 1; s++) {
-    if (_sprites[s].en) {
-      dX     = _pPosX - _sprites[s].x;
-      dY     = _pPosY - _sprites[s].y;
-      pDX    = _cosLUT[_pAng];
-      pDY    = _sinLUT[_pAng];
-      dot    = pDX * dX + pDY * dY;
-      det    = pDX * dY - pDY * dX;
-      dAng   = atan2(det, dot);
-      dist   = fsqrt(dX * dX + dY * dY);
-      scale  = SPRITE_SIZE / dist; if (scale > SPRITE_SIZE * 8) { continue; }
-      column = (RAYS / 2) + (RAYS * dAng) / FOV; if (column < 0 || column > 240) { continue; }
-    }
-  }
-
-  return 0;
-}
-
-float fsqrt(float x) {
-  float g = x / 2.0;
-
-  g = 0.5 * (g + x / g);
-  g = 0.5 * (g + x / g);
-  g = 0.5 * (g + x / g);
-
-  return g;
-}
-
 void pageFlip(void) {
   static volatile uint8_t activeBuffer = 1;
   activeBuffer ^= 1;
   BSP_LCD_SWAP(activeBuffer);
-}
-
-uint32_t dimColor(uint32_t inputColor, float dimmingFactor) {
-  if (dimmingFactor > 1) { return inputColor; }
-  return 0xFF000000 |
-  (0x00FF0000 & (uint32_t)((0x00FF0000 & inputColor) * dimmingFactor)) |
-  (0x0000FF00 & (uint32_t)((0x0000FF00 & inputColor) * dimmingFactor)) |
-  (0x000000FF & (uint32_t)((0x000000FF & inputColor) * dimmingFactor));
 }
 
 void showFPS(uint32_t frameTime) {
