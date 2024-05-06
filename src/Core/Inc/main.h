@@ -58,6 +58,7 @@ void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
 uint32_t cast(void);
+uint32_t drawSprites(void);
 uint32_t dimColor(uint32_t inputColor, float dimmingFactor);
 float    fsqrt(float x);
 void     showFPS(uint32_t frameTime);

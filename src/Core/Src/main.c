@@ -85,8 +85,9 @@ static float   _pPosX = 1.5, _pPosY = 8.0, _pDeltaX, _pDeltaY, _pVelocityX = 0, 
 static int32_t _pAngle = 0; // Angle in increments of FOV_INCR radians
 
 // SPRITES
-sprite _activeSprites[1] = {
-    {10.5, 8.0, 0}
+static sprite _activeSprites[1] = {
+//  X  |  Y  |  tID
+  {10.5,  8.0,   0}
 };
 
 // SYSTEM
@@ -405,6 +406,14 @@ uint32_t cast(void) {
   }
 
   return _sysElapsedTicks - pStartTime;
+}
+
+uint32_t drawSprites(void) {
+//  for (uint32) {
+//
+//  }
+
+  return 0;
 }
 
 float fsqrt(float x) {
