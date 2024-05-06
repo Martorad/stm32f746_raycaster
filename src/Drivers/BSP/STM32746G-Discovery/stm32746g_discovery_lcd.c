@@ -285,8 +285,8 @@ void BSP_LCD_LayerRgb565Init(uint16_t LayerIndex, uint32_t FB_Address)
   layer_cfg.Backcolor.Blue = 0;
   layer_cfg.Backcolor.Green = 0;
   layer_cfg.Backcolor.Red = 0;
-  layer_cfg.BlendingFactor1 = LTDC_BLENDING_FACTOR1_PAxCA;
-  layer_cfg.BlendingFactor2 = LTDC_BLENDING_FACTOR2_PAxCA;
+  layer_cfg.BlendingFactor1 = LTDC_BLENDING_FACTOR1_CA;
+  layer_cfg.BlendingFactor2 = LTDC_BLENDING_FACTOR2_CA;
   layer_cfg.ImageWidth = BSP_LCD_GetXSize();
   layer_cfg.ImageHeight = BSP_LCD_GetYSize();
   
@@ -296,9 +296,9 @@ void BSP_LCD_LayerRgb565Init(uint16_t LayerIndex, uint32_t FB_Address)
   DrawProp[LayerIndex].pFont     = &Font24;
   DrawProp[LayerIndex].TextColor = LCD_COLOR_BLACK; 
 
-  hDma2dHandler.Init.ColorMode    = DMA2D_RGB565;
-  hDma2dHandler.Init.Mode         = DMA2D_R2M;
-  hDma2dHandler.Instance = DMA2D;
+  hDma2dHandler.Init.ColorMode   = DMA2D_RGB565;
+  hDma2dHandler.Init.Mode        = DMA2D_R2M;
+  hDma2dHandler.Instance         = DMA2D;
 
   HAL_DMA2D_Init(&hDma2dHandler);
 }

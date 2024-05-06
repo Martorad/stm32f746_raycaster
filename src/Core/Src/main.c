@@ -302,8 +302,8 @@ void PeriphCommonClock_Config(void)
 uint32_t cast(void) {
   // Variable prefix convention: r = ray, m = map, p = performance, c = calculation, t = texture, sb = skybox, f = floor
   static float rZBuffer[RAYS];
-  uint32_t pStartTime = _sysElapsedTicks;
-  int32_t  rAngle;
+  uint32_t     pStartTime = _sysElapsedTicks;
+  int32_t      rAngle;
 
   BSP_LCD_SelectLayer(LTDC_BACKGROUND);
 
@@ -394,6 +394,7 @@ uint32_t cast(void) {
       }
     }
 
+    rZBuffer[rCount] = rLength;
     rAngle--;
     if (rAngle < 0) { rAngle += ANG_RANGE; }
   }
