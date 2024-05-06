@@ -81,8 +81,8 @@ void MX_USB_HOST_Process(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 // PLAYER
-static float   _pPosX = 1.5, _pPosY = 8.0, _pDeltaX, _pDeltaY, _pVelocityX = 0, _pVelocityY = 0;
-static int32_t _pAngle = 0; // Angle in increments of FOV_INCR radians
+static float _pPosX = 1.5, _pPosY = 8.0, _pDeltaX, _pDeltaY, _pVelocityX = 0, _pVelocityY = 0;
+static int   _pAngle = 0; // Angle in increments of FOV_INCR radians
 
 // SPRITES
 static sprite _activeSprites[1] = {
@@ -91,11 +91,11 @@ static sprite _activeSprites[1] = {
 };
 
 // SYSTEM
-static volatile uint32_t _sysElapsedTicks = 0; // 10K frequency, 1 tick = 100us = 0.1ms
+static volatile unsigned int _sysElapsedTicks = 0; // 10K frequency, 1 tick = 100us = 0.1ms
 
 // LOOKUP TABLES
-static float    _fisheyeCosLUT[RAYS], _sinLUT[ANG_RANGE], _cosLUT[ANG_RANGE], _fZLUT[SCREEN_HEIGHT / 2];
-static uint32_t _sbLUT[ANG_RANGE];
+static float        _fisheyeCosLUT[RAYS], _sinLUT[ANG_RANGE], _cosLUT[ANG_RANGE], _fZLUT[SCREEN_HEIGHT / 2];
+static unsigned int _sbLUT[ANG_RANGE];
 
 /* USER CODE END 0 */
 
@@ -169,13 +169,13 @@ int main(void)
   BSP_LCD_SelectLayer(LTDC_FOREGROUND);
   BSP_LCD_Clear(LCD_COLOR_BLACK);
 
-  for (uint16_t i = 0; i < RAYS; i++) { _fisheyeCosLUT[i] = 1 / cos((RAYS / 2 - i) * ANG_INCR); } // Pre-calculate all cosine values to correct fisheye effect later
-  for (uint16_t i = 0; i < ANG_RANGE; i++) {
+  for (int i = 0; i < RAYS; i++) { _fisheyeCosLUT[i] = 1 / cos((RAYS / 2 - i) * ANG_INCR); } // Pre-calculate all cosine values to correct fisheye effect later
+  for (int i = 0; i < ANG_RANGE; i++) {
     _sinLUT[i] = -sin(i * ANG_INCR + 0.0001); // Sin is inverted because I use screenspace coordinates so Y is inverted
     _cosLUT[i] =  cos(i * ANG_INCR + 0.0001); // Also why I have a separate cos LUT. While it uses more memory, it is faster because it avoids an expensive modulus operation
-    _sbLUT[i]  =  (uint16_t)(SKYBOX_SIZE_X - (i + 1) * ANG_INCR * SKYBOX_SCALE_F);
+    _sbLUT[i]  =  (int)(SKYBOX_SIZE_X - (i + 1) * ANG_INCR * SKYBOX_SCALE_F);
   }
-  for (uint16_t i = SCREEN_HEIGHT / 2; i < SCREEN_HEIGHT; i++) { _fZLUT[i - SCREEN_HEIGHT / 2] = (SCREEN_HEIGHT / 2 / (float)(i - SCREEN_HEIGHT / 2 + 1)) * LINE_VERTICAL_SCALE; }
+  for (int i = SCREEN_HEIGHT / 2; i < SCREEN_HEIGHT; i++) { _fZLUT[i - SCREEN_HEIGHT / 2] = (SCREEN_HEIGHT / 2 / (float)(i - SCREEN_HEIGHT / 2 + 1)) * LINE_VERTICAL_SCALE; }
 
   HAL_TIM_Base_Start_IT(&htim7);
   /* USER CODE END 2 */
@@ -212,8 +212,8 @@ int main(void)
         _pVelocityY -= _pDeltaY;
       }
 
-      if (_map[MAP_WALLS][(int32_t)_pPosY * MAP_SIZE_X + (int32_t)(_pPosX + ((_pVelocityX < 0) ? -P_HITBOX_SIZE : P_HITBOX_SIZE))] == 0) { _pPosX += _pVelocityX; }
-      if (_map[MAP_WALLS][(int32_t)(_pPosY + ((_pVelocityY < 0) ? -P_HITBOX_SIZE : P_HITBOX_SIZE)) * MAP_SIZE_X + (int32_t)_pPosX] == 0) { _pPosY += _pVelocityY; }
+      if (_map[MAP_WALLS][(int)_pPosY * MAP_SIZE_X + (int)(_pPosX + ((_pVelocityX < 0) ? -P_HITBOX_SIZE : P_HITBOX_SIZE))] == 0) { _pPosX += _pVelocityX; }
+      if (_map[MAP_WALLS][(int)(_pPosY + ((_pVelocityY < 0) ? -P_HITBOX_SIZE : P_HITBOX_SIZE)) * MAP_SIZE_X + (int)_pPosX] == 0) { _pPosY += _pVelocityY; }
 
       _pVelocityX *= (1 - P_FRICTION);
       _pVelocityY *= (1 - P_FRICTION);
@@ -305,24 +305,24 @@ void PeriphCommonClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-uint32_t cast(void) {
+int cast(void) {
   // Variable prefix convention: r = ray, m = map, p = performance, c = calculation, t = texture, sb = skybox, f = floor
   static float rZBuffer[RAYS];
-  uint32_t     pStartTime = _sysElapsedTicks;
-  int32_t      rAngle;
+  unsigned int pStartTime = _sysElapsedTicks;
+  int          rAngle;
 
   BSP_LCD_SelectLayer(LTDC_BACKGROUND);
 
   rAngle = _pAngle + RAYS / 2;
   if (rAngle >= ANG_RANGE) { rAngle -= ANG_RANGE; }
 
-  for (uint32_t rCount = 0; rCount < RAYS; rCount++) {
+  for (int rCount = 0; rCount < RAYS; rCount++) {
     // This uses David Ziemkiewicz' method of velocities and times, as well as Lodev's DDA. Massive thanks to both of these legends.
-    float   rVelocityX = _cosLUT[rAngle], rVelocityY = _sinLUT[rAngle], rIntersectX = _pPosX, rIntersectY = _pPosY, rTimeX, rTimeY, rLength = 0, tLineHeight;
-    int32_t mX = (int16_t)rIntersectX, mY = (int16_t)rIntersectY; // Casting to int16_t instead of int32_t is faster for some unknown reason.
-    int8_t  rVelSignX = (rVelocityX > 0), rVelSignY = (rVelocityY > 0), rStepX = rVelSignX ? 1 : -1, rStepY = rVelSignY ? 1 : -1, rHitSide = 0;
+    float       rVelocityX = _cosLUT[rAngle], rVelocityY = _sinLUT[rAngle], rIntersectX = _pPosX, rIntersectY = _pPosY, rTimeX, rTimeY, rLength = 0, tLineHeight;
+    int         mX = (short)rIntersectX, mY = (short)rIntersectY; // Casting to short instead of int is faster for some unknown reason.
+    signed char rVelSignX = (rVelocityX > 0), rVelSignY = (rVelocityY > 0), rStepX = rVelSignX ? 1 : -1, rStepY = rVelSignY ? 1 : -1, rHitSide = 0;
 
-    for (uint32_t i = 0; i < MAP_SIZE_X * MAP_SIZE_Y; i++) {
+    for (int i = 0; i < MAP_SIZE_X * MAP_SIZE_Y; i++) {
       if (_map[MAP_WALLS][mY * MAP_SIZE_X + mX] > 0) { break; }
 
       rTimeX = (mY - rIntersectY + rVelSignY) / rVelocityY; // This should be treated as "time to X-side wall"
@@ -350,15 +350,15 @@ uint32_t cast(void) {
     if (tLineHeight > SHORTEST_LINE) {
       float tX, tY = 0, tYStep = tLineHeight / TEXTURE_SIZE, tOffset = (tLineHeight - SCREEN_HEIGHT) * 0.5;
 
-      if (rHitSide) { tX = (1 - (rIntersectY - (int32_t)rIntersectY)) * TEXTURE_SIZE; if (rAngle < ANG_RANGE / 4 || rAngle > (ANG_RANGE / 4) * 3) { tX = TEXTURE_SIZE - tX; }}
-      else          { tX = (1 - (rIntersectX - (int32_t)rIntersectX)) * TEXTURE_SIZE; if (rAngle < ANG_RANGE / 2)                                 { tX = TEXTURE_SIZE - tX; }}
+      if (rHitSide) { tX = (1 - (rIntersectY - (int)rIntersectY)) * TEXTURE_SIZE; if (rAngle < ANG_RANGE / 4 || rAngle > (ANG_RANGE / 4) * 3) { tX = TEXTURE_SIZE - tX; }}
+      else          { tX = (1 - (rIntersectX - (int)rIntersectX)) * TEXTURE_SIZE; if (rAngle < ANG_RANGE / 2)                                 { tX = TEXTURE_SIZE - tX; }}
 
       if (tLineHeight > SCREEN_HEIGHT) { // Check if line fills up the screen, if it does, drawing the sky and floor is not necessary, so we just draw the wall
         if (rCount % 2 == 0) {
-          int32_t tSkipLines = tOffset / tYStep, tFirstLine = tYStep - (tOffset - tSkipLines * tYStep);
+          int tSkipLines = tOffset / tYStep, tFirstLine = tYStep - (tOffset - tSkipLines * tYStep);
           tY = tFirstLine;
-          for (uint32_t i = tSkipLines; i < TEXTURE_SIZE - tSkipLines; i++) {
-            BSP_LCD_SetTextColor(_textures[_map[MAP_WALLS][mY * MAP_SIZE_X + mX] - 1 + rHitSide][i * TEXTURE_SIZE + (int32_t)(tX)]);
+          for (int i = tSkipLines; i < TEXTURE_SIZE - tSkipLines; i++) {
+            BSP_LCD_SetTextColor(_textures[_map[MAP_WALLS][mY * MAP_SIZE_X + mX] - 1 + rHitSide][i * TEXTURE_SIZE + (int)(tX)]);
             if (i != tSkipLines && i != TEXTURE_SIZE - tSkipLines - 1) {
               BSP_LCD_FillRect((rCount * RECT_Y), tY, RECT_Y * 2, tYStep + 1);
               tY += tYStep;
@@ -374,26 +374,26 @@ uint32_t cast(void) {
 
         if (rCount % 2 == 0) {
           // DRAW SKYBOX
-          int32_t sbY = 0, sbDrawLines = ((int32_t)(tOffset / SKYBOX_TEXEL_Y) + 1) & (TEXTURE_SIZE - 1);
-          for (uint32_t i = 0; i < sbDrawLines; i++) {
+          int sbY = 0, sbDrawLines = ((int)(tOffset / SKYBOX_TEXEL_Y) + 1) & (TEXTURE_SIZE - 1);
+          for (int i = 0; i < sbDrawLines; i++) {
             BSP_LCD_SetTextColor(_skybox[i * SKYBOX_SIZE_X + _sbLUT[rAngle]]);
             BSP_LCD_FillRect((rCount * RECT_Y), sbY, RECT_Y * 2, SKYBOX_TEXEL_Y);
             sbY += SKYBOX_TEXEL_Y;
           }
 
           // DRAW WALLS
-          for (uint32_t i = 0; i < TEXTURE_SIZE; i++) {
-            BSP_LCD_SetTextColor(_textures[_map[MAP_WALLS][mY * MAP_SIZE_X + mX] - 1 + rHitSide][i * TEXTURE_SIZE + (int32_t)(tX)]);
+          for (int i = 0; i < TEXTURE_SIZE; i++) {
+            BSP_LCD_SetTextColor(_textures[_map[MAP_WALLS][mY * MAP_SIZE_X + mX] - 1 + rHitSide][i * TEXTURE_SIZE + (int)(tX)]);
             BSP_LCD_FillRect((rCount * RECT_Y), tOffset + tY, RECT_Y * 2, tYStep + 1);
             tY += tYStep;
           }
         }
 
         // DRAW FLOOR
-        for (uint32_t i = tOffset + tLineHeight; i < SCREEN_HEIGHT; i += RECT_Y) {
-          float   fZ = _fZLUT[i - SCREEN_HEIGHT / 2] * _fisheyeCosLUT[rCount], fX = _pPosX + rVelocityX * fZ, fY = _pPosY + rVelocityY * fZ;
-          int32_t fTextureX = (int32_t)(TEXTURE_SIZE * fX) & (TEXTURE_SIZE - 1), fTextureY = (int32_t)(TEXTURE_SIZE * fY) & (TEXTURE_SIZE - 1);
-          BSP_LCD_SetTextColor(_textures[_map[MAP_FLOOR][(int32_t)fY * MAP_SIZE_X + (int32_t)fX] - 1][fTextureY * TEXTURE_SIZE + fTextureX]);
+        for (int i = tOffset + tLineHeight; i < SCREEN_HEIGHT; i += RECT_Y) {
+          float fZ = _fZLUT[i - SCREEN_HEIGHT / 2] * _fisheyeCosLUT[rCount], fX = _pPosX + rVelocityX * fZ, fY = _pPosY + rVelocityY * fZ;
+          int   fTextureX = (int)(TEXTURE_SIZE * fX) & (TEXTURE_SIZE - 1), fTextureY = (int)(TEXTURE_SIZE * fY) & (TEXTURE_SIZE - 1);
+          BSP_LCD_SetTextColor(_textures[_map[MAP_FLOOR][(int)fY * MAP_SIZE_X + (int)fX] - 1][fTextureY * TEXTURE_SIZE + fTextureX]);
           BSP_LCD_FillRect((rCount * RECT_Y), i, RECT_Y, RECT_Y);
 //          BSP_LCD_FillRect((rCount * FOV_RECT), SCREEN_HEIGHT - i - 1, FOV_RECT, FOV_RECT); // DRAW CEILING
         }
@@ -408,7 +408,7 @@ uint32_t cast(void) {
   return _sysElapsedTicks - pStartTime;
 }
 
-uint32_t drawSprites(void) {
+int drawSprites(void) {
 //  for (uint32) {
 //
 //  }
