@@ -54,7 +54,7 @@ void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
 int  cast(void);
-void showFPS(uint32_t frameTime);
+void showFPS(unsigned int frameTime);
 void pageFlip(void);
 /* USER CODE END EFP */
 

@@ -394,16 +394,15 @@ int cast(void) {
 }
 
 void pageFlip(void) {
-  static volatile uint8_t activeBuffer = 1;
+  static volatile unsigned char activeBuffer = 1;
   activeBuffer ^= 1;
   BSP_LCD_SWAP(activeBuffer);
 }
 
-void showFPS(uint32_t frameTime) {
-  uint8_t frameTimeS[16];
-  uint8_t frameRateS[10];
-  sprintf((char*)frameTimeS, "%02li.%lims", frameTime / 10, frameTime % 10);
-  sprintf((char*)frameRateS, "%03lifps", 10000 / frameTime);
+void showFPS(unsigned int frameTime) {
+  unsigned char frameTimeS[16], frameRateS[10];
+  sprintf((char*)frameTimeS, "%02i.%ims", frameTime / 10, frameTime % 10);
+  sprintf((char*)frameRateS, "%03ifps", 10000 / frameTime);
   BSP_LCD_SetTextColor(0x001F);
   BSP_LCD_DisplayStringAt(0,  0, frameTimeS, LEFT_MODE);
   BSP_LCD_DisplayStringAt(0, 12, frameRateS, LEFT_MODE);
