@@ -409,11 +409,21 @@ int cast(void) {
 }
 
 int drawSprites(void) {
-  float dX, dY;
+  float dX, dY, pDX, pDY, dot, det, dAng, dist, scale;
+  int   column;
 
   for (int s = 0; s < 1; s++) {
     if (_sprites[s].en) {
-//      dX = _sprites[s];
+      dX     = _pPosX - _sprites[s].x;
+      dY     = _pPosY - _sprites[s].y;
+      pDX    = _cosLUT[_pAng];
+      pDY    = _sinLUT[_pAng];
+      dot    = pDX * dX + pDY * dY;
+      det    = pDX * dY - pDY * dX;
+      dAng   = atan2(det, dot);
+      dist   = fsqrt(dX * dX + dY * dY);
+      scale  = SPRITE_SIZE / dist; if (scale > SPRITE_SIZE * 8) { continue; }
+      column = (RAYS / 2) + (RAYS * dAng) / FOV; if (column < 0 || column > 240) { continue; }
     }
   }
 

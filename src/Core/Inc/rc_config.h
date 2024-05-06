@@ -17,6 +17,8 @@
 
 // <------------------------ DO NOT TOUCH ------------------------>
 // RESOLUTION CONFIGURATION TABLES
+#define FOV 2 * M_PI / 6 // 60 degree FOV in radians
+
 // RECT_Y describes the width of each rectangle column drawn on screen. Smaller width rectangles have higher fidelity, at the cost of speed. Odd width rectangles mean that symmetrical frames cannot be drawn.
 #ifdef  RES_MIN
 #define RAYS      160
