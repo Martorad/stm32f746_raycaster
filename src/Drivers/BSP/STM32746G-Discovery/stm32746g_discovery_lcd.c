@@ -630,8 +630,7 @@ void BSP_LCD_ClearStringLine(uint32_t Line)
   */
 void BSP_LCD_DisplayChar(uint16_t Xpos, uint16_t Ypos, uint8_t Ascii)
 {
-  DrawChar(Xpos, Ypos, &DrawProp[ActiveLayer].pFont->table[(Ascii-' ') *\
-    DrawProp[ActiveLayer].pFont->Height * ((DrawProp[ActiveLayer].pFont->Width + 7) / 8)]);
+  DrawChar(Xpos, Ypos, &DrawProp[ActiveLayer].pFont->table[(Ascii-' ') * DrawProp[ActiveLayer].pFont->Height * ((DrawProp[ActiveLayer].pFont->Width + 7) / 8)]);
 }
 
 /**
@@ -683,9 +682,9 @@ void BSP_LCD_DisplayStringAt(uint16_t Xpos, uint16_t Ypos, uint8_t *Text, Text_A
   }
   
   /* Check that the Start column is located in the screen */
-  if ((ref_column < 1) || (ref_column >= 0x8000))
+  if ((ref_column < 0) || (ref_column >= 0x8000))
   {
-    ref_column = 1;
+    ref_column = 0;
   }
 
   /* Send the string character by character on LCD */
