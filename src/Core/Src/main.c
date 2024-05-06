@@ -87,6 +87,9 @@ static int   _pAngle = 0; // Angle in increments of FOV_INCR radians
 // SYSTEM
 static volatile unsigned int _sysElapsedTicks = 0; // 10K frequency, 1 tick = 100us = 0.1ms
 
+// LEVELS
+static unsigned char _currentLevel = 0;
+
 // LOOKUP TABLES
 static float        _fisheyeCosLUT[RAYS], _sinLUT[ANG_RANGE], _cosLUT[ANG_RANGE], _fZLUT[SCREEN_HEIGHT / 2];
 static unsigned int _sbLUT[ANG_RANGE];
@@ -206,8 +209,8 @@ int main(void)
         _pVelocityY -= _pDeltaY;
       }
 
-      if (_map[MAP_WALLS][(int)_pPosY * MAP_SIZE_X + (int)(_pPosX + ((_pVelocityX < 0) ? -P_HITBOX_SIZE : P_HITBOX_SIZE))] == 0) { _pPosX += _pVelocityX; }
-      if (_map[MAP_WALLS][(int)(_pPosY + ((_pVelocityY < 0) ? -P_HITBOX_SIZE : P_HITBOX_SIZE)) * MAP_SIZE_X + (int)_pPosX] == 0) { _pPosY += _pVelocityY; }
+      if (_levels[_currentLevel].map[MAP_WALLS][(int)_pPosY * _levels[_currentLevel].sizeX + (int)(_pPosX + ((_pVelocityX < 0) ? -P_HITBOX_SIZE : P_HITBOX_SIZE))] == 0) { _pPosX += _pVelocityX; }
+      if (_levels[_currentLevel].map[MAP_WALLS][(int)(_pPosY + ((_pVelocityY < 0) ? -P_HITBOX_SIZE : P_HITBOX_SIZE)) * _levels[_currentLevel].sizeX + (int)_pPosX] == 0) { _pPosY += _pVelocityY; }
 
       _pVelocityX *= (1 - P_FRICTION);
       _pVelocityY *= (1 - P_FRICTION);
@@ -315,8 +318,8 @@ int cast(void) {
     int         mX = (short)rIntersectX, mY = (short)rIntersectY; // Casting to short instead of int is faster for some unknown reason.
     signed char rVelSignX = (rVelocityX > 0), rVelSignY = (rVelocityY > 0), rStepX = rVelSignX ? 1 : -1, rStepY = rVelSignY ? 1 : -1, rHitSide = 0;
 
-    for (int i = 0; i < MAP_SIZE_X * MAP_SIZE_Y; i++) {
-      if (_map[MAP_WALLS][mY * MAP_SIZE_X + mX] > 0) { break; }
+    for (int i = 0; i < _levels[_currentLevel].sizeX * _levels[_currentLevel].sizeY; i++) {
+      if (_levels[_currentLevel].map[MAP_WALLS][mY * _levels[_currentLevel].sizeX + mX] > 0) { break; }
 
       rTimeX = (mY - rIntersectY + rVelSignY) / rVelocityY; // This should be treated as "time to X-side wall"
       rTimeY = (mX - rIntersectX + rVelSignX) / rVelocityX;
@@ -351,7 +354,7 @@ int cast(void) {
           int tSkipLines = tOffset / tYStep, tFirstLine = tYStep - (tOffset - tSkipLines * tYStep);
           tY = tFirstLine;
           for (int i = tSkipLines; i < TEXTURE_SIZE - tSkipLines; i++) {
-            BSP_LCD_SetTextColor(_baseTex[_map[MAP_WALLS][mY * MAP_SIZE_X + mX] - 1 + rHitSide][i * TEXTURE_SIZE + (int)(tX)]);
+            BSP_LCD_SetTextColor(_baseTex[_levels[_currentLevel].map[MAP_WALLS][mY * _levels[_currentLevel].sizeX + mX] - 1 + rHitSide][i * TEXTURE_SIZE + (int)(tX)]);
             if (i != tSkipLines && i != TEXTURE_SIZE - tSkipLines - 1) { BSP_LCD_FillRect((rCount * RECT_Y), tY, RECT_Y * 2, tYStep + 1); tY += tYStep; }
             else { BSP_LCD_FillRect((rCount * RECT_Y), (i == tSkipLines) ? 0 : tY, RECT_Y * 2, tFirstLine + 2); }
           }
@@ -364,14 +367,14 @@ int cast(void) {
           // DRAW SKYBOX
           int sbY = 0, sbDrawLines = ((int)(tOffset / SKYBOX_TEXEL_Y) + 1) & (TEXTURE_SIZE - 1);
           for (int i = 0; i < sbDrawLines; i++) {
-            BSP_LCD_SetTextColor(_skyboxTex[0][i * SKYBOX_SIZE_X + _sbLUT[rAngle]]);
+            BSP_LCD_SetTextColor(_skyboxTex[_currentLevel][i * SKYBOX_SIZE_X + _sbLUT[rAngle]]);
             BSP_LCD_FillRect((rCount * RECT_Y), sbY, RECT_Y * 2, SKYBOX_TEXEL_Y);
             sbY += SKYBOX_TEXEL_Y;
           }
 
           // DRAW WALLS
           for (int i = 0; i < TEXTURE_SIZE; i++) {
-            BSP_LCD_SetTextColor(_baseTex[_map[MAP_WALLS][mY * MAP_SIZE_X + mX] - 1 + rHitSide][i * TEXTURE_SIZE + (int)(tX)]);
+            BSP_LCD_SetTextColor(_baseTex[_levels[_currentLevel].map[MAP_WALLS][mY * _levels[_currentLevel].sizeX + mX] - 1 + rHitSide][i * TEXTURE_SIZE + (int)(tX)]);
             BSP_LCD_FillRect((rCount * RECT_Y), tOffset + tY, RECT_Y * 2, tYStep + 1);
             tY += tYStep;
           }
@@ -381,7 +384,7 @@ int cast(void) {
         for (int i = tOffset + tLineHeight; i < SCREEN_HEIGHT; i += RECT_Y) {
           float fZ = _fZLUT[i - SCREEN_HEIGHT / 2] * _fisheyeCosLUT[rCount], fX = _pPosX + rVelocityX * fZ, fY = _pPosY + rVelocityY * fZ;
           int   fTextureX = (int)(TEXTURE_SIZE * fX) & (TEXTURE_SIZE - 1), fTextureY = (int)(TEXTURE_SIZE * fY) & (TEXTURE_SIZE - 1);
-          BSP_LCD_SetTextColor(_baseTex[_map[MAP_FLOOR][(int)fY * MAP_SIZE_X + (int)fX] - 1][fTextureY * TEXTURE_SIZE + fTextureX]);
+          BSP_LCD_SetTextColor(_baseTex[_levels[_currentLevel].map[MAP_FLOOR][(int)fY * _levels[_currentLevel].sizeX + (int)fX] - 1][fTextureY * TEXTURE_SIZE + fTextureX]);
           BSP_LCD_FillRect((rCount * RECT_Y), i, RECT_Y, RECT_Y);
         }
       }

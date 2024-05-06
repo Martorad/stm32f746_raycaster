@@ -8,13 +8,18 @@
 #ifndef INC_MAP_H_
 #define INC_MAP_H_
 
-#define MAP_SIZE_X 48
-#define MAP_SIZE_Y 16
+typedef struct __attribute__((aligned(4))) {
+  unsigned short sizeX;
+  unsigned short sizeY;
+  const unsigned char* map[2];
+} level_typedef;
+
 #define MAP_WALLS  0
 #define MAP_FLOOR  1
 
 // MAP
-static const unsigned char _map[2][MAP_SIZE_X * MAP_SIZE_Y] = {
+static const unsigned char _level_01[2][48 * 16] =
+{
   { // Walls
     5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,9,7,7,7,9,9,7,7,7,5,5,5,5,5,5,5,5,
     5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,0,0,0,5,5,5,0,0,0,0,0,0,0,9,0,0,0,0,0,7,0,0,0,0,0,0,0,0,0,5,
@@ -51,6 +56,10 @@ static const unsigned char _map[2][MAP_SIZE_X * MAP_SIZE_Y] = {
     0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,3,3,3,3,3,3,3,3,0,3,5,3,5,3,5,3,0,5,5,5,5,5,0,3,3,3,3,3,3,3,3,3,0,
     0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
   }
+};
+
+level_typedef _levels[1] = {
+    {48, 16, {_level_01[MAP_WALLS], _level_01[MAP_FLOOR]}}
 };
 
 #endif /* INC_MAP_H_ */
