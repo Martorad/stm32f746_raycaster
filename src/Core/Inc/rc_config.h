@@ -3,7 +3,6 @@
 
 // PERFORMANCE SETTINGS
 #define RES_MED // Vertical line resolution
-#define SBR_0   // Skybox resolution - 0 for 16px, 1 for 32px
 
 #define SHORTEST_LINE 5
 
@@ -16,12 +15,7 @@
 #define P_ACCEL       0.01
 #define P_FRICTION    0.08
 
-// DEBUG SETTINGS
-//#define DEBUG_FULLBRIGHT
-
 // <------------------------ DO NOT TOUCH ------------------------>
-// INTERNAL CONFIGURATION DEFINES
-
 // RESOLUTION CONFIGURATION TABLES
 // RECT_Y describes the width of each rectangle column drawn on screen. Smaller width rectangles have higher fidelity, at the cost of speed. Odd width rectangles mean that symmetrical frames cannot be drawn.
 #ifdef  RES_MIN

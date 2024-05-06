@@ -81,8 +81,13 @@ void MX_USB_HOST_Process(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 // PLAYER
-static float   _pPosX = 1.5, _pPosY = 8, _pDeltaX, _pDeltaY, _pVelocityX = 0, _pVelocityY = 0;
+static float   _pPosX = 1.5, _pPosY = 8.0, _pDeltaX, _pDeltaY, _pVelocityX = 0, _pVelocityY = 0;
 static int32_t _pAngle = 0; // Angle in increments of FOV_INCR radians
+
+// SPRITES
+sprite _activeSprites[1] = {
+    {10.5, 8.0, 0}
+};
 
 // SYSTEM
 static volatile uint32_t _sysElapsedTicks = 0; // 10K frequency, 1 tick = 100us = 0.1ms
