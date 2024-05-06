@@ -36,11 +36,12 @@ extern "C" {
 
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
-typedef struct {
-  float    x;   // X position
-  float    y;   // Y position
-  uint32_t tID; // Texture ID
-} sprite;
+typedef struct __attribute__((aligned(4))) {
+  float    x;       // X position
+  float    y;       // Y position
+  unsigned int tID; // Texture ID
+  signed char en;   // Enabled (flag)
+} sprite_typedef;
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/

@@ -85,13 +85,14 @@ static float _pPosX = 1.5, _pPosY = 8.0, _pDeltaX, _pDeltaY, _pVelocityX = 0, _p
 static int   _pAngle = 0; // Angle in increments of FOV_INCR radians
 
 // SPRITES
-static sprite _activeSprites[1] = {
-//  X  |  Y  |  tID
-  {10.5,  8.0,   0}
+static sprite_typedef _sprites[1] = {
+// X | Y | tID | en
+  {10.5, 8.0, 0, 1}
 };
 
 // SYSTEM
 static volatile unsigned int _sysElapsedTicks = 0; // 10K frequency, 1 tick = 100us = 0.1ms
+static float _zBuffer[RAYS];
 
 // LOOKUP TABLES
 static float        _fisheyeCosLUT[RAYS], _sinLUT[ANG_RANGE], _cosLUT[ANG_RANGE], _fZLUT[SCREEN_HEIGHT / 2];
@@ -307,7 +308,6 @@ void PeriphCommonClock_Config(void)
 /* USER CODE BEGIN 4 */
 int cast(void) {
   // Variable prefix convention: r = ray, m = map, p = performance, c = calculation, t = texture, sb = skybox, f = floor
-  static float rZBuffer[RAYS];
   unsigned int pStartTime = _sysElapsedTicks;
   int          rAngle;
 
@@ -358,7 +358,7 @@ int cast(void) {
           int tSkipLines = tOffset / tYStep, tFirstLine = tYStep - (tOffset - tSkipLines * tYStep);
           tY = tFirstLine;
           for (int i = tSkipLines; i < TEXTURE_SIZE - tSkipLines; i++) {
-            BSP_LCD_SetTextColor(_textures[_map[MAP_WALLS][mY * MAP_SIZE_X + mX] - 1 + rHitSide][i * TEXTURE_SIZE + (int)(tX)]);
+            BSP_LCD_SetTextColor(_baseTex[_map[MAP_WALLS][mY * MAP_SIZE_X + mX] - 1 + rHitSide][i * TEXTURE_SIZE + (int)(tX)]);
             if (i != tSkipLines && i != TEXTURE_SIZE - tSkipLines - 1) {
               BSP_LCD_FillRect((rCount * RECT_Y), tY, RECT_Y * 2, tYStep + 1);
               tY += tYStep;
@@ -376,14 +376,14 @@ int cast(void) {
           // DRAW SKYBOX
           int sbY = 0, sbDrawLines = ((int)(tOffset / SKYBOX_TEXEL_Y) + 1) & (TEXTURE_SIZE - 1);
           for (int i = 0; i < sbDrawLines; i++) {
-            BSP_LCD_SetTextColor(_skybox[i * SKYBOX_SIZE_X + _sbLUT[rAngle]]);
+            BSP_LCD_SetTextColor(_skyboxTex[0][i * SKYBOX_SIZE_X + _sbLUT[rAngle]]);
             BSP_LCD_FillRect((rCount * RECT_Y), sbY, RECT_Y * 2, SKYBOX_TEXEL_Y);
             sbY += SKYBOX_TEXEL_Y;
           }
 
           // DRAW WALLS
           for (int i = 0; i < TEXTURE_SIZE; i++) {
-            BSP_LCD_SetTextColor(_textures[_map[MAP_WALLS][mY * MAP_SIZE_X + mX] - 1 + rHitSide][i * TEXTURE_SIZE + (int)(tX)]);
+            BSP_LCD_SetTextColor(_baseTex[_map[MAP_WALLS][mY * MAP_SIZE_X + mX] - 1 + rHitSide][i * TEXTURE_SIZE + (int)(tX)]);
             BSP_LCD_FillRect((rCount * RECT_Y), tOffset + tY, RECT_Y * 2, tYStep + 1);
             tY += tYStep;
           }
@@ -393,14 +393,14 @@ int cast(void) {
         for (int i = tOffset + tLineHeight; i < SCREEN_HEIGHT; i += RECT_Y) {
           float fZ = _fZLUT[i - SCREEN_HEIGHT / 2] * _fisheyeCosLUT[rCount], fX = _pPosX + rVelocityX * fZ, fY = _pPosY + rVelocityY * fZ;
           int   fTextureX = (int)(TEXTURE_SIZE * fX) & (TEXTURE_SIZE - 1), fTextureY = (int)(TEXTURE_SIZE * fY) & (TEXTURE_SIZE - 1);
-          BSP_LCD_SetTextColor(_textures[_map[MAP_FLOOR][(int)fY * MAP_SIZE_X + (int)fX] - 1][fTextureY * TEXTURE_SIZE + fTextureX]);
+          BSP_LCD_SetTextColor(_baseTex[_map[MAP_FLOOR][(int)fY * MAP_SIZE_X + (int)fX] - 1][fTextureY * TEXTURE_SIZE + fTextureX]);
           BSP_LCD_FillRect((rCount * RECT_Y), i, RECT_Y, RECT_Y);
 //          BSP_LCD_FillRect((rCount * FOV_RECT), SCREEN_HEIGHT - i - 1, FOV_RECT, FOV_RECT); // DRAW CEILING
         }
       }
     }
 
-    rZBuffer[rCount] = rLength;
+    _zBuffer[rCount] = rLength;
     rAngle--;
     if (rAngle < 0) { rAngle += ANG_RANGE; }
   }
@@ -409,9 +409,13 @@ int cast(void) {
 }
 
 int drawSprites(void) {
-//  for (uint32) {
-//
-//  }
+  float dX, dY;
+
+  for (int s = 0; s < 1; s++) {
+    if (_sprites[s].en) {
+//      dX = _sprites[s];
+    }
+  }
 
   return 0;
 }
