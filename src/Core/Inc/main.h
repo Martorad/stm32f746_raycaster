@@ -36,7 +36,11 @@ extern "C" {
 
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
-
+typedef struct {
+  float    x;   // X position
+  float    y;   // Y position
+  uint32_t tID; // Texture ID
+} sprite;
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
