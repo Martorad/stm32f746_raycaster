@@ -2,8 +2,8 @@
 #define __RC__CONFIG__H__
 
 // PERFORMANCE SETTINGS
-#define RES_5 // Vertical line resolution
-#define SBR_0 // Skybox resolution - 0 for 16px, 1 for 32px
+#define RES_MED // Vertical line resolution
+#define SBR_0   // Skybox resolution - 0 for 16px, 1 for 32px
 
 #define SHORTEST_LINE 5
 
@@ -23,46 +23,24 @@
 // INTERNAL CONFIGURATION DEFINES
 
 // RESOLUTION CONFIGURATION TABLES
-// FOV_RECT describes the width of each rectangle drawn on screen. Smaller width rectangles have higher fidelity, at the cost of speed. Odd width rectangles mean that symmetrical frames cannot be drawn.
-
-#ifdef  RES_1
-#define RAYS       30
-#define RECT_Y     16
-#define ANG_INCR  (2 * M_PI) / (360 * 0.5)
-#define ANG_RANGE (360 * 0.5)
-#endif
-
-#ifdef  RES_2
-#define RAYS       60
-#define RECT_Y     8
-#define ANG_INCR  (2 * M_PI) / (360 * 1)
-#define ANG_RANGE (360 * 1)
-#endif
-
-#ifdef  RES_3
-#define RAYS       120
-#define RECT_Y     4
-#define ANG_INCR  (2 * M_PI) / (360 * 2)
-#define ANG_RANGE (360 * 2)
-#endif
-
-#ifdef  RES_4
-#define RAYS       160
-#define RECT_Y     3
+// RECT_Y describes the width of each rectangle column drawn on screen. Smaller width rectangles have higher fidelity, at the cost of speed. Odd width rectangles mean that symmetrical frames cannot be drawn.
+#ifdef  RES_MIN
+#define RAYS      160
+#define RECT_Y    3
 #define ANG_INCR  (2 * M_PI) / (360 * 3)
 #define ANG_RANGE (360 * 3)
 #endif
 
-#ifdef  RES_5
-#define RAYS       240
-#define RECT_Y     2
+#ifdef  RES_MED
+#define RAYS      240
+#define RECT_Y    2
 #define ANG_INCR  (2 * M_PI) / (360 * 4)
 #define ANG_RANGE (360 * 4)
 #endif
 
-#ifdef  RES_6
-#define RAYS       480
-#define RECT_Y     1
+#ifdef  RES_MAX
+#define RAYS      480
+#define RECT_Y    1
 #define ANG_INCR  (2 * M_PI) / (360 * 8)
 #define ANG_RANGE (360 * 8)
 #endif
