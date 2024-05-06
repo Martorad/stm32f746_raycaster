@@ -352,13 +352,8 @@ int cast(void) {
           tY = tFirstLine;
           for (int i = tSkipLines; i < TEXTURE_SIZE - tSkipLines; i++) {
             BSP_LCD_SetTextColor(_baseTex[_map[MAP_WALLS][mY * MAP_SIZE_X + mX] - 1 + rHitSide][i * TEXTURE_SIZE + (int)(tX)]);
-            if (i != tSkipLines && i != TEXTURE_SIZE - tSkipLines - 1) {
-              BSP_LCD_FillRect((rCount * RECT_Y), tY, RECT_Y * 2, tYStep + 1);
-              tY += tYStep;
-            }
-            else {
-              BSP_LCD_FillRect((rCount * RECT_Y), (i == tSkipLines) ? 0 : tY, RECT_Y * 2, tFirstLine + 2);
-            }
+            if (i != tSkipLines && i != TEXTURE_SIZE - tSkipLines - 1) { BSP_LCD_FillRect((rCount * RECT_Y), tY, RECT_Y * 2, tYStep + 1); tY += tYStep; }
+            else { BSP_LCD_FillRect((rCount * RECT_Y), (i == tSkipLines) ? 0 : tY, RECT_Y * 2, tFirstLine + 2); }
           }
         }
       }
@@ -388,7 +383,6 @@ int cast(void) {
           int   fTextureX = (int)(TEXTURE_SIZE * fX) & (TEXTURE_SIZE - 1), fTextureY = (int)(TEXTURE_SIZE * fY) & (TEXTURE_SIZE - 1);
           BSP_LCD_SetTextColor(_baseTex[_map[MAP_FLOOR][(int)fY * MAP_SIZE_X + (int)fX] - 1][fTextureY * TEXTURE_SIZE + fTextureX]);
           BSP_LCD_FillRect((rCount * RECT_Y), i, RECT_Y, RECT_Y);
-//          BSP_LCD_FillRect((rCount * FOV_RECT), SCREEN_HEIGHT - i - 1, FOV_RECT, FOV_RECT); // DRAW CEILING
         }
       }
     }
