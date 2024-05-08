@@ -306,7 +306,7 @@ void PeriphCommonClock_Config(void)
 
 /* USER CODE BEGIN 4 */
 int cast(void) {
-  // Variable prefix convention: r = ray, m = map, p = performance, c = calculation, t = texture, sb = skybox, f = floor
+  // Variable prefix convention: r = ray, m = map, p = performance, t = texture, sb = skybox, f = floor
   unsigned int pStartTime = _sysElapsedTicks;
   int          rAngle;
 
@@ -347,7 +347,7 @@ int cast(void) {
     tLineHeight = SCREEN_HEIGHT / rLength * _fisheyeCosLUT[rCount] * LINE_VERTICAL_SCALE;
 
     if (tLineHeight > SHORTEST_LINE) {
-      float tX, tY = 0, tYStep = tLineHeight / TEXTURE_SIZE, tOffset = (tLineHeight - SCREEN_HEIGHT) * 0.5;
+      float tX, tY = 0, tYStep = tLineHeight / TEXTURE_SIZE, tOffset = (tLineHeight - SCREEN_HEIGHT) / 2;
 
       if (rHitSide) { tX = (1 - (rIntersectY - (int)rIntersectY)) * TEXTURE_SIZE; if (rAngle < ANG_RANGE / 4 || rAngle > (ANG_RANGE / 4) * 3) { tX = TEXTURE_SIZE - tX; }}
       else          { tX = (1 - (rIntersectX - (int)rIntersectX)) * TEXTURE_SIZE; if (rAngle < ANG_RANGE / 2)                                 { tX = TEXTURE_SIZE - tX; }}
