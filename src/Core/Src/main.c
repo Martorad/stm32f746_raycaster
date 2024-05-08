@@ -85,7 +85,7 @@ static volatile unsigned int _sysElapsedTicks = 0; // 10K frequency, 1 tick = 10
 
 // LEVELS
 static unsigned char _currentLevel = 0;
-level_typedef _levels[2] = {LEVEL_00, LEVEL_01};
+static level_typedef _levels[2] = {LEVEL_00, LEVEL_01};
 
 // PLAYER
 static float _pPosX, _pPosY, _pDeltaX, _pDeltaY, _pVelocityX = 0, _pVelocityY = 0;
