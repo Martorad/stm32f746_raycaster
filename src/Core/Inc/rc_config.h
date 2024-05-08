@@ -3,7 +3,7 @@
 
 // PERFORMANCE SETTINGS
 #define RES_MED // Vertical line resolution
-#define SHORTEST_LINE 0
+#define SHORTEST_LINE 5
 
 // AESTHETIC SETTINGS
 #define LINE_VERTICAL_SCALE 1.5
