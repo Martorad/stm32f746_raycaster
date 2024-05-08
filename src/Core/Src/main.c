@@ -80,18 +80,16 @@ void MX_USB_HOST_Process(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-// PLAYER
-static float _pPosX = 1.5, _pPosY = 8.0, _pDeltaX, _pDeltaY, _pVelocityX = 0, _pVelocityY = 0;
-static int   _pAngle = 0; // Angle in increments of FOV_INCR radians
-
 // SYSTEM
 static volatile unsigned int _sysElapsedTicks = 0; // 10K frequency, 1 tick = 100us = 0.1ms
 
 // LEVELS
 static unsigned char _currentLevel = 0;
-level_typedef _levels[1] = {
-  {LEVEL_01_X, LEVEL_01_Y, {LEVEL_01[MAP_WALLS], LEVEL_01[MAP_FLOOR]}}
-};
+level_typedef _levels[2] = {LEVEL_00, LEVEL_01};
+
+// PLAYER
+static float _pPosX, _pPosY, _pDeltaX, _pDeltaY, _pVelocityX = 0, _pVelocityY = 0;
+static int   _pAngle = 0; // Angle in increments of FOV_INCR radians
 
 // LOOKUP TABLES
 static float        _fisheyeCosLUT[RAYS], _sinLUT[ANG_RANGE], _cosLUT[ANG_RANGE], _fZLUT[SCREEN_HEIGHT / 2];
@@ -106,7 +104,8 @@ static unsigned int _sbLUT[ANG_RANGE];
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-
+  _pPosX = _levels[_currentLevel].startX;
+  _pPosY = _levels[_currentLevel].startY;
   /* USER CODE END 1 */
 /* Enable the CPU Cache */
 
@@ -192,8 +191,8 @@ int main(void)
       pageFlip();
       showFPS(cast());
 
-      _pDeltaX = _cosLUT[_pAngle] * P_ACCEL;
-      _pDeltaY = _sinLUT[_pAngle] * P_ACCEL;
+      _pDeltaX = _cosLUT[_pAngle] * _levels[_currentLevel].acceleration;
+      _pDeltaY = _sinLUT[_pAngle] * _levels[_currentLevel].acceleration;
 
       if (HAL_GPIO_ReadPin(ARDUINO_D4_GPIO_Port, ARDUINO_D4_Pin)) { // RIGHT
         _pAngle -= P_LOOK_SPEED;
@@ -215,8 +214,8 @@ int main(void)
       if (_levels[_currentLevel].map[MAP_WALLS][(int)_pPosY * _levels[_currentLevel].sizeX + (int)(_pPosX + ((_pVelocityX < 0) ? -P_HITBOX_SIZE : P_HITBOX_SIZE))] == 0) { _pPosX += _pVelocityX; }
       if (_levels[_currentLevel].map[MAP_WALLS][(int)(_pPosY + ((_pVelocityY < 0) ? -P_HITBOX_SIZE : P_HITBOX_SIZE)) * _levels[_currentLevel].sizeX + (int)_pPosX] == 0) { _pPosY += _pVelocityY; }
 
-      _pVelocityX *= (1 - P_FRICTION);
-      _pVelocityY *= (1 - P_FRICTION);
+      _pVelocityX *= (1 - _levels[_currentLevel].friction);
+      _pVelocityY *= (1 - _levels[_currentLevel].friction);
     }
   }
   /* USER CODE END 3 */
@@ -370,7 +369,7 @@ int cast(void) {
           // DRAW SKYBOX
           int sbY = 0, sbDrawLines = ((int)(tOffset / SKYBOX_TEXEL_Y) + 1) & (TEXTURE_SIZE - 1);
           for (int i = 0; i < sbDrawLines; i++) {
-            BSP_LCD_SetTextColor(_skyboxTex[_currentLevel][i * SKYBOX_SIZE_X + _sbLUT[rAngle]]);
+            BSP_LCD_SetTextColor(_skyboxTex[_levels[_currentLevel].skybox][i * SKYBOX_SIZE_X + _sbLUT[rAngle]]);
             BSP_LCD_FillRect((rCount * RECT_Y), sbY, RECT_Y * 2, SKYBOX_TEXEL_Y);
             sbY += SKYBOX_TEXEL_Y;
           }

@@ -3,8 +3,7 @@
 
 // PERFORMANCE SETTINGS
 #define RES_MED // Vertical line resolution
-
-#define SHORTEST_LINE 5
+#define SHORTEST_LINE 0
 
 // AESTHETIC SETTINGS
 #define LINE_VERTICAL_SCALE 1.5
@@ -12,8 +11,6 @@
 // MOVEMENT SETTINGS
 #define P_LOOK_SPEED  5    // Higher is faster
 #define P_HITBOX_SIZE 0.6  // In units of map squares
-#define P_ACCEL       0.01
-#define P_FRICTION    0.08
 
 // <------------------------ DO NOT TOUCH ------------------------>
 // RESOLUTION CONFIGURATION TABLES
