@@ -90,7 +90,7 @@ static volatile unsigned int _sysElapsedTicks = 0; // 10K frequency, 1 tick = 10
 // LEVELS
 static unsigned char _currentLevel = 0;
 level_typedef _levels[1] = {
-  {LEVEL_01_X, LEVEL_01_Y, {_level_01[MAP_WALLS], _level_01[MAP_FLOOR]}}
+  {LEVEL_01_X, LEVEL_01_Y, {LEVEL_01[MAP_WALLS], LEVEL_01[MAP_FLOOR]}}
 };
 
 // LOOKUP TABLES

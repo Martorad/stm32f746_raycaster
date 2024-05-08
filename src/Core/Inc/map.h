@@ -20,7 +20,7 @@ typedef struct __attribute__((aligned(4))) {
 // LEVELS
 #define LEVEL_01_X 48
 #define LEVEL_01_Y 16
-static const unsigned char _level_01[2][LEVEL_01_X * LEVEL_01_Y] =
+static const unsigned char LEVEL_01[2][LEVEL_01_X * LEVEL_01_Y] =
 {
   { // Walls
     5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,9,7,7,7,9,9,7,7,7,5,5,5,5,5,5,5,5,
