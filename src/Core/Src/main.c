@@ -41,6 +41,7 @@
 #include <float.h>
 #include <string.h>
 #include <math.h>
+#include <stdbool.h>
 #include "../../Drivers/BSP/STM32746G-Discovery/stm32746g_discovery_lcd.h"
 #include "rc_config.h"
 #include "map.h"
@@ -318,7 +319,8 @@ int cast(void) {
     // This uses David Ziemkiewicz' method of velocities and times, as well as Lodev's DDA. Massive thanks to both of these legends.
     float       rVelocityX = _cosLUT[rAngle], rVelocityY = _sinLUT[rAngle], rIntersectX = _pPosX, rIntersectY = _pPosY, rTimeX, rTimeY, rLength = 0;
     int         mX = (short)rIntersectX, mY = (short)rIntersectY; // Casting to short instead of int is faster for some unknown reason.
-    signed char rVelSignX = (rVelocityX > 0), rVelSignY = (rVelocityY > 0), rStepX = rVelSignX ? 1 : -1, rStepY = rVelSignY ? 1 : -1, rHitSide = 0;
+    _Bool       rVelSignX = (rVelocityX > 0), rVelSignY = (rVelocityY > 0);
+    signed char rStepX = rVelSignX ? 1 : -1, rStepY = rVelSignY ? 1 : -1, rHitSide = 0;
 
     for (int i = 0; i < _levels[_currentLevel].sizeX * _levels[_currentLevel].sizeY; i++) {
       if (_levels[_currentLevel].map[MAP_WALLS][mY * _levels[_currentLevel].sizeX + mX] > 0) { break; }
