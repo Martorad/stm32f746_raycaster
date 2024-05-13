@@ -316,7 +316,7 @@ int cast(void) {
 
   for (int rCount = 0; rCount < RAYS; rCount++) {
     // This uses David Ziemkiewicz' method of velocities and times, as well as Lodev's DDA. Massive thanks to both of these legends.
-    float       rVelocityX = _cosLUT[rAngle], rVelocityY = _sinLUT[rAngle], rIntersectX = _pPosX, rIntersectY = _pPosY, rTimeX, rTimeY, rLength = 0, tLineHeight;
+    float       rVelocityX = _cosLUT[rAngle], rVelocityY = _sinLUT[rAngle], rIntersectX = _pPosX, rIntersectY = _pPosY, rTimeX, rTimeY, rLength = 0;
     int         mX = (short)rIntersectX, mY = (short)rIntersectY; // Casting to short instead of int is faster for some unknown reason.
     signed char rVelSignX = (rVelocityX > 0), rVelSignY = (rVelocityY > 0), rStepX = rVelSignX ? 1 : -1, rStepY = rVelSignY ? 1 : -1, rHitSide = 0;
 
@@ -343,54 +343,58 @@ int cast(void) {
     }
 
     // RENDERING
-    tLineHeight = SCREEN_HEIGHT / rLength * _fisheyeCosLUT[rCount] * LINE_VERTICAL_SCALE;
+    float tLineHeight = SCREEN_HEIGHT / rLength * _fisheyeCosLUT[rCount] * LINE_VERTICAL_SCALE;
+    if (tLineHeight < SHORTEST_LINE) { tLineHeight = 0; }
 
-    if (tLineHeight > SHORTEST_LINE) {
-      float tX, tY = 0, tYStep = tLineHeight / TEXTURE_SIZE, tOffset = (tLineHeight - SCREEN_HEIGHT) / 2;
+    float tX, tY = 0, tYStep = tLineHeight / TEXTURE_SIZE, tOffset = (tLineHeight - SCREEN_HEIGHT) / 2;
+    if (rHitSide) { tX = (1 - (rIntersectY - (int)rIntersectY)) * TEXTURE_SIZE; if (rAngle < ANG_RANGE / 4 || rAngle > (ANG_RANGE / 4) * 3) { tX = TEXTURE_SIZE - tX; }}
+    else          { tX = (1 - (rIntersectX - (int)rIntersectX)) * TEXTURE_SIZE; if (rAngle < ANG_RANGE / 2)                                 { tX = TEXTURE_SIZE - tX; }}
 
-      if (rHitSide) { tX = (1 - (rIntersectY - (int)rIntersectY)) * TEXTURE_SIZE; if (rAngle < ANG_RANGE / 4 || rAngle > (ANG_RANGE / 4) * 3) { tX = TEXTURE_SIZE - tX; }}
-      else          { tX = (1 - (rIntersectX - (int)rIntersectX)) * TEXTURE_SIZE; if (rAngle < ANG_RANGE / 2)                                 { tX = TEXTURE_SIZE - tX; }}
-
-      if (tLineHeight > SCREEN_HEIGHT) { // Check if line fills up the screen, if it does, drawing the sky and floor is not necessary, so we just draw the wall
-        if (rCount % 2 == 0) {
-          int tSkipLines = tOffset / tYStep, tFirstLine = tYStep - (tOffset - tSkipLines * tYStep);
-          tY = tFirstLine;
-          for (int i = tSkipLines; i < TEXTURE_SIZE - tSkipLines; i++) {
-            BSP_LCD_SetTextColor(_baseTex[_levels[_currentLevel].map[MAP_WALLS][mY * _levels[_currentLevel].sizeX + mX] - 1 + rHitSide][i * TEXTURE_SIZE + (int)(tX)]);
-            if (i != tSkipLines && i != TEXTURE_SIZE - tSkipLines - 1) { BSP_LCD_FillRect((rCount * RECT_Y), tY, RECT_Y * 2, tYStep + 1); tY += tYStep; }
-            else { BSP_LCD_FillRect((rCount * RECT_Y), (i == tSkipLines) ? 0 : tY, RECT_Y * 2, tFirstLine + 2); }
-          }
+    if (tLineHeight > SCREEN_HEIGHT) { // Check if line fills up the screen, if it does, drawing the sky and floor is not necessary, so we just draw the wall
+      if (rCount % 2 == 0) {
+        int tSkipLines = tOffset / tYStep, tFirstLine = tYStep - (tOffset - tSkipLines * tYStep);
+        tY = tFirstLine;
+        for (int i = tSkipLines; i < TEXTURE_SIZE - tSkipLines; i++) {
+          BSP_LCD_SetTextColor(_baseTex[_levels[_currentLevel].map[MAP_WALLS][mY * _levels[_currentLevel].sizeX + mX] - 1 + rHitSide][i * TEXTURE_SIZE + (int)(tX)]);
+          if (i != tSkipLines && i != TEXTURE_SIZE - tSkipLines - 1) { BSP_LCD_FillRect((rCount * RECT_Y), tY, RECT_Y * 2, tYStep + 1); tY += tYStep; }
+          else { BSP_LCD_FillRect((rCount * RECT_Y), (i == tSkipLines) ? 0 : tY, RECT_Y * 2, tFirstLine + 2); }
         }
       }
-      else {
-        tOffset *= -1;
+    }
+    else {
+      tOffset *= -1;
 
-        if (rCount % 2 == 0) {
-          // DRAW SKYBOX
-          int sbY = 0, sbDrawLines = ((int)(tOffset / SKYBOX_TEXEL_Y) + 1) & (TEXTURE_SIZE - 1);
-          for (int i = 0; i < sbDrawLines; i++) {
-            BSP_LCD_SetTextColor(_skyboxTex[_levels[_currentLevel].skybox][i * SKYBOX_SIZE_X + _sbLUT[rAngle]]);
-            BSP_LCD_FillRect((rCount * RECT_Y), sbY, RECT_Y * 2, SKYBOX_TEXEL_Y);
-            sbY += SKYBOX_TEXEL_Y;
-          }
+      if (rCount % 2 == 0) {
+        int sbY = 0, sbDrawLines;
+        if (tLineHeight) { sbDrawLines = ((int)(tOffset / SKYBOX_TEXEL_Y) + 1) & (TEXTURE_SIZE - 1); }
+        else             { sbDrawLines = SKYBOX_SIZE_Y; }
 
-          // DRAW WALLS
+        // DRAW SKYBOX
+        for (int i = 0; i < sbDrawLines; i++) {
+          BSP_LCD_SetTextColor(_skyboxTex[_levels[_currentLevel].skybox][i * SKYBOX_SIZE_X + _sbLUT[rAngle]]);
+          BSP_LCD_FillRect((rCount * RECT_Y), sbY, RECT_Y * 2, SKYBOX_TEXEL_Y);
+          sbY += SKYBOX_TEXEL_Y;
+        }
+
+        // DRAW WALLS
+        if (tLineHeight) {
           for (int i = 0; i < TEXTURE_SIZE; i++) {
             BSP_LCD_SetTextColor(_baseTex[_levels[_currentLevel].map[MAP_WALLS][mY * _levels[_currentLevel].sizeX + mX] - 1 + rHitSide][i * TEXTURE_SIZE + (int)(tX)]);
             BSP_LCD_FillRect((rCount * RECT_Y), tOffset + tY, RECT_Y * 2, tYStep + 1);
             tY += tYStep;
           }
         }
+      }
 
-        // DRAW FLOOR
-        for (int i = tOffset + tLineHeight; i < SCREEN_HEIGHT; i += RECT_Y) {
-          float fZ = _fZLUT[i - SCREEN_HEIGHT / 2] * _fisheyeCosLUT[rCount], fX = _pPosX + rVelocityX * fZ, fY = _pPosY + rVelocityY * fZ;
-          int   fTextureX = (int)(TEXTURE_SIZE * fX) & (TEXTURE_SIZE - 1), fTextureY = (int)(TEXTURE_SIZE * fY) & (TEXTURE_SIZE - 1);
-          BSP_LCD_SetTextColor(_baseTex[_levels[_currentLevel].map[MAP_FLOOR][(int)fY * _levels[_currentLevel].sizeX + (int)fX] - 1][fTextureY * TEXTURE_SIZE + fTextureX]);
-          BSP_LCD_FillRect((rCount * RECT_Y), i, RECT_Y, RECT_Y);
-        }
+      // DRAW FLOOR
+      for (int i = tOffset + tLineHeight; i < SCREEN_HEIGHT; i += RECT_Y) {
+        float fZ = _fZLUT[i - SCREEN_HEIGHT / 2] * _fisheyeCosLUT[rCount], fX = _pPosX + rVelocityX * fZ, fY = _pPosY + rVelocityY * fZ;
+        int   fTextureX = (int)(TEXTURE_SIZE * fX) & (TEXTURE_SIZE - 1), fTextureY = (int)(TEXTURE_SIZE * fY) & (TEXTURE_SIZE - 1);
+        BSP_LCD_SetTextColor(_baseTex[_levels[_currentLevel].map[MAP_FLOOR][(int)fY * _levels[_currentLevel].sizeX + (int)fX] - 1][fTextureY * TEXTURE_SIZE + fTextureX]);
+        BSP_LCD_FillRect((rCount * RECT_Y), i, RECT_Y, RECT_Y);
       }
     }
+
     rAngle--;
     if (rAngle < 0) { rAngle += ANG_RANGE; }
   }
