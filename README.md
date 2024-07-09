@@ -13,3 +13,5 @@ This is a simple raycasting engine, designed on the STM32F746G-DISCO board. This
 - 288x16 skybox texturing
 - Fisheye-corrected wall projection, with collision detection
 - Fisheye-corrected floor projection
+- Realistic movement with acceleration and friction
+- Heavily modified library for ultra-fast DMA-accelerated drawing
