@@ -305,7 +305,7 @@ void PeriphCommonClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-int cast(void) {
+int __attribute__((section(".RamFunc"))) cast(void) {
   // Variable prefix convention: r = ray, m = map, p = performance, t = texture, sb = skybox, f = floor
   unsigned int pStartTime = _sysElapsedTicks;
   int          rAngle;
