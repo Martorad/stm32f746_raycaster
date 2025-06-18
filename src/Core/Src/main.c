@@ -18,16 +18,12 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "adc.h"
 #include "crc.h"
 #include "dcmi.h"
-#include "eth.h"
 #include "ltdc.h"
 #include "quadspi.h"
 #include "sai.h"
 #include "spdifrx.h"
-#include "usart.h"
-#include "usb_host.h"
 #include "gpio.h"
 #include "fmc.h"
 
@@ -70,8 +66,6 @@
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 void PeriphCommonClock_Config(void);
-void MX_USB_HOST_Process(void);
-
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -131,18 +125,13 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_ADC3_Init();
   MX_CRC_Init();
   MX_DCMI_Init();
-  MX_ETH_Init();
   MX_FMC_Init();
   MX_LTDC_Init();
   MX_QUADSPI_Init();
   MX_SAI2_Init();
   MX_SPDIFRX_Init();
-  MX_USART1_UART_Init();
-  MX_USART6_UART_Init();
-  MX_USB_HOST_Init();
   /* USER CODE BEGIN 2 */
   BSP_LCD_Init();
   BSP_LCD_LayerRgb565Init(LTDC_FOREGROUND, LCD_FB_START_ADDRESS);
@@ -168,7 +157,6 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-    MX_USB_HOST_Process();
 
     /* USER CODE BEGIN 3 */
     if (!HAL_GPIO_ReadPin(LCD_VSYNC_GPIO_Port, LCD_VSYNC_Pin)) {
@@ -271,8 +259,7 @@ void PeriphCommonClock_Config(void)
 
   /** Initializes the peripherals clock
   */
-  PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_LTDC|RCC_PERIPHCLK_SAI2
-                              |RCC_PERIPHCLK_CLK48;
+  PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_LTDC|RCC_PERIPHCLK_SAI2;
   PeriphClkInitStruct.PLLSAI.PLLSAIN = 309;
   PeriphClkInitStruct.PLLSAI.PLLSAIR = 4;
   PeriphClkInitStruct.PLLSAI.PLLSAIQ = 2;
