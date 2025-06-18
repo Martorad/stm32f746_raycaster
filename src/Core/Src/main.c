@@ -20,7 +20,6 @@
 #include "main.h"
 #include "ltdc.h"
 #include "quadspi.h"
-#include "spdifrx.h"
 #include "gpio.h"
 #include "fmc.h"
 
@@ -121,7 +120,6 @@ int main(void)
   MX_FMC_Init();
   MX_LTDC_Init();
   MX_QUADSPI_Init();
-  MX_SPDIFRX_Init();
   /* USER CODE BEGIN 2 */
   BSP_LCD_Init();
   BSP_LCD_LayerRgb565Init(LTDC_FOREGROUND, LCD_FB_START_ADDRESS);

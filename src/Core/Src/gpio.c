@@ -36,6 +36,7 @@
      PG14   ------> ETH_TXD1
      PB8   ------> I2C1_SCL
      PB5   ------> USB_OTG_HS_ULPI_D7
+     PD7   ------> SPDIFRX_IN0
      PC12   ------> SDMMC1_CK
      PA15   ------> S_TIM2_CH1_ETR
      PE5   ------> DCMI_D6
@@ -172,6 +173,14 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(ARDUINO_D3_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : PtPin */
+  GPIO_InitStruct.Pin = SPDIF_RX0_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  GPIO_InitStruct.Alternate = GPIO_AF8_SPDIFRX;
+  HAL_GPIO_Init(SPDIF_RX0_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : PCPin PCPin PCPin PC9
                            PC8 */
