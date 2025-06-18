@@ -137,9 +137,27 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_ADC3_Init();
+  MX_CRC_Init();
+  MX_DCMI_Init();
   MX_DMA2D_Init();
+  MX_ETH_Init();
+  MX_FMC_Init();
   MX_LTDC_Init();
   MX_QUADSPI_Init();
+  MX_RTC_Init();
+  MX_SAI2_Init();
+  MX_SPDIFRX_Init();
+  MX_TIM1_Init();
+  MX_TIM2_Init();
+  MX_TIM3_Init();
+  MX_TIM5_Init();
+  MX_TIM8_Init();
+  MX_TIM12_Init();
+  MX_USART1_UART_Init();
+  MX_USART6_UART_Init();
+  MX_USB_HOST_Init();
+  MX_TIM7_Init();
   /* USER CODE BEGIN 2 */
   BSP_LCD_Init();
   BSP_LCD_LayerRgb565Init(LTDC_FOREGROUND, LCD_FB_START_ADDRESS);
@@ -158,6 +176,8 @@ int main(void)
     _sbLUT[i]  =  (int)(SKYBOX_SIZE_X - (i + 1) * ANG_INCR * SKYBOX_SCALE_F);
   }
   for (int i = SCREEN_HEIGHT / 2; i < SCREEN_HEIGHT; i++) { _fZLUT[i - SCREEN_HEIGHT / 2] = (SCREEN_HEIGHT / 2 / (float)(i - SCREEN_HEIGHT / 2 + 1)) * LINE_VERTICAL_SCALE; }
+
+  HAL_TIM_Base_Start_IT(&htim7);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -165,6 +185,7 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
+    MX_USB_HOST_Process();
 
     /* USER CODE BEGIN 3 */
     if (!HAL_GPIO_ReadPin(LCD_VSYNC_GPIO_Port, LCD_VSYNC_Pin)) {
@@ -286,7 +307,7 @@ void PeriphCommonClock_Config(void)
 /* USER CODE BEGIN 4 */
 int __attribute__((section(".RamFunc"))) cast(void) {
   // Variable prefix convention: r = ray, m = map, p = performance, t = texture, sb = skybox, f = floor
-  unsigned int pStartTime = HAL_GetTick();
+  unsigned int pStartTime = _sysElapsedTicks;
   int          rAngle;
 
   BSP_LCD_SelectLayer(LTDC_BACKGROUND);
@@ -380,7 +401,7 @@ int __attribute__((section(".RamFunc"))) cast(void) {
     if (rAngle < 0) { rAngle += ANG_RANGE; }
   }
 
-  return HAL_GetTick() - pStartTime;
+  return _sysElapsedTicks - pStartTime;
 }
 
 void pageFlip(void) {
@@ -391,8 +412,8 @@ void pageFlip(void) {
 
 void showFPS(unsigned int frameTime) {
   unsigned char frameTimeS[16], frameRateS[10];
-  sprintf((char*)frameTimeS, "%02i.%ims", frameTime, frameTime % 10);
-  sprintf((char*)frameRateS, "%03ifps", 1000 / frameTime);
+  sprintf((char*)frameTimeS, "%02i.%ims", frameTime / 10, frameTime % 10);
+  sprintf((char*)frameRateS, "%03ifps", 10000 / frameTime);
   BSP_LCD_SetTextColor(0x001F);
   BSP_LCD_DisplayStringAt(0,  0, frameTimeS, LEFT_MODE);
   BSP_LCD_DisplayStringAt(0, 12, frameRateS, LEFT_MODE);
@@ -416,7 +437,9 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     HAL_IncTick();
   }
   /* USER CODE BEGIN Callback 1 */
-
+  if (htim->Instance == TIM7) {
+    _sysElapsedTicks++;
+  }
   /* USER CODE END Callback 1 */
 }
 
