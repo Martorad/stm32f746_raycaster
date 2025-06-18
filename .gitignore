@@ -9,4 +9,4 @@ tools/*.txt
 ~$*.docx
 desktop.ini
 .project
-
+src/Release
