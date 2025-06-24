@@ -132,11 +132,6 @@ SECTIONS
   _sidata = LOADADDR(.data);
 
   /* Initialized data sections into "RAM" Ram type memory */
-  .sprites (NOLOAD) :
-  {
-    *(.sprites)
-  } >RAM
-
   .data :
   {
     . = ALIGN(4);
@@ -145,11 +140,12 @@ SECTIONS
     *(.data*)          /* .data* sections */
     *(.RamFunc)        /* .RamFunc sections */
     *(.RamFunc*)       /* .RamFunc* sections */
+    *(.sprites)
 
     . = ALIGN(4);
     _edata = .;        /* define a global symbol at data end */
 
-  } >RAM AT> FLASH
+  } >RAM AT> FLASH  
 
   /* Uninitialized data section into "RAM" Ram type memory */
   . = ALIGN(4);
